@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ToggleView">
+<!--        <attr name="toggleBackgroundColor" format="color" />-->
+        <attr name="toggleColor" format="color" />
+<!--        <attr name="borderColor" format="color" />-->
+        <attr name="checkedColor" format="color" />
+        <attr name="unCheckedColor" format="color" />
+        <attr name="checked" format="boolean" />
+        <attr name="borderWidth" format="dimension"/>
+    </declare-styleable>
+</resources>
