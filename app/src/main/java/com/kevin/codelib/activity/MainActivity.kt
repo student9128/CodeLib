@@ -12,5 +12,8 @@ class MainActivity : BaseActivity() {
         btn_custom_view.setOnClickListener {
             startNewActivity(CustomViewActivity::class.java)
         }
+        btn_share_anim.setOnClickListener {
+            startNewActivity(ShareActivity::class.java)
+        }
     }
 }

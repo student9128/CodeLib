@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CodeLib</string>
+    <string name="share_anim">share_anim</string>
 </resources>
