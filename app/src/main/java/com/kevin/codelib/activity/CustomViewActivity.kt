@@ -1,6 +1,6 @@
-package com.kevin.codelib
+package com.kevin.codelib.activity
 
-import android.os.Bundle
+import com.kevin.codelib.R
 import com.kevin.codelib.base.BaseActivity
 import com.kevin.codelib.customviewshow.ToggleViewActivity
 import kotlinx.android.synthetic.main.activity_custom_view.*
@@ -12,10 +12,15 @@ import kotlinx.android.synthetic.main.activity_custom_view.*
  * Describe:<br/>
  */
 class CustomViewActivity : BaseActivity() {
-    override fun getLayoutResID(): Int = R.layout.activity_custom_view
+    override fun getLayoutResID(): Int =
+        R.layout.activity_custom_view
 
     override fun initView() {
         btn_toggle_view.setOnClickListener { startNewActivity(ToggleViewActivity::class.java) }
+
+        btn_custom_view_regularHexagon.setOnClickListener {
+            startNewActivity(RegularHexagonActivity::class.java)
+        }
     }
 
 }

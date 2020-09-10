@@ -7,7 +7,7 @@
     app:alignItems="flex_start"
     app:flexWrap="wrap"
     app:justifyContent="flex_start"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
 
     <com.kevin.codelib.customview.ToggleView
