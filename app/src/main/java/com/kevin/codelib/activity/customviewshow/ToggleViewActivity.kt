@@ -1,4 +1,4 @@
-package com.kevin.codelib.customviewshow
+package com.kevin.codelib.activity.customviewshow
 
 import com.kevin.codelib.R
 import com.kevin.codelib.base.BaseActivity

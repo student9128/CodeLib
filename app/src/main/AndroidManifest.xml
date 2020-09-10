@@ -18,10 +18,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.CustomViewActivity"/>
-        <activity android:name=".customviewshow.ToggleViewActivity"/>
+        <activity android:name="com.kevin.codelib.activity.customviewshow.ToggleViewActivity"/>
 
         <activity
-            android:name=".activity.RegularHexagonActivity"
+            android:name="com.kevin.codelib.activity.customviewshow.RegularHexagonActivity"
             android:launchMode="singleTask" />
     </application>
 

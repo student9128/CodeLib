@@ -2,7 +2,8 @@ package com.kevin.codelib.activity
 
 import com.kevin.codelib.R
 import com.kevin.codelib.base.BaseActivity
-import com.kevin.codelib.customviewshow.ToggleViewActivity
+import com.kevin.codelib.activity.customviewshow.RegularHexagonActivity
+import com.kevin.codelib.activity.customviewshow.ToggleViewActivity
 import kotlinx.android.synthetic.main.activity_custom_view.*
 
 /**

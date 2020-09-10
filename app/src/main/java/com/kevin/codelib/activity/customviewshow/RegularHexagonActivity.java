@@ -1,4 +1,4 @@
-package com.kevin.codelib.activity;
+package com.kevin.codelib.activity.customviewshow;
 
 import android.widget.SeekBar;
 
