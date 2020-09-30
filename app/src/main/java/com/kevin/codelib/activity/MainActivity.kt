@@ -9,6 +9,7 @@ class MainActivity : BaseActivity() {
     override fun getLayoutResID(): Int = R.layout.activity_main
 
     override fun initView() {
+        supportActionBar!!.setDisplayHomeAsUpEnabled(false)
         btn_custom_view.setOnClickListener {
             startNewActivity(CustomViewActivity::class.java)
         }

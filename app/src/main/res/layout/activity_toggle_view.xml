@@ -8,8 +8,11 @@
     app:flexWrap="wrap"
     app:justifyContent="flex_start"
     tools:context=".activity.MainActivity">
-
-
+    <include
+        layout="@layout/layout_tool_bar"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <com.kevin.codelib.customview.ToggleView
         android:id="@+id/tv"
         android:layout_width="50dp"

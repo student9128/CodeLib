@@ -3,6 +3,7 @@ package com.kevin.codelib.activity
 import com.bumptech.glide.Glide
 import com.kevin.codelib.R
 import com.kevin.codelib.base.BaseActivity
+import com.kevin.codelib.util.AppUtils
 import kotlinx.android.synthetic.main.activity_image.*
 import java.io.File
 
@@ -15,6 +16,7 @@ class ImageActivity : BaseActivity() {
     }
 
     override fun initView() {
+        AppUtils.changeStatusBar(this,android.R.color.black)
         var filePath = intent.getStringExtra("filePath")
         var file: File = File(filePath)
         Glide.with(this).load(file).into(imageView)

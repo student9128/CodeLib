@@ -4,7 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="80dp">
-
+    <include
+        layout="@layout/layout_tool_bar"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
     <com.kevin.codelib.customview.RegularHexagon
         android:id="@+id/viewRegularHexagon"
         android:layout_width="300dp"
@@ -15,7 +19,7 @@
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolBar"
         app:progress="50"
         app:text="男"
         app:textSize="80dp" />
