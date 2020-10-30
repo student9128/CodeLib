@@ -5,6 +5,7 @@ import android.widget.SeekBar;
 import com.kevin.codelib.R;
 import com.kevin.codelib.base.BaseActivity;
 import com.kevin.codelib.customview.RegularHexagon;
+import com.kevin.codelib.customview.ReverseProgressBar;
 
 /**
  * auther：lkt
@@ -14,6 +15,7 @@ import com.kevin.codelib.customview.RegularHexagon;
 public class RegularHexagonActivity extends BaseActivity {
 
     private RegularHexagon viewRegularHexagon;
+    private ReverseProgressBar reverseProgress;
 
     @Override
     public int getLayoutResID() {
@@ -23,11 +25,13 @@ public class RegularHexagonActivity extends BaseActivity {
     @Override
     public void initView() {
         viewRegularHexagon = findViewById(R.id.viewRegularHexagon);
+        reverseProgress = findViewById(R.id.reverseProgress);
         SeekBar seekBar = findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 viewRegularHexagon.setProgress(progress);
+                reverseProgress.setProgress(progress);
             }
 
             @Override

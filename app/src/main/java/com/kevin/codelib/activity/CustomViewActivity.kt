@@ -22,6 +22,9 @@ class CustomViewActivity : BaseActivity() {
         btn_custom_view_regularHexagon.setOnClickListener {
             startNewActivity(RegularHexagonActivity::class.java)
         }
+        btnReverseProgress.setOnClickListener {
+            startNewActivity(RegularHexagonActivity::class.java)
+        }
     }
 
 }

@@ -5,6 +5,20 @@
     android:layout_height="match_parent"
     android:paddingBottom="80dp">
 
+    <com.kevin.codelib.customview.ReverseProgressBar
+        android:id="@+id/reverseProgress"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:progressBgColor="#00ff00"
+        app:progressBgTextColor="@color/FF514D50"
+        app:progressScColor="#ff0000"
+        app:progressScTextColor="@color/white"
+        app:progressX="50"
+        app:contentTextSize="12dp"
+        app:radiusX="12dp" />
+
     <com.kevin.codelib.customview.RegularHexagon
         android:id="@+id/viewRegularHexagon"
         android:layout_width="300dp"

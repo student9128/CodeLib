@@ -18,4 +18,21 @@
         <attr name="checked" format="boolean" />
         <attr name="borderWidth" format="dimension" />
     </declare-styleable>
+
+    <declare-styleable name="ReverseProgressBar">
+        <!--第一层背景颜色-->
+        <attr name="progressBgColor" format="color" />
+        <!--第一层文字颜色-->
+        <attr name="progressBgTextColor" format="color" />
+        <!--第二层背景颜色-->
+        <attr name="progressScColor" format="color" />
+        <!--第二层文字颜色-->
+        <attr name="progressScTextColor" format="color" />
+        <!--进度-->
+        <attr name="progressX" format="float" />
+        <!--圆角半径-->
+        <attr name="radiusX" format="dimension" />
+        <!--字体大小-->
+        <attr name="contentTextSize" format="dimension" />
+    </declare-styleable>
 </resources>
