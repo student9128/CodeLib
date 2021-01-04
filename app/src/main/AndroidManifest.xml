@@ -33,6 +33,8 @@
         <activity
             android:name=".activity.ImageActivity"
             android:launchMode="singleTask" />
+        <activity android:name=".activity.FunctionActivity"/>
+        <activity android:name=".activity.AppSignMD5Activity"/>
     </application>
 
 </manifest>

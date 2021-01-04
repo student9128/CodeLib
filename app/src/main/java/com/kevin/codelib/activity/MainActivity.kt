@@ -16,5 +16,8 @@ class MainActivity : BaseActivity() {
         btn_share_anim.setOnClickListener {
             startNewActivity(ShareActivity::class.java)
         }
+        btn_function.setOnClickListener {
+            startNewActivity(FunctionActivity::class.java)
+        }
     }
 }

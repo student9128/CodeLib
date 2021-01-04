@@ -14,7 +14,7 @@ import com.kevin.codelib.R;
 
 
 /**
- * auther：lkt
+ * author：lkt
  * 时间：2020/8/20 10:18
  * 功能：
  */

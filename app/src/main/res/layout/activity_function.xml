@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activity.MainActivity">
+    android:layout_height="match_parent">
 
     <include
         layout="@layout/layout_tool_bar"
@@ -30,22 +28,16 @@
                 app:flexWrap="wrap">
 
                 <Button
-                    android:id="@+id/btn_custom_view"
+                    android:id="@+id/btn_go_market"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="自定义控件" />
+                    android:text="跳转应用市场" />
 
                 <Button
-                    android:id="@+id/btn_share_anim"
+                    android:id="@+id/btn_get_app_sign_md5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="共享动画" />
-
-                <Button
-                    android:id="@+id/btn_function"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="常用功能" />
+                    android:text="获取App的MD5签名" />
 
             </com.google.android.flexbox.FlexboxLayout>
 

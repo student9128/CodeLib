@@ -35,4 +35,8 @@
         <!--字体大小-->
         <attr name="contentTextSize" format="dimension" />
     </declare-styleable>
+    <declare-styleable name="ProgressTextView">
+        <attr name="backgroundTextColor" format="color"/>
+        <attr name="foregroundTextColor" format="color"/>
+    </declare-styleable>
 </resources>

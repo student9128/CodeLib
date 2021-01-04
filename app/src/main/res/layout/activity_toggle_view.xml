@@ -56,5 +56,10 @@
         app:checked="true"
         app:checkedColor="#21bf73" />
 
-
+<com.kevin.codelib.customview.MyTextView
+    android:layout_width="100dp"
+    android:layout_height="50dp"
+    android:textColor="@color/colorPrimary"
+    android:textSize="25sp"
+    android:text="Hello"/>
 </com.google.android.flexbox.FlexboxLayout>

@@ -19,7 +19,7 @@ import com.kevin.codelib.util.DensityUtil;
 import java.text.DecimalFormat;
 
 /**
- * auther：lkt
+ * author：lkt
  * 时间：2020/10/29 9:25
  * 功能：字体颜色反转进度条
  */
