@@ -39,6 +39,7 @@
 
     <TextView
         android:id="@+id/tvSignMD5"
+        android:textIsSelectable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/colorAccent"

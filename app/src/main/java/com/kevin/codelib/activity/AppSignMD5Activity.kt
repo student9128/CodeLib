@@ -1,5 +1,8 @@
 package com.kevin.codelib.activity
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.text.TextUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.kevin.codelib.R
@@ -38,6 +41,19 @@ class AppSignMD5Activity : BaseActivity() {
                 }
             }
 
+        }
+        btn_copy.setOnClickListener {
+            copy()
+        }
+    }
+
+    private fun copy() {
+        if (TextUtils.isEmpty(tvSignMD5.text)) {
+            ToastUtils.showShort("没有签名内容，无法复制")
+        }else{
+            val cm: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val newPlainText = ClipData.newPlainText("label", tvSignMD5.text)
+            cm.setPrimaryClip(newPlainText)
         }
     }
 }
