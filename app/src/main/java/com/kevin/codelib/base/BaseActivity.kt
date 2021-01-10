@@ -30,8 +30,9 @@ abstract class BaseActivity : AppBaseActivity() {
     fun startNewActivity(clazz: Class<*>) {
         startActivity(Intent(this, clazz))
     }
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item!!.itemId) {
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             android.R.id.home -> onBackPressed()
         }
         return true
