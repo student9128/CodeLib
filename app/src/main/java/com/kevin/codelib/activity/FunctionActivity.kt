@@ -46,6 +46,9 @@ class FunctionActivity:BaseActivity() {
         btn_get_app_sign_md5.setOnClickListener {
            startNewActivity(AppSignMD5Activity::class.java )
         }
+        btn_get_imei.setOnClickListener {
+            startNewActivity(PhoneIMEIActivity::class.java)
+        }
     }
     private fun hasAnyMarketInstalled(context: Context): Boolean {
         val intent = Intent()

@@ -41,5 +41,5 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.4.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.4.0'
 
-    implementation 'com.hjq:xxpermissions:9.6'
+    api 'com.hjq:xxpermissions:9.6'
 }

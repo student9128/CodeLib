@@ -39,6 +39,12 @@
                     android:layout_height="wrap_content"
                     android:text="获取App的MD5签名" />
 
+                <Button
+                    android:id="@+id/btn_get_imei"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="获取手机IMEI" />
+
             </com.google.android.flexbox.FlexboxLayout>
 
         </LinearLayout>

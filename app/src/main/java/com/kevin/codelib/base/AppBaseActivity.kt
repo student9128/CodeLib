@@ -11,7 +11,7 @@ import com.kevin.codelib.util.LogUtils
  * Describe:<br/>
  */
 open class AppBaseActivity : AppCompatActivity() {
-    var TAG = javaClass.simpleName
+    open var TAG = javaClass.simpleName
 
     fun printD(msg: String) {
         LogUtils.log(Log.DEBUG, "$TAG=>", msg)
