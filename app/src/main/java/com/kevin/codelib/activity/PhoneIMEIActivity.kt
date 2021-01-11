@@ -37,16 +37,16 @@ class PhoneIMEIActivity : BaseActivity() {
                         list: List<String>,
                         all: Boolean
                     ) {
-                        if (Build.VERSION.SDK_INT < 30) {
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                             val imei = getIMEI(this@PhoneIMEIActivity)
-                            tv_imei.text="IMEI是 $imei"
+                            tv_imei.text = "IMEI是 $imei"
                         } else {
                             val string =
                                 Settings.System.getString(
                                     this@PhoneIMEIActivity.contentResolver,
                                     Settings.Secure.ANDROID_ID
                                 )
-                            tv_imei.text="Android ID替代的imei是 $string"
+                            tv_imei.text = "Android ID替代的imei是 $string"
                             LogUtils.d("string=$string")
                         }
                     }
