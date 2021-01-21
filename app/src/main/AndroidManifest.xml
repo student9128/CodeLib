@@ -38,6 +38,8 @@
         <activity android:name=".activity.FunctionActivity" />
         <activity android:name=".activity.AppSignMD5Activity" />
         <activity android:name=".activity.PhoneIMEIActivity" />
+        <activity android:name=".activity.PhotoActivity"/>
+        <activity android:name=".activity.AlbumPreviewActivity"/>
     </application>
 
 </manifest>
