@@ -22,16 +22,17 @@ import kotlinx.android.synthetic.main.activity_album_preview.*
  * Describe:<br/>
  */
 class AlbumPreviewActivity : BaseActivity() {
-    var showStatusBarAndNavBar = false
+    var showStatusBarAndNavBar = true
     override fun getLayoutResID(): Int {
         return R.layout.activity_album_preview
     }
 
     override fun initView() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.hide(WindowInsets.Type.statusBars())
+//            window.insetsController?.hide(WindowInsets.Type.statusBars())
         } else {
-           hideStatusBarAndNavBar()
+//           hideStatusBarAndNavBar()
+            showStatusBarAndNavBar()
         }
         val albumPath = intent.getStringExtra("albumPath")
         Glide.with(this)
@@ -48,8 +49,6 @@ class AlbumPreviewActivity : BaseActivity() {
     }
 
     fun hideStatusBarAndNavBar() {
-        printD("Hide======")
-        ToastUtils.showShort("Hide")
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -64,8 +63,6 @@ class AlbumPreviewActivity : BaseActivity() {
     }
 
     fun showStatusBarAndNavBar() {
-        ToastUtils.showShort("Show")
-        printD("Show======")
         window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
         window.statusBarColor = Color.TRANSPARENT

@@ -12,6 +12,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.kevin.codelib.R
 import com.kevin.codelib.bean.AlbumData
 import com.kevin.codelib.interfaces.ItemClickLisenter
+import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
 import com.kevin.codelib.util.DisplayUtils
 import kotlinx.android.synthetic.main.adapter_album.view.*
 
@@ -24,14 +25,20 @@ import kotlinx.android.synthetic.main.adapter_album.view.*
 class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
     RecyclerView.Adapter<AlbumAdapter.AlbumHolder>() {
     val screenWidth = DisplayUtils.getScreenWidth(mContext)
-    val width=(screenWidth-30)/4
+    val width = (screenWidth - 30) / 4
+
+    fun refreshData(d: MutableList<AlbumData>) {
+        data = d
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.adapter_album, parent, false)
         val layoutParams = view.ivImageView.layoutParams
-        layoutParams.width=width
-        layoutParams.height=width
-        view.ivImageView.layoutParams=layoutParams
+        layoutParams.width = width
+        layoutParams.height = width
+        view.ivImageView.layoutParams = layoutParams
         return AlbumHolder(view)
 
     }
@@ -46,7 +53,7 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
             .load(data[position].path)
             .into(holder.imageView)
         holder.imageView.setOnClickListener {
-            listener?.onItemClick(position, it)
+            listener?.onItemClick(position, it, "albumData")
         }
     }
 
@@ -59,8 +66,8 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
 
     }
 
-    private var listener: ItemClickLisenter? = null
-    fun setOnItemClickListener(l: ItemClickLisenter) {
+    private var listener: OnRecyclerItemClickListener? = null
+    fun setOnItemClickListener(l: OnRecyclerItemClickListener) {
         listener = l
     }
 }
