@@ -178,5 +178,6 @@ class AppUtils {
                 "navigationbar_is_min"
             }
         }
+
     }
 }

@@ -17,6 +17,7 @@ import androidx.annotation.RequiresApi
  */
 object AlbumConstant {
     private const val AND = " AND "
+    private const val OR = " OR "
     private const val MEDIA_TYPE = "${MediaStore.Files.FileColumns.MEDIA_TYPE}=?"
     private const val VALID_SIZE = "${MediaStore.MediaColumns.SIZE}>0"
     private const val MIME_TYPE = MediaStore.MediaColumns.MIME_TYPE
@@ -27,22 +28,24 @@ object AlbumConstant {
     /**
      * 所有的媒体文件
      */
-    const val SELECTION = MEDIA_TYPE + AND + VALID_SIZE
+    const val SELECTION = MEDIA_TYPE +OR+ MEDIA_TYPE + AND + VALID_SIZE
+
+    const val SELECTION_IMAGE_OR_VIDEO = MEDIA_TYPE + AND + VALID_SIZE
 
     /**
      * 没有GIF的图片
      */
     const val SELECTION_IMAGE_NO_GIF =
         MediaStore.Files.FileColumns.MEDIA_TYPE + "=?" +
-                " AND " + MediaStore.MediaColumns.SIZE + ">0" +
-                "AND" + MediaStore.MediaColumns.MIME_TYPE + "!=image/gif"
+                AND + MediaStore.MediaColumns.SIZE + ">0" +
+                AND + MediaStore.MediaColumns.MIME_TYPE + "!='image/gif'"
 
     /**
      * 只含有GIF
      */
     const val SELECTION_IMAGE_ONLY_GIF = MediaStore.Files.FileColumns.MEDIA_TYPE + "=?" +
             " AND " + MediaStore.MediaColumns.SIZE + ">0" +
-            "AND" + MediaStore.MediaColumns.MIME_TYPE + "=image/gif"
+            " AND " + MediaStore.MediaColumns.MIME_TYPE + "='image/gif'"
 
     /**
      * 视频长度有下限值
@@ -72,13 +75,18 @@ object AlbumConstant {
     const val SELECTION_IMAGE_WITH_DISPLAY_NAME = "${MediaStore.Files.FileColumns.MEDIA_TYPE}=? " +
             "AND ${MediaStore.MediaColumns.SIZE}>0 " +
             "AND ${MediaStore.MediaColumns.BUCKET_DISPLAY_NAME}=?"
+    const val SELECTION_ONLY_GIF_WITH_DISPLAY_NAME =
+        "${MediaStore.Files.FileColumns.MEDIA_TYPE}=? " +
+                "AND ${MediaStore.MediaColumns.SIZE}>0 " +
+                "AND ${MediaStore.MediaColumns.MIME_TYPE}='image/gif' " +
+                "AND ${MediaStore.MediaColumns.BUCKET_DISPLAY_NAME}=?"
 
     const val SELECTION_DISPLAY_NAME = ("(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? " +
             "OR ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?)"
             + " AND " + MediaStore.MediaColumns.SIZE + ">0"
             + ") GROUP BY (bucket_display_name")
 
-//    @RequiresApi(Build.VERSION_CODES.Q)
+    //    @RequiresApi(Build.VERSION_CODES.Q)
     const val SELECTION_DISPLAY_NAME_Q = ("(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? " +
             "OR ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?)"
             + " AND " + MediaStore.MediaColumns.SIZE + ">0")
