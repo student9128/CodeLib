@@ -5,6 +5,7 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="lightBlue">#7EAAFF</color>
     <color name="colorPrimaryAlpha">#807EAAFF</color>
+    <color name="alphaBlack">#cc000000</color>
     <color name="gray">#cccccc</color>
     <color name="dimBackground">#B3000000</color>
     <color name="FF514D50">#FF514D50</color>

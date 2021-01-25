@@ -5,10 +5,16 @@ import android.os.Build
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
+import android.widget.MediaController
+import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestOptions
 import com.kevin.codelib.R
 import com.kevin.codelib.base.BaseActivity
+import com.kevin.codelib.util.AlbumUtils
+import com.kevin.codelib.util.AppUtils
 import com.kevin.codelib.util.LogUtils
 import kotlinx.android.synthetic.main.activity_album_preview.*
 
@@ -28,24 +34,47 @@ class AlbumPreviewActivity : BaseActivity() {
     }
 
     override fun initView() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            window.insetsController?.hide(WindowInsets.Type.statusBars())
-        } else {
-//           hideStatusBarAndNavBar()
-            showStatusBarAndNavBar()
-        }
+        val mimeType = intent.getStringExtra("mimeType")
         val albumPath = intent.getStringExtra("albumPath")
-        Glide.with(this)
-            .load(albumPath)
-            .into(ivImageViewPreview)
-        llBack.setOnClickListener { onBackPressed() }
-        clContainer.setOnClickListener {
-            if (showStatusBarAndNavBar) {
-                hideStatusBarAndNavBar()
+        printD("albumPath=$albumPath,mimeType=$mimeType")
+        if (AlbumUtils.isVideo(mimeType!!)) {
+            hideStatusBarAndNavBar()
+            ivImageViewPreview.visibility = View.GONE
+            videoViewPreview.visibility = View.VISIBLE
+            videoViewPreview.setVideoPath(albumPath)
+            val mediaController = MediaController(this)
+            videoViewPreview.setMediaController(mediaController)
+            videoViewPreview.start()
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            window.insetsController?.hide(WindowInsets.Type.statusBars())
             } else {
+//           hideStatusBarAndNavBar()
                 showStatusBarAndNavBar()
             }
+            ivImageViewPreview.visibility = View.VISIBLE
+            videoViewPreview.visibility = View.GONE
+            Glide.with(this)
+                .applyDefaultRequestOptions(RequestOptions().skipMemoryCache(false)
+                    .error(R.drawable.ic_image_error)
+                    .placeholder(R.drawable.ic_image_placehodler))
+                .load(albumPath)
+                .into(ivImageViewPreview)
+//            if (AlbumUtils.isGif(mimeType)) {
+//                var gif: GifDrawable = ivImageViewPreview.drawable as GifDrawable
+//                gif.start()
+//
+//            }
+            clContainer.setOnClickListener {
+                if (showStatusBarAndNavBar) {
+                    hideStatusBarAndNavBar()
+                } else {
+                    showStatusBarAndNavBar()
+                }
+            }
         }
+//        llContainer.setBackgroundColor(AppUtils.addAlphaForColor(0.5f,ContextCompat.getColor(this,R.color.colorAccent)))
+        llBack.setOnClickListener { onBackPressed() }
     }
 
     fun hideStatusBarAndNavBar() {
@@ -68,5 +97,14 @@ class AlbumPreviewActivity : BaseActivity() {
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
         showStatusBarAndNavBar = true
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (videoViewPreview.isPlaying) {
+            videoViewPreview.stopPlayback()
+            videoViewPreview.suspend()
+        }
     }
 }

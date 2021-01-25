@@ -13,7 +13,9 @@ import com.kevin.codelib.R
 import com.kevin.codelib.bean.AlbumData
 import com.kevin.codelib.interfaces.ItemClickLisenter
 import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
+import com.kevin.codelib.util.AlbumUtils
 import com.kevin.codelib.util.DisplayUtils
+import kotlinx.android.synthetic.main.activity_toggle_view.view.*
 import kotlinx.android.synthetic.main.adapter_album.view.*
 
 /**
@@ -44,13 +46,17 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
     }
 
     override fun onBindViewHolder(holder: AlbumHolder, position: Int) {
+        val albumData = data[position]
+        if (AlbumUtils.isVideo(albumData.mimeType)) {
+            holder.tvDuration.text=AlbumUtils.parseTime(albumData.duration)
+        }
         Glide.with(mContext)
             .applyDefaultRequestOptions(
                 RequestOptions().skipMemoryCache(false)
-                    .error(R.mipmap.ic_launcher)
-                    .placeholder(R.mipmap.ic_launcher)
+                    .error(R.drawable.ic_image_error)
+                    .placeholder(R.drawable.ic_image_placehodler)
             )
-            .load(data[position].path)
+            .load(albumData.path)
             .into(holder.imageView)
         holder.imageView.setOnClickListener {
             listener?.onItemClick(position, it, "albumData")
@@ -63,6 +69,7 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
 
     class AlbumHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var imageView = itemView.ivImageView!!
+        var tvDuration=itemView.tv_duration
 
     }
 

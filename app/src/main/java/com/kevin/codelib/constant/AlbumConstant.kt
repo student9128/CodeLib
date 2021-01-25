@@ -3,6 +3,7 @@ package com.kevin.codelib.constant
 import android.os.Build
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
+import com.kevin.codelib.util.AlbumUtils
 
 /**
  * Created by Kevin on 2021/1/20<br/>
@@ -28,7 +29,7 @@ object AlbumConstant {
     /**
      * 所有的媒体文件
      */
-    const val SELECTION = MEDIA_TYPE +OR+ MEDIA_TYPE + AND + VALID_SIZE
+    const val SELECTION = MEDIA_TYPE + OR + MEDIA_TYPE + AND + VALID_SIZE
 
     const val SELECTION_IMAGE_OR_VIDEO = MEDIA_TYPE + AND + VALID_SIZE
 
@@ -71,10 +72,13 @@ object AlbumConstant {
 
     /**
      * 根据相册文件夹名字查询相应的图片或者视频
+     *
+     * 微信有两个bucket_id,但是display_name同名
      */
     const val SELECTION_IMAGE_WITH_DISPLAY_NAME = "${MediaStore.Files.FileColumns.MEDIA_TYPE}=? " +
             "AND ${MediaStore.MediaColumns.SIZE}>0 " +
-            "AND ${MediaStore.MediaColumns.BUCKET_DISPLAY_NAME}=?"
+//            "AND ${MediaStore.MediaColumns.BUCKET_DISPLAY_NAME}=? "+
+            "AND ${MediaStore.MediaColumns.BUCKET_ID}=?"
     const val SELECTION_ONLY_GIF_WITH_DISPLAY_NAME =
         "${MediaStore.Files.FileColumns.MEDIA_TYPE}=? " +
                 "AND ${MediaStore.MediaColumns.SIZE}>0 " +
@@ -90,10 +94,19 @@ object AlbumConstant {
     const val SELECTION_DISPLAY_NAME_Q = ("(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? " +
             "OR ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?)"
             + " AND " + MediaStore.MediaColumns.SIZE + ">0")
+    const val SELECTION_DISPLAY_NAME_Q_GIF = ("(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? " +
+            "OR ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?)"
+            + " AND " + MediaStore.MediaColumns.SIZE + ">0" +
+            AND + "${MediaStore.MediaColumns.MIME_TYPE}='image/gif'")
+    const val SELECTION_DISPLAY_NAME_Q_NO_GIF = ("(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? " +
+            "OR ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?)"
+            + " AND " + MediaStore.MediaColumns.SIZE + ">0" +
+            AND + "${MediaStore.MediaColumns.MIME_TYPE}!='image/gif'")
 
     //==============PROJECTION=============
     val PROJECTION_DISPLAY_NAME = arrayOf(
-        MediaStore.Files.FileColumns._ID, "bucket_id",
+        MediaStore.Files.FileColumns._ID,
+        "bucket_id",
         "bucket_display_name",
         MediaStore.MediaColumns.MIME_TYPE,
         "COUNT(*) AS count"
@@ -122,5 +135,13 @@ object AlbumConstant {
         MediaStore.MediaColumns.BUCKET_DISPLAY_NAME,
         MediaStore.MediaColumns.BUCKET_ID
     )
+
+    fun selectMediaWithDisplayName(mimeType: String, displayName: String): Array<String> {
+        return if (AlbumUtils.isVideo(mimeType)) {
+            arrayOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString(), displayName)
+        } else {
+            arrayOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(), displayName)
+        }
+    }
 
 }
