@@ -1,22 +1,25 @@
 package com.kevin.codelib.activity
 
+import android.R.attr
 import android.graphics.Color
 import android.os.Build
+import android.os.Handler
 import android.view.View
-import android.view.WindowInsets
 import android.view.WindowManager
+import android.widget.ImageView
 import android.widget.MediaController
-import androidx.core.content.ContextCompat
-import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.kevin.codelib.R
 import com.kevin.codelib.base.BaseActivity
 import com.kevin.codelib.util.AlbumUtils
-import com.kevin.codelib.util.AppUtils
-import com.kevin.codelib.util.LogUtils
 import kotlinx.android.synthetic.main.activity_album_preview.*
+
 
 /**
  * Created by Kevin on 2021/1/20<br/>
@@ -29,6 +32,8 @@ import kotlinx.android.synthetic.main.activity_album_preview.*
  */
 class AlbumPreviewActivity : BaseActivity() {
     var showStatusBarAndNavBar = true
+    var handler: Handler? = null
+    var runnable: Runnable? = null
     override fun getLayoutResID(): Int {
         return R.layout.activity_album_preview
     }
@@ -38,13 +43,16 @@ class AlbumPreviewActivity : BaseActivity() {
         val albumPath = intent.getStringExtra("albumPath")
         printD("albumPath=$albumPath,mimeType=$mimeType")
         if (AlbumUtils.isVideo(mimeType!!)) {
-            hideStatusBarAndNavBar()
-            ivImageViewPreview.visibility = View.GONE
-            videoViewPreview.visibility = View.VISIBLE
-            videoViewPreview.setVideoPath(albumPath)
-            val mediaController = MediaController(this)
-            videoViewPreview.setMediaController(mediaController)
-            videoViewPreview.start()
+//            hideStatusBarAndNavBar()
+            showStatusBarAndNavBar()
+            ivImageViewPreview.visibility = View.VISIBLE
+            videoViewPreview.visibility = View.GONE
+            ivImageViewPreview.loadImageIfAvailable(albumPath)
+            ivPlay.visibility=View.VISIBLE
+            ivPlay.setOnClickListener {
+                ivPlay.visibility=View.GONE
+                postLoadVideo(albumPath!!)
+            }
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
 //            window.insetsController?.hide(WindowInsets.Type.statusBars())
@@ -52,19 +60,9 @@ class AlbumPreviewActivity : BaseActivity() {
 //           hideStatusBarAndNavBar()
                 showStatusBarAndNavBar()
             }
+            ivPlay.visibility=View.GONE
             ivImageViewPreview.visibility = View.VISIBLE
             videoViewPreview.visibility = View.GONE
-            Glide.with(this)
-                .applyDefaultRequestOptions(RequestOptions().skipMemoryCache(false)
-                    .error(R.drawable.ic_image_error)
-                    .placeholder(R.drawable.ic_image_placehodler))
-                .load(albumPath)
-                .into(ivImageViewPreview)
-//            if (AlbumUtils.isGif(mimeType)) {
-//                var gif: GifDrawable = ivImageViewPreview.drawable as GifDrawable
-//                gif.start()
-//
-//            }
             clContainer.setOnClickListener {
                 if (showStatusBarAndNavBar) {
                     hideStatusBarAndNavBar()
@@ -72,9 +70,26 @@ class AlbumPreviewActivity : BaseActivity() {
                     showStatusBarAndNavBar()
                 }
             }
+            ivImageViewPreview.loadImageIfAvailable(albumPath)
+            postLoadImageAgain(albumPath)
         }
 //        llContainer.setBackgroundColor(AppUtils.addAlphaForColor(0.5f,ContextCompat.getColor(this,R.color.colorAccent)))
         llBack.setOnClickListener { onBackPressed() }
+    }
+
+    private fun postLoadVideo(albumPath: String) {
+        ivImageViewPreview.visibility = View.GONE
+        videoViewPreview.visibility = View.VISIBLE
+        videoViewPreview.setVideoPath(albumPath)
+        val mediaController = MediaController(this)
+        videoViewPreview.setMediaController(mediaController)
+        videoViewPreview.start()
+    }
+
+    private fun postLoadImageAgain(albumPath: String?) {
+        handler = Handler()
+        runnable = Runnable { ivImageViewPreview.loadImageIfAvailable(albumPath) }
+        handler!!.postDelayed(runnable!!, 500)
     }
 
     fun hideStatusBarAndNavBar() {
@@ -105,6 +120,21 @@ class AlbumPreviewActivity : BaseActivity() {
         if (videoViewPreview.isPlaying) {
             videoViewPreview.stopPlayback()
             videoViewPreview.suspend()
+        }
+        runnable?.let { handler?.removeCallbacks(it) }
+    }
+
+    private fun ImageView.loadImageIfAvailable(url: String?) {
+        url?.let {
+            Glide.with(context)
+                .applyDefaultRequestOptions(
+                    RequestOptions().skipMemoryCache(false)
+                        .error(R.drawable.ic_image_error)
+                        .placeholder(R.drawable.ic_image_placehodler)
+                        .fitCenter()
+                )
+                .load(url)
+                .into(this)
         }
     }
 }

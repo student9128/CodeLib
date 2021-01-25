@@ -15,6 +15,7 @@ import com.kevin.codelib.interfaces.ItemClickLisenter
 import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
 import com.kevin.codelib.util.AlbumUtils
 import com.kevin.codelib.util.DisplayUtils
+import com.kevin.codelib.util.LogUtils
 import kotlinx.android.synthetic.main.activity_toggle_view.view.*
 import kotlinx.android.synthetic.main.adapter_album.view.*
 
@@ -50,6 +51,7 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
         if (AlbumUtils.isVideo(albumData.mimeType)) {
             holder.tvDuration.text=AlbumUtils.parseTime(albumData.duration)
         }
+        LogUtils.logD("AlbumPre",albumData.path+"")
         Glide.with(mContext)
             .applyDefaultRequestOptions(
                 RequestOptions().skipMemoryCache(false)
