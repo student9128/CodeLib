@@ -28,12 +28,10 @@ import com.kevin.codelib.util.DisplayUtils
 import com.kevin.codelib.widget.DividerItemDecoration
 import com.kevin.codelib.widget.GridSpacingItemDecoration
 import kotlinx.android.synthetic.main.activity_album.*
-import kotlinx.android.synthetic.main.activity_photo.*
 import kotlinx.android.synthetic.main.layout_album_folder_popup_window.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
@@ -73,6 +71,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
     private var popLastPosition = 0
     private var popLastOffset = 0
     private var currentSelectedAllAlbum = true//当前选择的相册
+    var mSelectList: MutableList<MutableMap<Int, AlbumData>> = mutableListOf()
     var mMimeType = "all"
     override fun getLayoutResID(): Int {
         return R.layout.activity_album
@@ -323,7 +322,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
                     )
                     val displayName =
                         data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[2]))
-                    printD("DisplayName=$displayName,bucketId=$bucketId,count=$count")
+//                    printD("DisplayName=$displayName,bucketId=$bucketId,count=$count")
                     if (bucketIdSet.contains(bucketId)) {
                         continue
                     }
@@ -343,7 +342,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
                     val withAppendedId = getUri(it)
                     val l = countMap[bucketId]
                     bucketIdSet.add(bucketId)
-                    printD("id=$id,displayName=$displayName,count=$l,mimeType=$mimeType,withAppendedId=$withAppendedId")
+//                    printD("id=$id,displayName=$displayName,count=$l,mimeType=$mimeType,withAppendedId=$withAppendedId")
                     var albumFolder = AlbumFolder()
                     albumFolder.bucketId = bucketId
                     albumFolder.id = id
@@ -470,7 +469,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
                     currentSelectedAllAlbum = false
                     tvTitle.text = albumFolder.displayName
                     val mimeType = albumFolder.mimeType
-                    printD("Album mimeType=$mimeType")
+//                    printD("Album mimeType=$mimeType")
                     when {
                         AlbumUtils.isImage(mimeType) -> {
                             coroutineScope.launch {
@@ -508,6 +507,62 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
             )
             startActivity(intent, option.toBundle())
         }
+    }
+
+    override fun onChildItemClick(position: Int, view: View, type: String) {
+        super.onChildItemClick(position, view, type)
+        if (currentSelectedAllAlbum) {//当前为全部相册内容
+            handleSelectEvent(position, mAllAlbumDataList)
+        } else {//其他文件夹相册内容
+            handleSelectEvent(position, mOtherAlbumDataList)
+        }
+
+    }
+
+    private fun handleSelectEvent(position: Int, dataList: MutableList<AlbumData>) {
+        val albumData = dataList[position]
+        if (mSelectList.size == 0) {
+            albumData.selected = true
+            albumData.selectedIndex = 1
+            dataList[position] = albumData
+            var map: MutableMap<Int, AlbumData> = HashMap()
+            map[position] = albumData
+            mSelectList.add(map)
+        } else {
+            if (albumData.selected) {//选中的都在集合中存储，获取改集合
+                val iterator = mSelectList.iterator()
+                while (iterator.hasNext()) {
+                    val next = iterator.next()
+
+                    if (next[position] == dataList[position]) {
+                        iterator.remove()
+                        albumData.selected = false
+                        albumData.selectedIndex = -1
+                        dataList[position] = albumData
+                    }
+                }
+                for (index in 0 until mSelectList.size) {
+                    val mutableMap = mSelectList[index]
+                    for ((key, value) in mutableMap) {
+                        //                            printD("key=$key,value=${value.selectedIndex},index=$index")
+                        //                            dataList[key].selectedIndex=index+1
+                        val albumDataX = dataList[key]
+                        albumDataX.selectedIndex = index + 1
+                        dataList[key] = albumDataX
+
+                    }
+                }
+
+            } else {//不在集合中
+                albumData.selected = true
+                albumData.selectedIndex = mSelectList.size + 1
+                dataList[position] = albumData
+                var map: MutableMap<Int, AlbumData> = HashMap()
+                map[position] = albumData
+                mSelectList.add(map)
+            }
+        }
+        mAlbumDataAdapter?.refreshData(dataList)
     }
 
 }

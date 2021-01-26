@@ -18,7 +18,9 @@ data class AlbumData(
     var width: Int = 0,
     var height: Int = 0,
     var mimeType: String = "",
-    var duration: Long = 0
+    var duration: Long = 0,
+    var selected: Boolean = false,
+    var selectedIndex:Int=-1
 )
 
 /**
@@ -30,6 +32,6 @@ data class AlbumFolder(
     var displayName: String = "",
     var coverUri: Uri? = null,
     var bucketId: Long = 0,
-    var count:Long=0,
-    var checked:Boolean=false
+    var count: Long = 0,
+    var checked: Boolean = false
 )

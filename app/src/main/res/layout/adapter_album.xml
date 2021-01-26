@@ -27,16 +27,25 @@
         app:layout_constraintBottom_toBottomOf="@id/ivImageView"
         app:layout_constraintLeft_toLeftOf="@id/ivImageView" />
 
-    <TextView
-        android:id="@+id/tv_select_view"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:enabled="false"
-        android:textSize="14sp"
-        android:gravity="center"
-        android:text="1"
-        android:textColor="@color/white"
-        android:background="@drawable/bg_select_view"
+    <LinearLayout
+        android:id="@+id/ll_select_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="5dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_select_view"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:enabled="false"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:background="@drawable/bg_select_view"
+          />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -49,9 +49,9 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
     override fun onBindViewHolder(holder: AlbumHolder, position: Int) {
         val albumData = data[position]
         if (AlbumUtils.isVideo(albumData.mimeType)) {
-            holder.tvDuration.text=AlbumUtils.parseTime(albumData.duration)
+            holder.tvDuration.text = AlbumUtils.parseTime(albumData.duration)
         }
-        LogUtils.logD("AlbumPre",albumData.path+"")
+//        LogUtils.logD("AlbumPre", albumData.path + "")
         Glide.with(mContext)
             .applyDefaultRequestOptions(
                 RequestOptions().skipMemoryCache(false)
@@ -63,6 +63,15 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
         holder.imageView.setOnClickListener {
             listener?.onItemClick(position, it, "albumData")
         }
+        holder.llSelectView.setOnClickListener {
+            listener?.onChildItemClick(position, it, "selectView")
+        }
+        holder.tvSelectView.isEnabled = albumData.selected
+        if (albumData.selected) {
+            holder.tvSelectView.text = albumData.selectedIndex.toString()
+        } else {
+            holder.tvSelectView.text = ""
+        }
     }
 
     override fun getItemCount(): Int {
@@ -71,7 +80,9 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
 
     class AlbumHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var imageView = itemView.ivImageView!!
-        var tvDuration=itemView.tv_duration
+        var tvDuration = itemView.tv_duration
+        var tvSelectView = itemView.tv_select_view
+        var llSelectView = itemView.ll_select_view
 
     }
 

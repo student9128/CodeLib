@@ -14,4 +14,5 @@ import android.view.View
 interface OnRecyclerItemClickListener {
    open fun onItemClick(position:Int,view:View){}
    open fun onItemClick(position: Int,view: View,type:String=""){}
+   open fun onChildItemClick(position: Int,view: View,type:String=""){}
 }
