@@ -83,7 +83,12 @@ object AlbumConstant {
         "${MediaStore.Files.FileColumns.MEDIA_TYPE}=? " +
                 "AND ${MediaStore.MediaColumns.SIZE}>0 " +
                 "AND ${MediaStore.MediaColumns.MIME_TYPE}='image/gif' " +
-                "AND ${MediaStore.MediaColumns.BUCKET_DISPLAY_NAME}=?"
+                "AND ${MediaStore.MediaColumns.BUCKET_ID}=?"
+    const val SELECTION_NO_GIF_WITH_DISPLAY_NAME =
+        "${MediaStore.Files.FileColumns.MEDIA_TYPE}=? " +
+                "AND ${MediaStore.MediaColumns.SIZE}>0 " +
+                "AND ${MediaStore.MediaColumns.MIME_TYPE}!='image/gif' " +
+                "AND ${MediaStore.MediaColumns.BUCKET_ID}=?"
 
     const val SELECTION_DISPLAY_NAME = ("(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? " +
             "OR ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?)"

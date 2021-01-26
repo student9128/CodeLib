@@ -14,7 +14,6 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.blankj.utilcode.util.SnackbarUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.kevin.codelib.R
 import com.kevin.codelib.adapter.AlbumAdapter
@@ -74,14 +73,14 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
     private var popLastPosition = 0
     private var popLastOffset = 0
     private var currentSelectedAllAlbum = true//当前选择的相册
-    var mimeType = "all"
+    var mMimeType = "all"
     override fun getLayoutResID(): Int {
         return R.layout.activity_album
     }
 
     override fun initView() {
-        mimeType = intent.getStringExtra("type")!!
-        when (mimeType) {
+        mMimeType = intent.getStringExtra("type")!!
+        when (mMimeType) {
             "all" -> {
                 SELECTION = AlbumConstant.SELECTION
                 SELECTION_ARGS = AlbumConstant.SELECTION_ARGS
@@ -196,7 +195,11 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
         val data = contentResolver.query(
             QUERY_URI,
             AlbumConstant.PROJECTION,
-            AlbumConstant.SELECTION_IMAGE_WITH_DISPLAY_NAME,
+            when (mMimeType) {
+                "gif" -> AlbumConstant.SELECTION_ONLY_GIF_WITH_DISPLAY_NAME
+                "noGif" -> AlbumConstant.SELECTION_NO_GIF_WITH_DISPLAY_NAME
+                else -> AlbumConstant.SELECTION_IMAGE_WITH_DISPLAY_NAME
+            },
             AlbumConstant.selectMediaWithDisplayName(mimeType, bucketId),
             ORDER_BY
         )
@@ -235,21 +238,15 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
 
     private fun loadX() {
         mAlbumFolderList.clear()
-//        val data = contentResolver.query(
-//            QUERY_URI,
-//            if (AppUtils.beforeAndroidQ()) AlbumConstant.PROJECTION_DISPLAY_NAME
-//            else AlbumConstant.PROJECTION_DISPLAY_NAME_Q,
-//            if (AppUtils.beforeAndroidQ()) AlbumConstant.SELECTION_DISPLAY_NAME
-//            else AlbumConstant.SELECTION_DISPLAY_NAME_Q,
-//            AlbumConstant.SELECTION_ARGS,
-//            ORDER_BY
-//        )
+
         val data = contentResolver.query(
             QUERY_URI,
             AlbumConstant.PROJECTION_DISPLAY_NAME_Q,
-            if (mimeType == "gif") AlbumConstant.SELECTION_DISPLAY_NAME_Q_GIF
-            else if(mimeType == "noGif")AlbumConstant.SELECTION_DISPLAY_NAME_Q_NO_GIF
-            else AlbumConstant.SELECTION_DISPLAY_NAME_Q,
+            when (mMimeType) {
+                "gif" -> AlbumConstant.SELECTION_DISPLAY_NAME_Q_GIF
+                "noGif" -> AlbumConstant.SELECTION_DISPLAY_NAME_Q_NO_GIF
+                else -> AlbumConstant.SELECTION_DISPLAY_NAME_Q
+            },
             SELECTION_ARGS,
             ORDER_BY
         )
@@ -326,7 +323,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
                     )
                     val displayName =
                         data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[2]))
-//                    printD("DisplayName=$displayName,bucketId=$bucketId,count=$count")
+                    printD("DisplayName=$displayName,bucketId=$bucketId,count=$count")
                     if (bucketIdSet.contains(bucketId)) {
                         continue
                     }
@@ -346,7 +343,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
                     val withAppendedId = getUri(it)
                     val l = countMap[bucketId]
                     bucketIdSet.add(bucketId)
-//                    printD("id=$id,displayName=$displayName,count=$l,mimeType=$mimeType,withAppendedId=$withAppendedId")
+                    printD("id=$id,displayName=$displayName,count=$l,mimeType=$mimeType,withAppendedId=$withAppendedId")
                     var albumFolder = AlbumFolder()
                     albumFolder.bucketId = bucketId
                     albumFolder.id = id
@@ -409,7 +406,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
         )
         data?.let {
             var count = it.count
-//            printD("this count= $count")
+            printD("this count= $count")
             if (count > 0) {
                 it.moveToFirst()
                 do {
