@@ -3,6 +3,7 @@ package com.kevin.codelib.activity
 import android.content.ContentUris
 import android.content.Intent
 import android.database.Cursor
+import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
@@ -10,7 +11,10 @@ import android.provider.MediaStore
 import android.view.View
 import android.view.WindowManager
 import android.widget.PopupWindow
+import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.ContextCompat
+import androidx.core.util.Pair
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +28,7 @@ import com.kevin.codelib.bean.AlbumFolder
 import com.kevin.codelib.constant.AlbumConstant
 import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
 import com.kevin.codelib.util.AlbumUtils
+import com.kevin.codelib.util.AppUtils
 import com.kevin.codelib.util.DisplayUtils
 import com.kevin.codelib.widget.DividerItemDecoration
 import com.kevin.codelib.widget.GridSpacingItemDecoration
@@ -59,8 +64,9 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
         MediaStore.MediaColumns.BUCKET_DISPLAY_NAME,
         MediaStore.MediaColumns.BUCKET_ID
     )
-    var mAllAlbumDataList = mutableListOf<AlbumData>()
-    var mOtherAlbumDataList = mutableListOf<AlbumData>()
+    var mAllAlbumDataList: ArrayList<AlbumData> = ArrayList<AlbumData>()
+    var mOtherAlbumDataList: ArrayList<AlbumData> = ArrayList<AlbumData>()
+    var mSelectedAlbumDataList: ArrayList<AlbumData> = ArrayList<AlbumData>()
     var mAlbumFolderList = mutableListOf<AlbumFolder>()
     var coroutineScope = CoroutineScope(Dispatchers.Main)
     var mPopupWindow: PopupWindow? = null
@@ -117,8 +123,31 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
             mAlbumDataAdapter?.setOnItemClickListener(this@AlbumActivity)
 
         }
+        rlMenu.setOnClickListener { }
+        tv_preview.setOnClickListener {
+            showPreview(
+                mSelectedAlbumDataList,
+                0,
+                AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_SELECTED
+            )
+        }
+        tv_origin.setOnClickListener { }
+        tv_send.setOnClickListener { }
+//        window.navigationBarColor = AppUtils.addAlphaForColor(0.99f,ContextCompat.getColor(this,R.color.colorPrimary))
 
 
+    }
+
+    private fun showPreview(data: ArrayList<AlbumData>, currentPosition: Int, requestCode: Int) {
+        var intent = Intent(this, AlbumPreviewActivity::class.java)
+        intent.putParcelableArrayListExtra("data", data)
+        intent.putExtra("position", currentPosition)
+        val customAnimation = ActivityOptionsCompat.makeCustomAnimation(
+            this,
+            R.anim.photo_fade_in,
+            R.anim.photo_fade_out_nothing
+        )
+        ActivityCompat.startActivityForResult(this,intent, requestCode,customAnimation.toBundle())
     }
 
     private fun showSelectableWindow() {
@@ -492,20 +521,36 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
             }
 
         } else if (type == "albumData") {
-            var intent = Intent(this@AlbumActivity, AlbumPreviewActivity::class.java)
-            intent.putExtra(
-                "mimeType",
-                if (currentSelectedAllAlbum) mAllAlbumDataList[position].mimeType else mOtherAlbumDataList[position].mimeType
+            showPreview(
+                if (currentSelectedAllAlbum) mAllAlbumDataList else mOtherAlbumDataList,
+                position, AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_ITEM
             )
-            intent.putExtra(
-                "albumPath",
-                if (currentSelectedAllAlbum) mAllAlbumDataList[position].path else mOtherAlbumDataList[position].path
-            )
-            var option = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                this@AlbumActivity,
-                view!!, getString(R.string.share_anim)
-            )
-            startActivity(intent, option.toBundle())
+//            var intent = Intent(this@AlbumActivity, AlbumPreviewActivity::class.java)
+//            intent.putExtra(
+//                "mimeType",
+//                if (currentSelectedAllAlbum) mAllAlbumDataList[position].mimeType else mOtherAlbumDataList[position].mimeType
+//            )
+//            intent.putExtra(
+//                "albumPath",
+//                if (currentSelectedAllAlbum) mAllAlbumDataList[position].path else mOtherAlbumDataList[position].path
+//            )
+//            intent.putParcelableArrayListExtra(
+//                "data",
+//                if (currentSelectedAllAlbum) mAllAlbumDataList else mOtherAlbumDataList
+//            )
+//            intent.putExtra("position", position)
+            var share: Pair<View, String> = Pair.create(view, getString(R.string.share_anim))
+//            var shareX:Pair<View,String> = Pair.create(tv_send,getString(R.string.share_album_btn_send))
+            var option =
+                ActivityOptionsCompat.makeSceneTransitionAnimation(this@AlbumActivity, share)
+//            var option = ActivityOptionsCompat.makeSceneTransitionAnimation(
+//                this@AlbumActivity,
+//                view!!, getString(R.string.share_anim)
+//            )
+//            startActivityForResult(
+//                intent,
+//                AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW
+//            )
         }
     }
 
@@ -528,6 +573,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
             var map: MutableMap<Int, AlbumData> = HashMap()
             map[position] = albumData
             mSelectList.add(map)
+            mSelectedAlbumDataList.add(albumData)
         } else {
             if (albumData.selected) {//选中的都在集合中存储，获取改集合
                 val iterator = mSelectList.iterator()
@@ -560,7 +606,15 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
                 var map: MutableMap<Int, AlbumData> = HashMap()
                 map[position] = albumData
                 mSelectList.add(map)
+                mSelectedAlbumDataList.add(albumData)
             }
+        }
+        if (mSelectList.size > 0) {
+            tv_preview.setTextColor(Color.BLACK)
+            tv_preview.isClickable = true
+        } else {
+            tv_preview.setTextColor(ContextCompat.getColor(this, R.color.gray))
+            tv_preview.isClickable = false
         }
         mAlbumDataAdapter?.refreshData(dataList)
     }

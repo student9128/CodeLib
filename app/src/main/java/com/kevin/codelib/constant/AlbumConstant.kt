@@ -15,8 +15,21 @@ import com.kevin.codelib.util.AlbumUtils
  * Describe:<br/>
  *
  * 获取手机媒体文件所需要的SQL语句
+ *
+ * 及一些常用参数量
  */
 object AlbumConstant {
+    /**
+     * 跳转到预览页面
+     */
+    const val REQUEST_CODE_ALBUM_PREVIEW_ITEM=1001
+    const val REQUEST_CODE_ALBUM_PREVIEW_SELECTED=1002
+
+
+
+
+    //=================================查询相册相关========================================
+
     private const val AND = " AND "
     private const val OR = " OR "
     private const val MEDIA_TYPE = "${MediaStore.Files.FileColumns.MEDIA_TYPE}=?"

@@ -37,15 +37,15 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/bg_album_expand"
                 android:paddingHorizontal="10dp"
-                android:paddingVertical="2dp"
-                android:background="@drawable/bg_album_expand">
+                android:paddingVertical="2dp">
 
                 <TextView
                     android:id="@+id/tvTitle"
                     android:layout_width="0dp"
-                    android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:ellipsize="marquee"
                     android:gravity="center"
                     android:singleLine="true"
@@ -54,9 +54,9 @@
                     tool:text="@string/app_name" />
 
                 <ImageView
-                    android:layout_gravity="center"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:layout_gravity="center"
                     android:src="@drawable/ic_arrow_down" />
             </LinearLayout>
         </LinearLayout>
@@ -66,6 +66,55 @@
         android:id="@+id/rvRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleBar"
         app:layout_constraintVertical_weight="1" />
+
+    <RelativeLayout
+        android:id="@+id/rlMenu"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:background="@color/alphaWhite"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/tv_preview"
+            android:layout_width="56dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="15dp"
+            android:gravity="center"
+            android:textColor="@color/gray"
+            android:textSize="16sp"
+            android:text="预览" />
+
+        <TextView
+            android:id="@+id/tv_origin"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:text="原图" />
+
+        <TextView
+            android:id="@+id/tv_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+            android:paddingHorizontal="15dp"
+            android:paddingVertical="5dp"
+            android:textSize="16sp"
+            android:transitionName="@string/share_album_btn_send"
+            android:textColor="@color/white"
+            android:layout_centerVertical="true"
+            android:background="@drawable/bg_btn_send"
+            android:text="发送" />
+    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

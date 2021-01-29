@@ -6,8 +6,8 @@
     android:layout_height="match_parent"
     android:background="@android:color/black">
 
-    <ImageView
-        android:id="@+id/ivImageViewPreview"
+    <com.kevin.codelib.widget.PreviewViewPager
+        android:id="@+id/vpViewPagerPreview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bg_tool_bar"
@@ -17,17 +17,28 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+    <!--    <ImageView-->
+    <!--        android:id="@+id/ivImageViewPreview"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:background="@drawable/bg_tool_bar"-->
+    <!--        android:scaleType="fitCenter"-->
+    <!--        android:transitionName="@string/share_anim"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintLeft_toLeftOf="parent"-->
+    <!--        app:layout_constraintRight_toRightOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
-    <ImageView
-        android:id="@+id/ivPlay"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:background="@drawable/bg_play"
-        android:src="@drawable/ic_play"
-        app:layout_constraintBottom_toBottomOf="@id/ivImageViewPreview"
-        app:layout_constraintLeft_toLeftOf="@id/ivImageViewPreview"
-        app:layout_constraintRight_toRightOf="@id/ivImageViewPreview"
-        app:layout_constraintTop_toTopOf="@id/ivImageViewPreview" />
+    <!--    <ImageView-->
+    <!--        android:id="@+id/ivPlay"-->
+    <!--        android:layout_width="60dp"-->
+    <!--        android:layout_height="60dp"-->
+    <!--        android:background="@drawable/bg_play"-->
+    <!--        android:src="@drawable/ic_play"-->
+    <!--        app:layout_constraintBottom_toBottomOf="@id/ivImageViewPreview"-->
+    <!--        app:layout_constraintLeft_toLeftOf="@id/ivImageViewPreview"-->
+    <!--        app:layout_constraintRight_toRightOf="@id/ivImageViewPreview"-->
+    <!--        app:layout_constraintTop_toTopOf="@id/ivImageViewPreview" />-->
 
     <VideoView
         android:id="@+id/videoViewPreview"
@@ -40,10 +51,11 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/llContainer"
+    <RelativeLayout
+        android:id="@+id/rlContainer"
         android:layout_width="match_parent"
         android:layout_height="80dp"
+        android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -60,7 +72,77 @@
                 android:id="@+id/ivBack"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:background="@drawable/bg_transparent_circle"
                 android:src="@drawable/ic_back_material_light" />
         </LinearLayout>
-    </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="24dp"
+            android:layout_marginRight="15dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+
+            <LinearLayout
+                android:id="@+id/ll_select_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="5dp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/tv_select_view"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:background="@drawable/bg_select_view"
+                    android:enabled="false"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rlMenu"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/alphaWhite"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/tv_origin"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="原图"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="15dp"
+            android:background="@drawable/bg_btn_send"
+            android:paddingHorizontal="15dp"
+            android:paddingVertical="5dp"
+            android:text="发送"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:transitionName="@string/share_album_btn_send" />
+    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

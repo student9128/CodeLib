@@ -5,9 +5,12 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="lightBlue">#7EAAFF</color>
     <color name="colorPrimaryAlpha">#807EAAFF</color>
+    <color name="colorPrimaryAlphaX">#FC3D7BF6</color>
     <color name="alphaBlack">#cc000000</color>
+    <color name="black">#000000</color>
     <color name="alphaBlack_1">#80000000</color>
-    <color name="gray">#cccccc</color>
+    <color name="alphaWhite">#FCFFFFFF</color>
+    <color name="gray">#CCCCCC</color>
     <color name="dimBackground">#B3000000</color>
     <color name="FF514D50">#FF514D50</color>
     <color name="FF13E7FF">#FF13E7FF</color>

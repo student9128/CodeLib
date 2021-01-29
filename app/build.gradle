@@ -22,6 +22,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    androidExtensions { experimental = true }
 }
 
 dependencies {
@@ -45,4 +46,5 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2'
 
     api 'com.hjq:xxpermissions:9.6'
+    implementation 'it.sephiroth.android.library.imagezoom:library:1.0.4'
 }

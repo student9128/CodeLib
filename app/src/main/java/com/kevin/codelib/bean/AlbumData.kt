@@ -1,7 +1,9 @@
 package com.kevin.codelib.bean
 
 import android.net.Uri
+import android.os.Parcelable
 import android.util.Log
+import kotlinx.android.parcel.Parcelize
 
 /**
  * Created by Kevin on 2021/1/20<br/>
@@ -12,6 +14,7 @@ import android.util.Log
 /**
  * 图片数据
  */
+@Parcelize
 data class AlbumData(
     var id: Long = 0,
     var path: String? = "",
@@ -20,8 +23,8 @@ data class AlbumData(
     var mimeType: String = "",
     var duration: Long = 0,
     var selected: Boolean = false,
-    var selectedIndex:Int=-1
-)
+    var selectedIndex: Int = -1
+) : Parcelable
 
 /**
  * 相册文件夹
