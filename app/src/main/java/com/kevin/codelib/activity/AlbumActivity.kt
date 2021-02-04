@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.util.Pair
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -121,6 +122,11 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
             mAlbumDataAdapter = AlbumAdapter(this@AlbumActivity, mAllAlbumDataList)
             rvRecyclerView.adapter = mAlbumDataAdapter
             mAlbumDataAdapter?.setOnItemClickListener(this@AlbumActivity)
+            if (mAlbumFolderList.size > 0) {
+                showAlbumData()
+            } else {
+                showEmpty()
+            }
 
         }
         rlMenu.setOnClickListener { }
@@ -134,7 +140,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
         tv_origin.setOnClickListener { }
         tv_send.setOnClickListener { }
 //        window.navigationBarColor = AppUtils.addAlphaForColor(0.99f,ContextCompat.getColor(this,R.color.colorPrimary))
-
+        blurLayout.viewBehind = rvRecyclerView
 
     }
 
@@ -147,7 +153,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
             R.anim.photo_fade_in,
             R.anim.photo_fade_out_nothing
         )
-        ActivityCompat.startActivityForResult(this,intent, requestCode,customAnimation.toBundle())
+        ActivityCompat.startActivityForResult(this, intent, requestCode, customAnimation.toBundle())
     }
 
     private fun showSelectableWindow() {
@@ -493,7 +499,12 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
                 if (albumFolder.displayName == "全部") {
                     currentSelectedAllAlbum = true
                     tvTitle.text = "全部"
-                    mAlbumDataAdapter?.refreshData(mAllAlbumDataList)
+                    if (mAllAlbumDataList.size > 0) {
+                        showAlbumData()
+                        mAlbumDataAdapter?.refreshData(mAllAlbumDataList)
+                    } else {
+                        showEmpty()
+                    }
                 } else {
                     currentSelectedAllAlbum = false
                     tvTitle.text = albumFolder.displayName
@@ -551,6 +562,20 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
 //                intent,
 //                AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW
 //            )
+        }
+    }
+
+    private fun showEmpty() {
+        if (llEmpty.visibility != View.VISIBLE) {
+            clContainer.visibility = View.GONE
+            llEmpty.visibility = View.VISIBLE
+        }
+    }
+
+    private fun showAlbumData() {
+        if (clContainer.visibility != View.VISIBLE) {
+            clContainer.visibility = View.VISIBLE
+            llEmpty.visibility = View.GONE
         }
     }
 

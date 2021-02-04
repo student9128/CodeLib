@@ -47,4 +47,5 @@ dependencies {
 
     api 'com.hjq:xxpermissions:9.6'
     implementation 'it.sephiroth.android.library.imagezoom:library:1.0.4'
+    implementation 'no.danielzeller.blurbehindlib:blurbehindlib:1.0.0'
 }

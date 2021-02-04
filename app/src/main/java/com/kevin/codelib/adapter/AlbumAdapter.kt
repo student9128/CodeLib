@@ -41,11 +41,11 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
             layoutParams.height = width
             view.ivImageView.layoutParams = layoutParams
             return AlbumHolder(view)
-        }else if(viewType==TYPE_FOOTER){
+        } else if (viewType == TYPE_FOOTER) {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.adapter_album_bottom, parent, false)
             return FooterHolder(view)
-        }else{
+        } else {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.adapter_album_empty, parent, false)
             return EmptyHolder(view)
@@ -54,56 +54,65 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (getItemViewType(position)) {
-            TYPE_CONTENT -> {
-                val albumHolder = holder as AlbumHolder
-                val albumData = data[position]
-                if (AlbumUtils.isVideo(albumData.mimeType)) {
-                    albumHolder.tvDuration.text = AlbumUtils.parseTime(albumData.duration)
+//        when (getItemViewType(position)) {
+//            TYPE_CONTENT -> {
+        if (holder is AlbumHolder) {
+            val albumHolder = holder as AlbumHolder
+            val albumData = data[position]
+            if (AlbumUtils.isVideo(albumData.mimeType)) {
+                albumHolder.tvDuration.text = AlbumUtils.parseTime(albumData.duration)
+            }
+            with(albumHolder) {
+                Glide.with(mContext)
+                    .applyDefaultRequestOptions(
+                        RequestOptions().skipMemoryCache(false)
+                            .error(R.drawable.ic_image_error)
+                            .placeholder(R.drawable.ic_image_placehodler)
+                    )
+                    .load(albumData.path)
+                    .into(imageView)
+                imageView.setOnClickListener {
+                    listener?.onItemClick(position, it, "albumData")
                 }
-                with(albumHolder) {
-                    Glide.with(mContext)
-                        .applyDefaultRequestOptions(
-                            RequestOptions().skipMemoryCache(false)
-                                .error(R.drawable.ic_image_error)
-                                .placeholder(R.drawable.ic_image_placehodler)
-                        )
-                        .load(albumData.path)
-                        .into(imageView)
-                    imageView.setOnClickListener {
-                        listener?.onItemClick(position, it, "albumData")
-                    }
-                    llSelectView.setOnClickListener {
-                        listener?.onChildItemClick(position, it, "selectView")
-                    }
-                    tvSelectView.isEnabled = albumData.selected
-                    if (albumData.selected) {
-                        tvSelectView.text = albumData.selectedIndex.toString()
-                    } else {
-                        tvSelectView.text = ""
-                    }
+                llSelectView.setOnClickListener {
+                    listener?.onChildItemClick(position, it, "selectView")
+                }
+                tvSelectView.isEnabled = albumData.selected
+                if (albumData.selected) {
+                    tvSelectView.text = albumData.selectedIndex.toString()
+                } else {
+                    tvSelectView.text = ""
                 }
             }
+//                }
+//            }
         }
 
     }
 
     override fun getItemCount(): Int {
-        return data.size + 1
+        return data.size + 4//4列的，底部加空白
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when {
-            data.size == 0 -> {
-                TYPE_EMPTY
-            }
-            position == data.size -> {
-                TYPE_FOOTER
-            }
-            else -> {
-                TYPE_CONTENT
-            }
+        if (data.size == 0) {
+            return TYPE_EMPTY
+        } else if (position >= data.size) {
+            return TYPE_FOOTER
+        } else {
+            return TYPE_CONTENT
         }
+//        return when {
+//            data.size == 0 -> {
+//                TYPE_EMPTY
+//            }
+//            position == data.size -> {
+//                TYPE_FOOTER
+//            }
+//            else -> {
+//                TYPE_CONTENT
+//            }
+//        }
     }
 
     class AlbumHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -113,8 +122,10 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
         var llSelectView = itemView.ll_select_view
 
     }
+
     class FooterHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
+
     class EmptyHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
 

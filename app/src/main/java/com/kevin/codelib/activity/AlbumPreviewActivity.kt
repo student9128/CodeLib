@@ -54,6 +54,8 @@ class AlbumPreviewActivity : BaseActivity() {
 //        val albumPath = intent.getStringExtra("albumPath")
 //        printD("albumPath=$albumPath,mimeType=$mimeType")
         transparentStatusBar()
+//        blurLayout.updateForMilliSeconds(100)
+        blurLayout.viewBehind=vpViewPagerPreview
 //        if (AlbumUtils.isVideo(mimeType!!)) {
 //            hideStatusBarAndNavBar()
 //            showStatusBarAndNavBar()

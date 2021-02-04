@@ -29,6 +29,8 @@ object AlbumConstant {
 
 
     //=================================查询相册相关========================================
+    val QUERY_URI = MediaStore.Files.getContentUri("external")
+    val ORDER_BY = MediaStore.Files.FileColumns._ID + " DESC"
 
     private const val AND = " AND "
     private const val OR = " OR "
