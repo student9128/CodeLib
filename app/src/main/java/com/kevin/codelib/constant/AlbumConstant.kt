@@ -18,14 +18,34 @@ import com.kevin.codelib.util.AlbumUtils
  *
  * 及一些常用参数量
  */
+
+
+/**
+ *@property SINGLE,//预览选中的
+ *
+ *@property MULTIPLE//预览全部
+ */
+enum class AlbumPreviewMethod {
+    SINGLE,//预览选中的
+    MULTIPLE//预览全部
+}
+
 object AlbumConstant {
     /**
      * 跳转到预览页面
      */
-    const val REQUEST_CODE_ALBUM_PREVIEW_ITEM=1001
-    const val REQUEST_CODE_ALBUM_PREVIEW_SELECTED=1002
+    const val REQUEST_CODE_ALBUM_PREVIEW_ITEM = 1001
+    const val REQUEST_CODE_ALBUM_PREVIEW_SELECTED = 1002
+    const val SET_RESULT_FOR_SELECTION = "setResultForSelection"
+    const val PREVIEW_METHOD = "preview_method"
+    const val ALBUM_FOLDER_TYPE_DEFAULT = "全部"
+    var ALBUM_FOLDER_TYPE = ""
 
-
+    const val TYPE_ALL = "all"
+    const val TYPE_IMAGE = "image"
+    const val TYPE_IMAGE_NO_GIF = "noGif"
+    const val TYPE_GIF = "gif"
+    const val TYPE_VIDEO = "video"
 
 
     //=================================查询相册相关========================================

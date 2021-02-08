@@ -10,10 +10,12 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.kevin.codelib.AlbumManagerCollection
 import com.kevin.codelib.R
 import com.kevin.codelib.adapter.AlbumPreviewAdapter
 import com.kevin.codelib.base.BaseActivity
 import com.kevin.codelib.bean.AlbumData
+import com.kevin.codelib.constant.AlbumConstant
 import com.kevin.codelib.util.AppUtils
 import kotlinx.android.synthetic.main.activity_album_preview.*
 
@@ -31,15 +33,17 @@ class AlbumPreviewActivity : BaseActivity() {
     var showStatusBarAndNavBar = true
     var handler: Handler? = null
     var runnable: Runnable? = null
+    val albumManagerCollectionInstance = AlbumManagerCollection.albumManagerCollectionInstance
     override fun getLayoutResID(): Int {
         return R.layout.activity_album_preview
     }
 
     override fun initView() {
-        val data = intent.getParcelableArrayListExtra<AlbumData>("data")
+        val previewMethod = intent.getSerializableExtra(AlbumConstant.PREVIEW_METHOD)
         val position = intent.getIntExtra("position", 0)
+        val data = albumManagerCollectionInstance.getCurrentAlbumData()
         val albumPreviewAdapter = AlbumPreviewAdapter(
-            data!!, supportFragmentManager,
+            data, supportFragmentManager,
             FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
         )
         vpViewPagerPreview.adapter = albumPreviewAdapter

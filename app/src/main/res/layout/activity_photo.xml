@@ -32,6 +32,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="获取手机相册" />
+
                 <Button
                     android:id="@+id/btn_get_gif"
                     android:layout_width="wrap_content"
@@ -49,6 +50,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="只获取视频" />
+
+                <Button
+                    android:id="@+id/btn_photo_test"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="获取手机相册框架测试" />
+                <ImageView
+                    android:id="@+id/iv_preview"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"/>
+                <TextView
+                    android:id="@+id/tv_preview_path"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
 
             </com.google.android.flexbox.FlexboxLayout>

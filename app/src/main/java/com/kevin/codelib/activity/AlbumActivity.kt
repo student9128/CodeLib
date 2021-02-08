@@ -1,25 +1,19 @@
 package com.kevin.codelib.activity
 
-import android.content.ContentUris
 import android.content.Intent
-import android.database.Cursor
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
-import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import android.view.View
 import android.view.WindowManager
 import android.widget.PopupWindow
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
-import androidx.core.util.Pair
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blankj.utilcode.util.ToastUtils
+import com.kevin.codelib.AlbumManagerCollection
 import com.kevin.codelib.R
 import com.kevin.codelib.adapter.AlbumAdapter
 import com.kevin.codelib.adapter.AlbumFolderAdapter
@@ -27,9 +21,9 @@ import com.kevin.codelib.base.BaseActivity
 import com.kevin.codelib.bean.AlbumData
 import com.kevin.codelib.bean.AlbumFolder
 import com.kevin.codelib.constant.AlbumConstant
+import com.kevin.codelib.constant.AlbumPreviewMethod
 import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
-import com.kevin.codelib.util.AlbumUtils
-import com.kevin.codelib.util.AppUtils
+import com.kevin.codelib.loader.AlbumLoader
 import com.kevin.codelib.util.DisplayUtils
 import com.kevin.codelib.widget.DividerItemDecoration
 import com.kevin.codelib.widget.GridSpacingItemDecoration
@@ -37,9 +31,9 @@ import kotlinx.android.synthetic.main.activity_album.*
 import kotlinx.android.synthetic.main.layout_album_folder_popup_window.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlin.collections.HashMap
-import kotlin.collections.HashSet
 
 /**
  * Created by Kevin on 2021/1/24<br/>
@@ -50,21 +44,8 @@ import kotlin.collections.HashSet
  *
  * Describe:<br/>
  */
-class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
+class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickListener {
 
-    private val QUERY_URI = MediaStore.Files.getContentUri("external")
-    private val ORDER_BY = MediaStore.Files.FileColumns._ID + " DESC"
-    private val NOT_GIF = "!='image/gif'"
-    private val PROJECTION = arrayOf(
-        MediaStore.Files.FileColumns._ID,
-        MediaStore.MediaColumns.DATA,
-        MediaStore.MediaColumns.MIME_TYPE,
-        MediaStore.MediaColumns.WIDTH,
-        MediaStore.MediaColumns.HEIGHT,
-        MediaStore.MediaColumns.DURATION,
-        MediaStore.MediaColumns.BUCKET_DISPLAY_NAME,
-        MediaStore.MediaColumns.BUCKET_ID
-    )
     var mAllAlbumDataList: ArrayList<AlbumData> = ArrayList<AlbumData>()
     var mOtherAlbumDataList: ArrayList<AlbumData> = ArrayList<AlbumData>()
     var mSelectedAlbumDataList: ArrayList<AlbumData> = ArrayList<AlbumData>()
@@ -73,38 +54,19 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
     var mPopupWindow: PopupWindow? = null
     var mFolderAdapter: AlbumFolderAdapter? = null
     var mAlbumDataAdapter: AlbumAdapter? = null
-    var SELECTION = ""
-    var SELECTION_ARGS = emptyArray<String>()
     private var popLastPosition = 0
     private var popLastOffset = 0
     private var currentSelectedAllAlbum = true//当前选择的相册
     var mSelectList: MutableList<MutableMap<Int, AlbumData>> = mutableListOf()
-    var mMimeType = "all"
+    private val albumLoaderInstance = AlbumLoader.albumLoaderInstance
+    private val albumManagerCollectionInstance =
+        AlbumManagerCollection.albumManagerCollectionInstance
+
     override fun getLayoutResID(): Int {
         return R.layout.activity_album
     }
 
     override fun initView() {
-        mMimeType = intent.getStringExtra("type")!!
-        when (mMimeType) {
-            "all" -> {
-                SELECTION = AlbumConstant.SELECTION
-                SELECTION_ARGS = AlbumConstant.SELECTION_ARGS
-            }
-            "gif" -> {
-                SELECTION = AlbumConstant.SELECTION_IMAGE_ONLY_GIF
-                SELECTION_ARGS = AlbumConstant.SELECTION_ARGS_IMAGE
-            }
-            "noGif" -> {
-                SELECTION = AlbumConstant.SELECTION_IMAGE_NO_GIF
-                SELECTION_ARGS = AlbumConstant.SELECTION_ARGS_IMAGE
-            }
-            "video" -> {
-                SELECTION = AlbumConstant.SELECTION_IMAGE_OR_VIDEO
-                SELECTION_ARGS = AlbumConstant.SELECTION_ARGS_VIDEO
-
-            }
-        }
         tvTitle.text = "全部"
         ivBack.setOnClickListener { onBackPressed() }
         llTitle.setOnClickListener {
@@ -116,9 +78,16 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
         }
         rvRecyclerView.addItemDecoration(GridSpacingItemDecoration(4, 10, false))
         rvRecyclerView.layoutManager = GridLayoutManager(this, 4)
+
+        albumLoaderInstance.setParams(this)
+//        albumLoaderInstance.loadAlbumFolder()
+
         val launch = coroutineScope.launch {
-            loadAlbum()
-            loadX()
+//            loadAlbum()
+//            loadX()
+            mAllAlbumDataList =
+                async(Dispatchers.IO) { albumLoaderInstance.loadAlbumDataX() }.await()
+            mAlbumFolderList = async(Dispatchers.IO) { albumLoaderInstance.loadFolderX() }.await()
             mAlbumDataAdapter = AlbumAdapter(this@AlbumActivity, mAllAlbumDataList)
             rvRecyclerView.adapter = mAlbumDataAdapter
             mAlbumDataAdapter?.setOnItemClickListener(this@AlbumActivity)
@@ -132,21 +101,34 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
         rlMenu.setOnClickListener { }
         tv_preview.setOnClickListener {
             showPreview(
-                mSelectedAlbumDataList,
+                AlbumPreviewMethod.SINGLE,
                 0,
                 AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_SELECTED
             )
         }
         tv_origin.setOnClickListener { }
-        tv_send.setOnClickListener { }
+        tv_send.setOnClickListener(this)
 //        window.navigationBarColor = AppUtils.addAlphaForColor(0.99f,ContextCompat.getColor(this,R.color.colorPrimary))
         blurLayout.viewBehind = rvRecyclerView
-
     }
 
-    private fun showPreview(data: ArrayList<AlbumData>, currentPosition: Int, requestCode: Int) {
+    private fun showPreview(
+        previewMethod: AlbumPreviewMethod,
+        currentPosition: Int,
+        requestCode: Int
+    ) {
+        if (previewMethod == AlbumPreviewMethod.SINGLE) {
+            albumManagerCollectionInstance.saveCurrentAlbumData(mSelectedAlbumDataList)
+        } else {
+            val albumFolderType = albumManagerCollectionInstance.getAlbumFolderType()
+            if (albumFolderType == AlbumConstant.ALBUM_FOLDER_TYPE_DEFAULT) {
+                albumManagerCollectionInstance.saveCurrentAlbumData(mAllAlbumDataList)
+            } else {
+                albumManagerCollectionInstance.saveCurrentAlbumData(mOtherAlbumDataList)
+            }
+        }
         var intent = Intent(this, AlbumPreviewActivity::class.java)
-        intent.putParcelableArrayListExtra("data", data)
+        intent.putExtra(AlbumConstant.PREVIEW_METHOD, previewMethod)
         intent.putExtra("position", currentPosition)
         val customAnimation = ActivityOptionsCompat.makeCustomAnimation(
             this,
@@ -210,278 +192,6 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
 
     }
 
-    private fun getSelectionArgsForSingleMediaType(mediaType: Int): Array<String>? {
-        return arrayOf(mediaType.toString())
-    }
-
-    val SELECTION_IMAGE =
-        MediaStore.Files.FileColumns.MEDIA_TYPE + "=?" + " AND " + MediaStore.MediaColumns.SIZE + ">0"
-
-    private val PROJECTION_BUCKET = arrayOf(
-        MediaStore.Images.ImageColumns.BUCKET_ID,
-        MediaStore.Files.FileColumns.MEDIA_TYPE,
-        MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME
-    )
-
-    private fun loadImageByBucketId(mimeType: String, bucketId: String) {
-        mOtherAlbumDataList.clear()
-
-        val data = contentResolver.query(
-            QUERY_URI,
-            AlbumConstant.PROJECTION,
-            when (mMimeType) {
-                "gif" -> AlbumConstant.SELECTION_ONLY_GIF_WITH_DISPLAY_NAME
-                "noGif" -> AlbumConstant.SELECTION_NO_GIF_WITH_DISPLAY_NAME
-                else -> AlbumConstant.SELECTION_IMAGE_WITH_DISPLAY_NAME
-            },
-            AlbumConstant.selectMediaWithDisplayName(mimeType, bucketId),
-            ORDER_BY
-        )
-        data?.let {
-            var count = it.count
-            printD("loadImageByDisplayName count=$count")
-            if (count > 0) {
-                it.moveToFirst()
-                do {
-                    val id = data.getLong(
-                        data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[0])
-                    )
-                    val path =
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) getRealPathAndroid_Q(id) else data.getString(
-                            data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[1])
-                        )
-
-                    val displayName =
-                        data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[6]))
-                    var width = it.getInt(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[3]))
-                    var height = it.getInt(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[4]))
-                    val mimeType =
-                        data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[2]))
-//                    printD("id=$id,displayName=$displayName,count=$countX,mimeType=$mimeType")
-                    var albumData = AlbumData()
-                    albumData.id = id
-                    albumData.path = path
-                    albumData.width = width
-                    albumData.height = height
-                    albumData.mimeType = mimeType
-                    mOtherAlbumDataList.add(albumData)
-                } while (it.moveToNext())
-            }
-        }
-    }
-
-    private fun loadX() {
-        mAlbumFolderList.clear()
-
-        val data = contentResolver.query(
-            QUERY_URI,
-            AlbumConstant.PROJECTION_DISPLAY_NAME_Q,
-            when (mMimeType) {
-                "gif" -> AlbumConstant.SELECTION_DISPLAY_NAME_Q_GIF
-                "noGif" -> AlbumConstant.SELECTION_DISPLAY_NAME_Q_NO_GIF
-                else -> AlbumConstant.SELECTION_DISPLAY_NAME_Q
-            },
-            SELECTION_ARGS,
-            ORDER_BY
-        )
-//        if (AppUtils.beforeAndroidQ()) {
-//            data?.let {
-//                var count = it.count
-//                printD("count1=$count")
-//
-//                if (count > 0) {
-//                    it.moveToFirst()
-//                    do {
-//                        val id = data.getLong(
-//                            data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[0])
-//                        )
-////                    val path =
-//////                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) getRealPathAndroid_Q(id) else data.getString(
-////                            data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[2])
-//////                        )
-//
-//                        val displayName =
-//                            data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[2]))
-//                        var countX = 0
-//                        if (AppUtils.beforeAndroidQ()) {
-//                            countX = data.getInt(data.getColumnIndexOrThrow("count"))
-//                        }
-//                        val mimeType =
-//                            data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[3]))
-//                        val long = it.getLong(it.getColumnIndex(MediaStore.Files.FileColumns._ID))
-//                        val string =
-//                            it.getString(it.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE))
-//                        if (string.startsWith("image")) {
-//                            var contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-//                            val withAppendedId = ContentUris.withAppendedId(contentUri, id)
-////                        printD("long=$long,string=$string,withAppendedId=$withAppendedId")
-//                        } else if (string.startsWith("video")) {
-//                            var contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-//
-//                        } else {
-//                            var contentUri = MediaStore.Files.getContentUri("external")
-//
-//                        }
-//
-//                        printD("id=$id,displayName=$displayName,count=$countX,mimeType=$mimeType")
-//
-//
-//                    } while (it.moveToNext())
-//                }
-//            }
-//        } else {
-        data?.let {
-            var count = it.count
-            var contentUri: Uri? = null
-            var countMap: MutableMap<Long, Long> = HashMap()
-            val bucketIdSet: MutableSet<Long> = HashSet()
-            var countW = 0
-            while (it.moveToNext()) {
-                val bucketId = data.getLong(
-                    data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[1])
-                )
-                var countL: Long? = countMap[bucketId]
-                if (countL == null) {
-                    countL = 1L
-                } else {
-                    countL++
-                }
-                countMap[bucketId] = countL
-            }
-            if (count > 0) {
-                it.moveToFirst()
-                val allAlbumCover = getUri(it)
-                do {
-                    val bucketId = data.getLong(
-                        data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[1])
-                    )
-                    val displayName =
-                        data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[2]))
-//                    printD("DisplayName=$displayName,bucketId=$bucketId,count=$count")
-                    if (bucketIdSet.contains(bucketId)) {
-                        continue
-                    }
-                    val id = data.getLong(
-                        data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[0])
-                    )
-
-                    var countX = 0
-//                        if (AppUtils.beforeAndroidQ()) {
-//                            countX = data.getInt(data.getColumnIndexOrThrow("count"))
-//                        }
-                    val mimeType =
-                        data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[3]))
-                    val long = it.getLong(it.getColumnIndex(MediaStore.Files.FileColumns._ID))
-                    val string =
-                        it.getString(it.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE))
-                    val withAppendedId = getUri(it)
-                    val l = countMap[bucketId]
-                    bucketIdSet.add(bucketId)
-//                    printD("id=$id,displayName=$displayName,count=$l,mimeType=$mimeType,withAppendedId=$withAppendedId")
-                    var albumFolder = AlbumFolder()
-                    albumFolder.bucketId = bucketId
-                    albumFolder.id = id
-                    albumFolder.count = l ?: 0
-                    albumFolder.coverUri = withAppendedId
-                    albumFolder.displayName = displayName
-                    albumFolder.mimeType = mimeType
-                    albumFolder.checked = false
-                    mAlbumFolderList.add(albumFolder)
-                } while (it.moveToNext())
-                var albumFolder = AlbumFolder()
-                albumFolder.bucketId = -1
-                albumFolder.id = -1
-                albumFolder.count = count.toLong()
-                albumFolder.coverUri = allAlbumCover
-                albumFolder.displayName = "全部"
-                albumFolder.mimeType = ""
-                albumFolder.checked = true
-                mAlbumFolderList.add(0, albumFolder)
-            }
-
-//            }
-        }
-    }
-
-    private fun getUri(
-        cursor: Cursor
-    ): Uri {
-        val string = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE))
-        val id = cursor.getLong(
-            cursor.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[0])
-        )
-        var contentUri1: Uri? = null
-        if (string.startsWith("image")) {
-            contentUri1 = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            //                        printD("long=$long,string=$string,withAppendedId=$withAppendedId")
-        } else if (string.startsWith("video")) {
-            contentUri1 = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-
-        } else {
-            contentUri1 = MediaStore.Files.getContentUri("external")
-
-        }
-        val withAppendedId = ContentUris.withAppendedId(contentUri1, id)
-        return withAppendedId
-    }
-
-    private fun loadAlbum() {
-        mAllAlbumDataList.clear()
-        var selection = (MediaStore.Files.FileColumns.MEDIA_TYPE + "=?"
-                + " AND " + MediaStore.MediaColumns.SIZE + ">0")
-        val data: Cursor? = contentResolver.query(
-            QUERY_URI,
-            AlbumConstant.PROJECTION,
-//            AlbumConstant.SELECTION_IMAGE_ONLY_GIF,
-//            AlbumConstant.SELECTION_ARGS_IMAGE,
-            SELECTION,
-            SELECTION_ARGS,
-            ORDER_BY
-        )
-        data?.let {
-            var count = it.count
-            printD("this count= $count")
-            if (count > 0) {
-                it.moveToFirst()
-                do {
-                    val id = data.getLong(
-                        data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[0])
-                    )
-                    val path =
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) getRealPathAndroid_Q(id) else data.getString(
-                            data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[1])
-                        )
-                    var picType =
-                        it.getString(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[2]))
-                    var width = it.getInt(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[3]))
-                    var height = it.getInt(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[4]))
-                    var duration = 0L
-                    if (AlbumUtils.isVideo(picType)) {
-                        duration =
-                            data.getLong(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[5]))
-                    }
-                    val displayName =
-                        it.getString(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[6]))
-//                    printD("path=$duration")
-                    AlbumUtils.parseTime(duration)
-                    var albumData = AlbumData()
-                    albumData.id = id
-                    albumData.path = path
-                    albumData.width = width
-                    albumData.height = height
-                    albumData.mimeType = picType
-                    albumData.duration = duration
-                    mAllAlbumDataList.add(albumData)
-                } while (it.moveToNext())
-            }
-        }
-    }
-
-    private fun getRealPathAndroid_Q(id: Long): String? {
-        return QUERY_URI.buildUpon()
-            .appendPath(id.toString()).build().toString()
-    }
-
     override fun onItemClick(position: Int, view: View, type: String) {
         if (type == "albumFolder") {
             val albumFolder = mAlbumFolderList[position]
@@ -496,6 +206,9 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
                 mAlbumFolderList[position] = albumFolder
                 mFolderAdapter?.refreshData(mAlbumFolderList)
                 mPopupWindow?.dismiss()
+
+                albumManagerCollectionInstance.saveAlbumFolderType(albumFolder.displayName)
+
                 if (albumFolder.displayName == "全部") {
                     currentSelectedAllAlbum = true
                     tvTitle.text = "全部"
@@ -509,59 +222,23 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
                     currentSelectedAllAlbum = false
                     tvTitle.text = albumFolder.displayName
                     val mimeType = albumFolder.mimeType
-//                    printD("Album mimeType=$mimeType")
-                    when {
-                        AlbumUtils.isImage(mimeType) -> {
-                            coroutineScope.launch {
-                                loadImageByBucketId(mimeType, albumFolder.bucketId.toString())
-                                mAlbumDataAdapter?.refreshData(mOtherAlbumDataList)
-                            }
-
-                        }
-                        AlbumUtils.isVideo(mimeType) -> {
-                            coroutineScope.launch {
-                                loadImageByBucketId(mimeType, albumFolder.bucketId.toString())
-                                mAlbumDataAdapter?.refreshData(mOtherAlbumDataList)
-                            }
-                        }
-                        AlbumUtils.isGif(mimeType) -> {
-
-                        }
+                    coroutineScope.launch {
+                        mOtherAlbumDataList = async(Dispatchers.IO) {
+                            albumLoaderInstance.loadImageByBucketIdX(
+                                mimeType,
+                                albumFolder.bucketId.toString()
+                            )
+                        }.await()
+                        mAlbumDataAdapter?.refreshData(mOtherAlbumDataList)
                     }
                 }
             }
 
         } else if (type == "albumData") {
             showPreview(
-                if (currentSelectedAllAlbum) mAllAlbumDataList else mOtherAlbumDataList,
+                AlbumPreviewMethod.MULTIPLE,
                 position, AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_ITEM
             )
-//            var intent = Intent(this@AlbumActivity, AlbumPreviewActivity::class.java)
-//            intent.putExtra(
-//                "mimeType",
-//                if (currentSelectedAllAlbum) mAllAlbumDataList[position].mimeType else mOtherAlbumDataList[position].mimeType
-//            )
-//            intent.putExtra(
-//                "albumPath",
-//                if (currentSelectedAllAlbum) mAllAlbumDataList[position].path else mOtherAlbumDataList[position].path
-//            )
-//            intent.putParcelableArrayListExtra(
-//                "data",
-//                if (currentSelectedAllAlbum) mAllAlbumDataList else mOtherAlbumDataList
-//            )
-//            intent.putExtra("position", position)
-            var share: Pair<View, String> = Pair.create(view, getString(R.string.share_anim))
-//            var shareX:Pair<View,String> = Pair.create(tv_send,getString(R.string.share_album_btn_send))
-            var option =
-                ActivityOptionsCompat.makeSceneTransitionAnimation(this@AlbumActivity, share)
-//            var option = ActivityOptionsCompat.makeSceneTransitionAnimation(
-//                this@AlbumActivity,
-//                view!!, getString(R.string.share_anim)
-//            )
-//            startActivityForResult(
-//                intent,
-//                AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW
-//            )
         }
     }
 
@@ -615,8 +292,6 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
                 for (index in 0 until mSelectList.size) {
                     val mutableMap = mSelectList[index]
                     for ((key, value) in mutableMap) {
-                        //                            printD("key=$key,value=${value.selectedIndex},index=$index")
-                        //                            dataList[key].selectedIndex=index+1
                         val albumDataX = dataList[key]
                         albumDataX.selectedIndex = index + 1
                         dataList[key] = albumDataX
@@ -642,6 +317,20 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener {
             tv_preview.isClickable = false
         }
         mAlbumDataAdapter?.refreshData(dataList)
+    }
+
+    override fun onClick(v: View?) {
+        when (v!!.id) {
+            R.id.tv_send -> {
+                val intent = Intent()
+                intent.putParcelableArrayListExtra(
+                    AlbumConstant.SET_RESULT_FOR_SELECTION,
+                    mSelectedAlbumDataList
+                )
+                setResult(RESULT_OK, intent)
+                finish()
+            }
+        }
     }
 
 }

@@ -1,8 +1,11 @@
 package com.kevin.codelib
 
 import android.app.Activity
+import android.content.Intent
 import androidx.annotation.NonNull
 import androidx.fragment.app.Fragment
+import com.kevin.codelib.bean.AlbumData
+import com.kevin.codelib.constant.AlbumConstant
 import java.lang.ref.WeakReference
 
 /**
@@ -38,5 +41,36 @@ class AlbumManager {
         fun withContext(@NonNull fragment: Fragment): AlbumManager {
             return AlbumManager(fragment)
         }
+        fun getAlbumDataResult(data: Intent?): List<AlbumData> {
+            return if (data != null) {
+                val albumData =
+                    data!!.getParcelableArrayListExtra<AlbumData>(AlbumConstant.SET_RESULT_FOR_SELECTION)
+                albumData!!
+            } else {
+                ArrayList<AlbumData>()
+            }
+        }
     }
+
+    fun getActivity(): Activity? {
+        return mContext?.get()
+    }
+
+    fun getFragment(): Fragment? {
+        return mFragment?.get()
+    }
+
+    /**
+     * @param mimeType 选择的媒体类型:全部内容（图片和视频）、图片、GIF、不含GIF的图片、视频等
+     */
+    fun openAlbum(mimeType: String = AlbumConstant.TYPE_ALL): AlbumManagerModel {
+        return AlbumManagerModel(this, mimeType)
+    }
+
+
+    fun openAlbumWithCameraShot(mimeType: String): AlbumManagerModel {
+        return AlbumManagerModel(this, mimeType, true)
+    }
+
+
 }
