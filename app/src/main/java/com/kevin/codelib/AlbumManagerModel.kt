@@ -17,9 +17,13 @@ import com.kevin.codelib.activity.AlbumActivity
 class AlbumManagerModel(
     val albumManager: AlbumManager,
     val mimeType: String,
-    var showCameraShot: Boolean = false
+    var showCameraShot: Boolean = false,
+    private val albumManagerConfig: AlbumManagerConfig = AlbumManagerConfig.albumManagerConfig
 ) {
-    var albumManagerConfig: AlbumManagerConfig = AlbumManagerConfig.albumManagerConfig
+    init {
+        albumManagerConfig.mimeType = mimeType
+    }
+
 
     fun maxSelectedNum(maxSelectNum: Int): AlbumManagerModel {
         albumManagerConfig.maxSelectedNum = maxSelectNum
@@ -30,19 +34,20 @@ class AlbumManagerModel(
         albumManagerConfig.minSelectedNum = minSelectNum
         return this
     }
+
     fun showPreview(enablePreview: Boolean): AlbumManagerModel {
-        albumManagerConfig.enablePreview=enablePreview
+        albumManagerConfig.enablePreview = enablePreview
         return this
     }
 
-    fun forResult(requestCode:Int) {
+    fun forResult(requestCode: Int) {
         val activity = albumManager.getActivity()
         activity?.let {
             val intent = Intent(activity, AlbumActivity::class.java)
             val fragment = albumManager.getFragment()
             if (fragment != null) {
-                fragment.startActivityForResult(intent,requestCode)
-            }else{
+                fragment.startActivityForResult(intent, requestCode)
+            } else {
                 activity.startActivityForResult(intent, requestCode)
             }
         }

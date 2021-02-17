@@ -28,11 +28,9 @@ import com.kevin.codelib.util.DisplayUtils
 import com.kevin.codelib.widget.DividerItemDecoration
 import com.kevin.codelib.widget.GridSpacingItemDecoration
 import kotlinx.android.synthetic.main.activity_album.*
+import kotlinx.android.synthetic.main.activity_function.*
 import kotlinx.android.synthetic.main.layout_album_folder_popup_window.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlin.collections.HashMap
 
 /**
@@ -61,7 +59,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
     private val albumLoaderInstance = AlbumLoader.albumLoaderInstance
     private val albumManagerCollectionInstance =
         AlbumManagerCollection.albumManagerCollectionInstance
-
+    var loadAlbumJob: Job? = null
     override fun getLayoutResID(): Int {
         return R.layout.activity_album
     }
@@ -82,7 +80,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
         albumLoaderInstance.setParams(this)
 //        albumLoaderInstance.loadAlbumFolder()
 
-        val launch = coroutineScope.launch {
+        loadAlbumJob = coroutineScope.launch {
 //            loadAlbum()
 //            loadX()
             mAllAlbumDataList =
@@ -119,6 +117,12 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
     ) {
         if (previewMethod == AlbumPreviewMethod.SINGLE) {
             albumManagerCollectionInstance.saveCurrentAlbumData(mSelectedAlbumDataList)
+            val albumFolderType = albumManagerCollectionInstance.getAlbumFolderType()
+            if (albumFolderType == AlbumConstant.ALBUM_FOLDER_TYPE_DEFAULT) {
+                albumManagerCollectionInstance.saveAllAlbumData(mAllAlbumDataList)
+            } else {
+                albumManagerCollectionInstance.saveAllAlbumData(mOtherAlbumDataList)
+            }
         } else {
             val albumFolderType = albumManagerCollectionInstance.getAlbumFolderType()
             if (albumFolderType == AlbumConstant.ALBUM_FOLDER_TYPE_DEFAULT) {
@@ -128,7 +132,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
             }
         }
         var intent = Intent(this, AlbumPreviewActivity::class.java)
-        intent.putExtra(AlbumConstant.PREVIEW_METHOD, previewMethod)
+        intent.putExtra(AlbumConstant.PREVIEW_METHOD, previewMethod.name)
         intent.putExtra("position", currentPosition)
         val customAnimation = ActivityOptionsCompat.makeCustomAnimation(
             this,
@@ -273,6 +277,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
             albumData.selectedIndex = 1
             dataList[position] = albumData
             var map: MutableMap<Int, AlbumData> = HashMap()
+            albumData.key = position
             map[position] = albumData
             mSelectList.add(map)
             mSelectedAlbumDataList.add(albumData)
@@ -283,12 +288,14 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
                     val next = iterator.next()
 
                     if (next[position] == dataList[position]) {
+                        mSelectedAlbumDataList.remove(albumData)
                         iterator.remove()
                         albumData.selected = false
                         albumData.selectedIndex = -1
                         dataList[position] = albumData
                     }
                 }
+                printD("mSelectList.Size=${mSelectList.size},mSelectedAlbumDataList.size=${mSelectedAlbumDataList.size}")
                 for (index in 0 until mSelectList.size) {
                     val mutableMap = mSelectList[index]
                     for ((key, value) in mutableMap) {
@@ -304,6 +311,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
                 albumData.selectedIndex = mSelectList.size + 1
                 dataList[position] = albumData
                 var map: MutableMap<Int, AlbumData> = HashMap()
+                albumData.key = position
                 map[position] = albumData
                 mSelectList.add(map)
                 mSelectedAlbumDataList.add(albumData)
@@ -316,6 +324,8 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
             tv_preview.setTextColor(ContextCompat.getColor(this, R.color.gray))
             tv_preview.isClickable = false
         }
+        albumManagerCollectionInstance.saveSelectionData(mSelectedAlbumDataList)
+        albumManagerCollectionInstance.saveSelectionList(mSelectList)
         mAlbumDataAdapter?.refreshData(dataList)
     }
 
@@ -329,6 +339,46 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
                 )
                 setResult(RESULT_OK, intent)
                 finish()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        loadAlbumJob?.let { if (it.isActive) it.cancel() }
+        AlbumManagerCollection.albumManagerCollectionInstance.reset()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        printD("resultCode=$resultCode,requestCode=$requestCode")
+        if (resultCode == RESULT_OK) {
+            when (requestCode) {
+                AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_ITEM -> {
+                    val selectionData = albumManagerCollectionInstance.getSelectionData()
+                    val selectionList = albumManagerCollectionInstance.getSelectionList()
+                    mSelectedAlbumDataList = selectionData
+                    mSelectList = selectionList
+                    val currentAlbumData = albumManagerCollectionInstance.getCurrentAlbumData()
+                    mAlbumDataAdapter?.refreshData(currentAlbumData)
+                    if (mSelectList.size > 0) {
+                        tv_preview.setTextColor(Color.BLACK)
+                        tv_preview.isClickable = true
+                    }
+                }
+                AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_SELECTED -> {
+                    val selectionData = albumManagerCollectionInstance.getSelectionData()
+                    val selectionList = albumManagerCollectionInstance.getSelectionList()
+                    mSelectedAlbumDataList = selectionData
+                    mSelectList = selectionList
+                    val currentAlbumData = albumManagerCollectionInstance.getCurrentAlbumData()
+                    val allAlbumData = albumManagerCollectionInstance.getAllAlbumData()
+                    mAlbumDataAdapter?.refreshData(allAlbumData)
+                    if (mSelectList.size > 0) {
+                        tv_preview.setTextColor(Color.BLACK)
+                        tv_preview.isClickable = true
+                    }
+                }
             }
         }
     }

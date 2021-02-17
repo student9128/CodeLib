@@ -21,6 +21,7 @@ class AlbumManagerCollection {
     private var mCurrentAlbumDataList: ArrayList<AlbumData> = ArrayList()
     private var mAllAlbumDataList: ArrayList<AlbumData> = ArrayList()
     private var mCurrentAlbumFolderType: String = AlbumConstant.ALBUM_FOLDER_TYPE_DEFAULT
+    var mSelectionList: MutableList<MutableMap<Int, AlbumData>> = mutableListOf()
 
     companion object {
         val albumManagerCollectionInstance: AlbumManagerCollection by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -37,7 +38,14 @@ class AlbumManagerCollection {
         }
     }
 
-    fun getSelectionData(): ArrayList<AlbumData> = mSelectionCollection
+    fun getSelectionData() = mSelectionCollection
+
+    fun saveSelectionList(selectionList: MutableList<MutableMap<Int, AlbumData>>) {
+//        mSelectionList.clear()
+        mSelectionList = selectionList
+    }
+
+    fun getSelectionList() = mSelectionList
 
     fun saveAllAlbumData(albumDataList: ArrayList<AlbumData>) {
         albumDataList?.let {
@@ -45,19 +53,19 @@ class AlbumManagerCollection {
         }
     }
 
-    fun getAllAlbumData(): ArrayList<AlbumData> = mAllAlbumDataList
+    fun getAllAlbumData() = mAllAlbumDataList
 
     fun saveCurrentAlbumData(albumDataList: ArrayList<AlbumData>) {
         mCurrentAlbumDataList = albumDataList
     }
 
-    fun getCurrentAlbumData(): ArrayList<AlbumData> = mCurrentAlbumDataList
+    fun getCurrentAlbumData() = mCurrentAlbumDataList
 
     fun saveAlbumFolder(albumFolderList: ArrayList<AlbumFolder>) {
         albumFolderList?.let { mAlbumFolderDataList = it }
     }
 
-    fun getAlbumFolder(): ArrayList<AlbumFolder> = ArrayList()
+    fun getAlbumFolder(): ArrayList<AlbumFolder> = mAlbumFolderDataList
 
     fun saveAlbumFolderType(albumFolderType: String) {
         mCurrentAlbumFolderType = albumFolderType
@@ -68,6 +76,10 @@ class AlbumManagerCollection {
 
     fun clearSelectionData() {
         mSelectionCollection?.let { it.clear() }
+    }
+
+    fun clearSelectionList() {
+        mSelectionList?.let { it.clear() }
     }
 
     fun clearAllAlbumData() {
@@ -84,6 +96,7 @@ class AlbumManagerCollection {
 
     fun reset() {
         clearSelectionData()
+        clearSelectionList()
         clearAllAlbumData()
         clearCurrentAlbumData()
         clearAlbumFolderData()

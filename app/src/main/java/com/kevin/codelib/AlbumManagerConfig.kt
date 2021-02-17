@@ -15,11 +15,11 @@ class AlbumManagerConfig {
     var mimeType = AlbumConstant.TYPE_ALL
     var camera = false
     var outputCameraPath = ""
-    var minSelectedNum = 0
-    var maxSelectedNum = 0
+    var minSelectedNum = 1
+    var maxSelectedNum = 9
     var spanCount = 4
     var showGif = false
-    var enablePreview=false
+    var enablePreview = false
 
     companion object {
         val albumManagerConfig: AlbumManagerConfig by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -36,10 +36,10 @@ class AlbumManagerConfig {
         var mimeType = AlbumConstant.TYPE_ALL
         var camera = false
         var outputCameraPath = ""
-        var minSelectedNum = 0
-        var maxSelectedNum = 0
+        var minSelectedNum = 1
+        var maxSelectedNum = 9
         var spanCount = 4
         var showGif = false
-        var enablePreview=false
+        var enablePreview = false
     }
 }

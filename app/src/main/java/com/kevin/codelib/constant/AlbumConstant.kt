@@ -34,8 +34,8 @@ object AlbumConstant {
     /**
      * 跳转到预览页面
      */
-    const val REQUEST_CODE_ALBUM_PREVIEW_ITEM = 1001
-    const val REQUEST_CODE_ALBUM_PREVIEW_SELECTED = 1002
+    const val REQUEST_CODE_ALBUM_PREVIEW_ITEM = 10099//全部预览
+    const val REQUEST_CODE_ALBUM_PREVIEW_SELECTED = 10098//选中的图片预览
     const val SET_RESULT_FOR_SELECTION = "setResultForSelection"
     const val PREVIEW_METHOD = "preview_method"
     const val ALBUM_FOLDER_TYPE_DEFAULT = "全部"

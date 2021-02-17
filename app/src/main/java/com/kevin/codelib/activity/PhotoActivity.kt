@@ -40,24 +40,36 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.btn_photo -> {
-                var intent = Intent(this, AlbumActivity::class.java)
-                intent.putExtra("type", "all")
-                startActivity(intent)
+//                var intent = Intent(this, AlbumActivity::class.java)
+//                intent.putExtra("type", "all")
+//                startActivity(intent)
+                AlbumManager.withContext(this)
+                    .openAlbum(AlbumConstant.TYPE_ALL)
+                    .forResult(AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_ITEM)
             }
             R.id.btn_get_gif -> {
-                var intent = Intent(this, AlbumActivity::class.java)
-                intent.putExtra("type", "gif")
-                startActivity(intent)
+//                var intent = Intent(this, AlbumActivity::class.java)
+//                intent.putExtra("type", "gif")
+//                startActivity(intent)
+                AlbumManager.withContext(this)
+                    .openAlbum(AlbumConstant.TYPE_GIF)
+                    .forResult(AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_ITEM)
             }
             R.id.btn_get_image -> {
-                var intent = Intent(this, AlbumActivity::class.java)
-                intent.putExtra("type", "noGif")
-                startActivity(intent)
+//                var intent = Intent(this, AlbumActivity::class.java)
+//                intent.putExtra("type", "noGif")
+//                startActivity(intent)
+                AlbumManager.withContext(this)
+                    .openAlbum(AlbumConstant.TYPE_IMAGE_NO_GIF)
+                    .forResult(AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_ITEM)
             }
             R.id.btn_get_video -> {
-                var intent = Intent(this, AlbumActivity::class.java)
-                intent.putExtra("type", "video")
-                startActivity(intent)
+//                var intent = Intent(this, AlbumActivity::class.java)
+//                intent.putExtra("type", "video")
+//                startActivity(intent)
+                AlbumManager.withContext(this)
+                    .openAlbum(AlbumConstant.TYPE_VIDEO)
+                    .forResult(AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_ITEM)
             }
             R.id.btn_photo_test -> {
                 AlbumManager.withContext(this)

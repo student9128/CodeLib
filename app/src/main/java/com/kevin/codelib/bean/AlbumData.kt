@@ -23,7 +23,8 @@ data class AlbumData(
     var mimeType: String = "",
     var duration: Long = 0,
     var selected: Boolean = false,
-    var selectedIndex: Int = -1
+    var selectedIndex: Int = -1,
+    var key:Int=-1//再相册数据集合中的位置,必须设置
 ) : Parcelable
 
 /**
