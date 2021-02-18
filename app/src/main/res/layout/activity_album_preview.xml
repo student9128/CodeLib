@@ -110,23 +110,15 @@
 
     </RelativeLayout>
 
-    <no.danielzeller.blurbehindlib.BlurBehindLayout
-        android:id="@+id/blurLayout"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        app:blurRadius="100.0"
-        app:updateMode="continuously"
-        app:useTextureView="false"
-        app:blurTextureScale="0.5"
-        app:useChildAlphaAsMask="false"
-        app:layout_constraintBottom_toBottomOf="parent">
+
 
         <RelativeLayout
             android:id="@+id/rlMenu"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:background="@color/alphaWhite"
+            android:background="@color/white"
             android:gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:orientation="horizontal">
 
             <TextView
@@ -155,6 +147,4 @@
                 android:textSize="16sp"
                 android:transitionName="@string/share_album_btn_send" />
         </RelativeLayout>
-
-    </no.danielzeller.blurbehindlib.BlurBehindLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

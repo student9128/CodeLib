@@ -24,6 +24,10 @@ class AlbumManagerModel(
         albumManagerConfig.mimeType = mimeType
     }
 
+    fun setTheme(themeId: Int): AlbumManagerModel {
+        albumManagerConfig.themeId = themeId
+        return this
+    }
 
     fun maxSelectedNum(maxSelectNum: Int): AlbumManagerModel {
         albumManagerConfig.maxSelectedNum = maxSelectNum

@@ -14,9 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blankj.utilcode.util.ToastUtils
 import com.kevin.codelib.AlbumManagerCollection
+import com.kevin.codelib.AlbumManagerConfig
 import com.kevin.codelib.R
 import com.kevin.codelib.adapter.AlbumAdapter
 import com.kevin.codelib.adapter.AlbumFolderAdapter
+import com.kevin.codelib.base.AlbumBaseActivity
 import com.kevin.codelib.base.BaseActivity
 import com.kevin.codelib.bean.AlbumData
 import com.kevin.codelib.bean.AlbumFolder
@@ -42,7 +44,7 @@ import kotlin.collections.HashMap
  *
  * Describe:<br/>
  */
-class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickListener {
+class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnClickListener {
 
     var mAllAlbumDataList: ArrayList<AlbumData> = ArrayList<AlbumData>()
     var mOtherAlbumDataList: ArrayList<AlbumData> = ArrayList<AlbumData>()
@@ -59,12 +61,16 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
     private val albumLoaderInstance = AlbumLoader.albumLoaderInstance
     private val albumManagerCollectionInstance =
         AlbumManagerCollection.albumManagerCollectionInstance
+
     var loadAlbumJob: Job? = null
+    val attrArray = intArrayOf(android.R.attr.colorPrimary)
     override fun getLayoutResID(): Int {
         return R.layout.activity_album
     }
 
     override fun initView() {
+//        val typeArray = obtainStyledAttributes(albumManagerConfig.themeId, attrArray)
+//        val color = typeArray.getColor(0,R.color.colorPrimary)
         tvTitle.text = "全部"
         ivBack.setOnClickListener { onBackPressed() }
         llTitle.setOnClickListener {
@@ -318,9 +324,11 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
             }
         }
         if (mSelectList.size > 0) {
+            tv_send.isEnabled = true
             tv_preview.setTextColor(Color.BLACK)
             tv_preview.isClickable = true
         } else {
+            tv_send.isEnabled = false
             tv_preview.setTextColor(ContextCompat.getColor(this, R.color.gray))
             tv_preview.isClickable = false
         }
@@ -332,13 +340,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.tv_send -> {
-                val intent = Intent()
-                intent.putParcelableArrayListExtra(
-                    AlbumConstant.SET_RESULT_FOR_SELECTION,
-                    mSelectedAlbumDataList
-                )
-                setResult(RESULT_OK, intent)
-                finish()
+                setResultAlbum()
             }
         }
     }
@@ -347,6 +349,7 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
         super.onDestroy()
         loadAlbumJob?.let { if (it.isActive) it.cancel() }
         AlbumManagerCollection.albumManagerCollectionInstance.reset()
+        btnSendClick = false
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -380,7 +383,20 @@ class AlbumActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
                     }
                 }
             }
+            if (btnSendClick) {
+                setResultAlbum()
+            }
         }
+    }
+
+    private fun setResultAlbum() {
+        val intent = Intent()
+        intent.putParcelableArrayListExtra(
+            AlbumConstant.SET_RESULT_FOR_SELECTION,
+            mSelectedAlbumDataList
+        )
+        setResult(RESULT_OK, intent)
+        finish()
     }
 
 }

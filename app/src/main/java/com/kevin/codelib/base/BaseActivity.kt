@@ -3,6 +3,7 @@ package com.kevin.codelib.base
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import com.kevin.codelib.R
 import kotlinx.android.synthetic.main.layout_tool_bar.*
 
 /**
@@ -14,6 +15,7 @@ import kotlinx.android.synthetic.main.layout_tool_bar.*
 abstract class BaseActivity : AppBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        doSomethingBeforeOnCreate()
         super.onCreate(savedInstanceState)
         setContentView(getLayoutResID())
         setSupportActionBar(toolBar)
@@ -22,6 +24,9 @@ abstract class BaseActivity : AppBaseActivity() {
             it.setHomeButtonEnabled(true)
         }
         initView()
+    }
+
+   open fun doSomethingBeforeOnCreate() {
     }
 
     abstract fun getLayoutResID(): Int

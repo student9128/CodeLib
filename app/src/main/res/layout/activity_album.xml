@@ -9,7 +9,7 @@
         android:id="@+id/titleBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
+        android:background="?colorPrimary"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_back_material_light"
         app:popupTheme="@style/Theme.AppCompat.Light"
@@ -35,6 +35,7 @@
             app:layout_constraintLeft_toLeftOf="parent">
 
             <LinearLayout
+                android:id="@+id/ll_expand_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_album_expand"
@@ -129,6 +130,7 @@
                     android:paddingHorizontal="15dp"
                     android:paddingVertical="5dp"
                     android:text="发送"
+                    android:enabled="false"
                     android:textColor="@color/white"
                     android:textSize="16sp"
                     android:transitionName="@string/share_album_btn_send" />

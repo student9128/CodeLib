@@ -9,19 +9,17 @@ import android.widget.ImageView
 import android.widget.MediaController
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
-import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.kevin.codelib.AlbumManagerCollection
 import com.kevin.codelib.R
 import com.kevin.codelib.adapter.AlbumPreviewAdapter
-import com.kevin.codelib.base.BaseActivity
+import com.kevin.codelib.base.AlbumBaseActivity
 import com.kevin.codelib.bean.AlbumData
 import com.kevin.codelib.constant.AlbumConstant
 import com.kevin.codelib.constant.AlbumPreviewMethod
 import com.kevin.codelib.util.AppUtils
 import kotlinx.android.synthetic.main.activity_album_preview.*
-import kotlinx.android.synthetic.main.activity_album_preview.blurLayout
 import kotlinx.android.synthetic.main.activity_album_preview.tv_send
 
 
@@ -34,7 +32,7 @@ import kotlinx.android.synthetic.main.activity_album_preview.tv_send
  *
  * Describe:<br/>
  */
-class AlbumPreviewActivity : BaseActivity(), View.OnClickListener {
+class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
     var showStatusBarAndNavBar = true
     var handler: Handler? = null
     var runnable: Runnable? = null
@@ -64,12 +62,14 @@ class AlbumPreviewActivity : BaseActivity(), View.OnClickListener {
             tv_select_view.isEnabled = albumData.selected
             tv_select_view.text = selectedIndex.toString()
         }
+        val selectionList = albumManagerCollectionInstance.getSelectionList()
+        checkBtnSendEnabled(selectionList)
 //        val mimeType = intent.getStringExtra("mimeType")
 //        val albumPath = intent.getStringExtra("albumPath")
 //        printD("albumPath=$albumPath,mimeType=$mimeType")
         transparentStatusBar()
 //        blurLayout.updateForMilliSeconds(100)
-        blurLayout.viewBehind = vpViewPagerPreview
+//        blurLayout.viewBehind = vpViewPagerPreview
 //        if (AlbumUtils.isVideo(mimeType!!)) {
 //            hideStatusBarAndNavBar()
 //            showStatusBarAndNavBar()
@@ -130,6 +130,10 @@ class AlbumPreviewActivity : BaseActivity(), View.OnClickListener {
         })
         tv_send.setOnClickListener(this)
         ll_select_view.setOnClickListener(this)
+    }
+
+    private fun checkBtnSendEnabled(selectionList: MutableList<MutableMap<Int, AlbumData>>) {
+        tv_send.isEnabled = selectionList.size > 0
     }
 
     private fun postLoadVideo(albumPath: String) {
@@ -201,16 +205,21 @@ class AlbumPreviewActivity : BaseActivity(), View.OnClickListener {
     }
 
     override fun onBackPressed() {
-        val intent = Intent()
-        setResult(RESULT_OK, intent)
+        setResult()
         super.onBackPressed()
         overridePendingTransition(0, R.anim.photo_fade_out)
+    }
+
+    private fun setResult() {
+        val intent = Intent()
+        setResult(RESULT_OK, intent)
     }
 
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.tv_send -> {
-
+                btnSendClick=true
+                onBackPressed()
             }
             R.id.ll_select_view -> {
                 if (mPreviewMethod == AlbumPreviewMethod.MULTIPLE.name) {
@@ -218,7 +227,6 @@ class AlbumPreviewActivity : BaseActivity(), View.OnClickListener {
                 } else {
                     handleSingle()
                 }
-
             }
         }
     }
@@ -282,6 +290,7 @@ class AlbumPreviewActivity : BaseActivity(), View.OnClickListener {
                 selectionData.add(albumData)
             }
         }
+        checkBtnSendEnabled(selectionList)
         printD("selectionList.size=${selectionList.size},selectionData.size=${selectionData.size}")
         albumManagerCollectionInstance.saveSelectionData(selectionData)
         albumManagerCollectionInstance.saveSelectionList(selectionList)
@@ -360,6 +369,7 @@ class AlbumPreviewActivity : BaseActivity(), View.OnClickListener {
                 selectionData.add(albumData)
             }
         }
+        checkBtnSendEnabled(selectionList)
         printD("selectionList.size=${selectionList.size},selectionData.size=${selectionData.size}")
         albumManagerCollectionInstance.saveSelectionData(selectionData)
         albumManagerCollectionInstance.saveSelectionList(selectionList)

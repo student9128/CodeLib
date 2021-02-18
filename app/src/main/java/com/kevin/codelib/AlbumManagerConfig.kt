@@ -20,6 +20,7 @@ class AlbumManagerConfig {
     var spanCount = 4
     var showGif = false
     var enablePreview = false
+    var themeId = R.style.AppTheme
 
     companion object {
         val albumManagerConfig: AlbumManagerConfig by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -32,14 +33,15 @@ class AlbumManagerConfig {
         }
     }
 
-    private fun reset() {
-        var mimeType = AlbumConstant.TYPE_ALL
-        var camera = false
-        var outputCameraPath = ""
-        var minSelectedNum = 1
-        var maxSelectedNum = 9
-        var spanCount = 4
-        var showGif = false
-        var enablePreview = false
+    fun reset() {
+        mimeType = AlbumConstant.TYPE_ALL
+        camera = false
+        outputCameraPath = ""
+        minSelectedNum = 1
+        maxSelectedNum = 9
+        spanCount = 4
+        showGif = false
+        enablePreview = false
+        themeId = R.style.AppTheme
     }
 }
