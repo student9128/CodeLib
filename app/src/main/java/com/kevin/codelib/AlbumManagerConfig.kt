@@ -1,6 +1,7 @@
 package com.kevin.codelib
 
 import com.kevin.codelib.constant.AlbumConstant
+import com.kevin.codelib.constant.AlbumTheme
 
 /**
  * Created by Kevin on 2021/2/4<br/>
@@ -21,6 +22,8 @@ class AlbumManagerConfig {
     var showGif = false
     var enablePreview = false
     var themeId = R.style.AppTheme
+    var theme = AlbumTheme.Default
+    var showNum = true
 
     companion object {
         val albumManagerConfig: AlbumManagerConfig by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -43,5 +46,7 @@ class AlbumManagerConfig {
         showGif = false
         enablePreview = false
         themeId = R.style.AppTheme
+        theme = AlbumTheme.Default
+        showNum = true
     }
 }

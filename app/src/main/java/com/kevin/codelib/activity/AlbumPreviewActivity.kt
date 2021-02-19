@@ -18,6 +18,7 @@ import com.kevin.codelib.base.AlbumBaseActivity
 import com.kevin.codelib.bean.AlbumData
 import com.kevin.codelib.constant.AlbumConstant
 import com.kevin.codelib.constant.AlbumPreviewMethod
+import com.kevin.codelib.util.AlbumUtils
 import com.kevin.codelib.util.AppUtils
 import kotlinx.android.synthetic.main.activity_album_preview.*
 import kotlinx.android.synthetic.main.activity_album_preview.tv_send
@@ -60,7 +61,11 @@ class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
         val selectedIndex = albumData.selectedIndex
         if (albumData.selected) {
             tv_select_view.isEnabled = albumData.selected
-            tv_select_view.text = selectedIndex.toString()
+            if (albumManagerConfig.showNum) {
+                tv_select_view.text = selectedIndex.toString()
+            } else {
+                showSelectedWithTick()
+            }
         }
         val selectionList = albumManagerCollectionInstance.getSelectionList()
         checkBtnSendEnabled(selectionList)
@@ -118,7 +123,11 @@ class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
                 val selectedIndex = albumData.selectedIndex
                 tv_select_view.isEnabled = albumData.selected
                 if (albumData.selected) {
-                    tv_select_view.text = selectedIndex.toString()
+                    if (albumManagerConfig.showNum) {
+                        tv_select_view.text = selectedIndex.toString()
+                    } else {
+                        showSelectedWithTick()
+                    }
                 } else {
                     tv_select_view.text = ""
                 }
@@ -130,6 +139,12 @@ class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
         })
         tv_send.setOnClickListener(this)
         ll_select_view.setOnClickListener(this)
+    }
+
+    private fun showSelectedWithTick() {
+        AlbumUtils.formatCustomFont(tv_select_view)
+        tv_select_view.textSize = 10f
+        tv_select_view.text = getString(R.string.icon_tick)
     }
 
     private fun checkBtnSendEnabled(selectionList: MutableList<MutableMap<Int, AlbumData>>) {
@@ -218,7 +233,7 @@ class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.tv_send -> {
-                btnSendClick=true
+                btnSendClick = true
                 onBackPressed()
             }
             R.id.ll_select_view -> {
@@ -276,7 +291,11 @@ class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
                 }
 
             } else {//不在集合中
-                tv_select_view.text = (selectionList.size + 1).toString()
+                if (albumManagerConfig.showNum) {
+                    tv_select_view.text = (selectionList.size + 1).toString()
+                } else {
+                    showSelectedWithTick()
+                }
                 tv_select_view.isEnabled = true
                 albumData.selected = true
                 albumData.selectedIndex = selectionList.size + 1
@@ -354,7 +373,11 @@ class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
                 }
 
             } else {//不在集合中
-                tv_select_view.text = (selectionList.size + 1).toString()
+                if (albumManagerConfig.showNum) {
+                    tv_select_view.text = (selectionList.size + 1).toString()
+                } else {
+                    showSelectedWithTick()
+                }
                 tv_select_view.isEnabled = true
                 albumData.selected = true
                 albumData.selectedIndex = selectionList.size + 1

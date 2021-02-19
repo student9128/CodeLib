@@ -2,6 +2,7 @@ package com.kevin.codelib
 
 import android.content.Intent
 import com.kevin.codelib.activity.AlbumActivity
+import com.kevin.codelib.constant.AlbumTheme
 
 /**
  * Created by Kevin on 2021/2/4<br/>
@@ -24,8 +25,18 @@ class AlbumManagerModel(
         albumManagerConfig.mimeType = mimeType
     }
 
-    fun setTheme(themeId: Int): AlbumManagerModel {
+    fun setTheme(theme: AlbumTheme): AlbumManagerModel {
+        albumManagerConfig.theme = theme
+        return this
+    }
+
+    fun setCustomTheme(themeId: Int): AlbumManagerModel {
         albumManagerConfig.themeId = themeId
+        return this
+    }
+
+    fun showSelectedWithNum(b: Boolean): AlbumManagerModel {
+        albumManagerConfig.showNum = b
         return this
     }
 

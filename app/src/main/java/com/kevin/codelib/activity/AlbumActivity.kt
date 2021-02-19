@@ -3,6 +3,7 @@ package com.kevin.codelib.activity
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.view.WindowManager
 import android.widget.PopupWindow
@@ -26,6 +27,9 @@ import com.kevin.codelib.constant.AlbumConstant
 import com.kevin.codelib.constant.AlbumPreviewMethod
 import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
 import com.kevin.codelib.loader.AlbumLoader
+import com.kevin.codelib.util.AlbumUtils
+import com.kevin.codelib.util.AppUtils
+import com.kevin.codelib.util.DensityUtil
 import com.kevin.codelib.util.DisplayUtils
 import com.kevin.codelib.widget.DividerItemDecoration
 import com.kevin.codelib.widget.GridSpacingItemDecoration
@@ -63,14 +67,13 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
         AlbumManagerCollection.albumManagerCollectionInstance
 
     var loadAlbumJob: Job? = null
-    val attrArray = intArrayOf(android.R.attr.colorPrimary)
+    val attrArray = intArrayOf(android.R.attr.colorAccent)
     override fun getLayoutResID(): Int {
         return R.layout.activity_album
     }
 
     override fun initView() {
-//        val typeArray = obtainStyledAttributes(albumManagerConfig.themeId, attrArray)
-//        val color = typeArray.getColor(0,R.color.colorPrimary)
+        ll_expand_container.background = AlbumUtils.expandBackground(albumManagerConfig.theme)
         tvTitle.text = "全部"
         ivBack.setOnClickListener { onBackPressed() }
         llTitle.setOnClickListener {
@@ -348,7 +351,8 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
     override fun onDestroy() {
         super.onDestroy()
         loadAlbumJob?.let { if (it.isActive) it.cancel() }
-        AlbumManagerCollection.albumManagerCollectionInstance.reset()
+        albumManagerCollectionInstance.reset()
+        albumManagerConfig.reset()
         btnSendClick = false
     }
 

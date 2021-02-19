@@ -10,6 +10,7 @@ import com.kevin.codelib.R
 import com.kevin.codelib.base.BaseActivity
 import com.kevin.codelib.bean.AlbumData
 import com.kevin.codelib.constant.AlbumConstant
+import com.kevin.codelib.constant.AlbumTheme
 import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
 import kotlinx.android.synthetic.main.activity_function.*
 import kotlinx.android.synthetic.main.activity_function.btn_photo
@@ -45,7 +46,8 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
 //                startActivity(intent)
                 AlbumManager.withContext(this)
                     .openAlbum(AlbumConstant.TYPE_ALL)
-                    .setTheme(R.style.RedTheme)
+                    .setTheme(AlbumTheme.Red)
+                    .showSelectedWithNum(false)
                     .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
             }
             R.id.btn_get_gif -> {
@@ -54,6 +56,7 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
 //                startActivity(intent)
                 AlbumManager.withContext(this)
                     .openAlbum(AlbumConstant.TYPE_GIF)
+                    .setTheme(AlbumTheme.Green)
                     .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
             }
             R.id.btn_get_image -> {
@@ -62,6 +65,7 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
 //                startActivity(intent)
                 AlbumManager.withContext(this)
                     .openAlbum(AlbumConstant.TYPE_IMAGE_NO_GIF)
+                    .setTheme(AlbumTheme.Orange)
                     .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
             }
             R.id.btn_get_video -> {

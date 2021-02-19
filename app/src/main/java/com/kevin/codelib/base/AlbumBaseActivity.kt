@@ -4,6 +4,7 @@ import android.os.Bundle
 import com.blankj.utilcode.util.ToastUtils
 import com.kevin.codelib.AlbumManagerConfig
 import com.kevin.codelib.R
+import com.kevin.codelib.util.AlbumUtils
 
 /**
  * Created by Kevin on 2021/2/17<br/>
@@ -21,19 +22,28 @@ abstract class AlbumBaseActivity : BaseActivity() {
     }
 
     override fun doSomethingBeforeOnCreate() {
-        setTheme(albumManagerConfig.themeId)
+        if (albumManagerConfig.themeId != R.style.AppTheme) {
+            setTheme(albumManagerConfig.themeId)
+        } else {
+            setTheme(AlbumUtils.getTheme(albumManagerConfig.theme))
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
     }
 
+    fun formatExpandBackground() {
+
+    }
+
     fun closeActivity() {
         finish()
     }
 
+
     override fun onDestroy() {
         super.onDestroy()
-        albumManagerConfig.reset()
+//        albumManagerConfig.reset()
     }
 }

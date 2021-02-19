@@ -29,6 +29,21 @@ enum class AlbumPreviewMethod {
     SINGLE,//预览选中的
     MULTIPLE//预览全部
 }
+enum class AlbumTheme{
+    Default,
+    Red,
+    Pink,
+    Purple,
+    DeepPurple,
+    Indigo,
+    LightBlue,
+    Cyan,
+    Teal,
+    Green,
+    Amber,
+    Orange,
+    BlueGrey
+}
 
 object AlbumConstant {
     /**

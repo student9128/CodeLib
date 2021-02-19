@@ -7,10 +7,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.kevin.codelib.AlbumManagerConfig
 import com.kevin.codelib.R
 import com.kevin.codelib.bean.AlbumData
 import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
 import com.kevin.codelib.util.AlbumUtils
+import com.kevin.codelib.util.DensityUtil
 import com.kevin.codelib.util.DisplayUtils
 import kotlinx.android.synthetic.main.adapter_album.view.*
 
@@ -79,7 +81,13 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
                 }
                 tvSelectView.isEnabled = albumData.selected
                 if (albumData.selected) {
-                    tvSelectView.text = albumData.selectedIndex.toString()
+                    if (AlbumManagerConfig.albumManagerConfig.showNum) {
+                        tvSelectView.text = albumData.selectedIndex.toString()
+                    } else {
+                        AlbumUtils.formatCustomFont(tvSelectView)
+                        tvSelectView.textSize = 10f
+                        tvSelectView.text = mContext.getString(R.string.icon_tick)
+                    }
                 } else {
                     tvSelectView.text = ""
                 }
