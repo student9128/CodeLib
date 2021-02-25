@@ -19,5 +19,8 @@ class MainActivity : BaseActivity() {
         btn_function.setOnClickListener {
             startNewActivity(FunctionActivity::class.java)
         }
+        btn_animation.setOnClickListener({
+            startNewActivity(AnimationActivity::class.java)
+        })
     }
 }

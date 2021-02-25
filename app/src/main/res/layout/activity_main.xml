@@ -47,6 +47,11 @@
                     android:layout_height="wrap_content"
                     android:text="常用功能" />
 
+                <Button
+                    android:id="@+id/btn_animation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="lottie动画" />
             </com.google.android.flexbox.FlexboxLayout>
 
         </LinearLayout>
