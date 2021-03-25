@@ -24,7 +24,6 @@ abstract class BaseActivity : AppBaseActivity() {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeButtonEnabled(true)
         }
-        AlbumUtils.initAlbumUtils(this)
         initView()
     }
 

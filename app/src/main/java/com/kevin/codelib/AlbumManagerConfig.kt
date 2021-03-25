@@ -24,6 +24,7 @@ class AlbumManagerConfig {
     var themeId = R.style.AppTheme
     var theme = AlbumTheme.Default
     var showNum = true
+    var canSelected=true
 
     companion object {
         val albumManagerConfig: AlbumManagerConfig by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
@@ -48,5 +49,6 @@ class AlbumManagerConfig {
         themeId = R.style.AppTheme
         theme = AlbumTheme.Default
         showNum = true
+        canSelected=true
     }
 }

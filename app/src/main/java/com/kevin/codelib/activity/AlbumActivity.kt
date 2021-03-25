@@ -73,7 +73,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
     }
 
     override fun initView() {
-        ll_expand_container.background = AlbumUtils.expandBackground(albumManagerConfig.theme)
+        ll_expand_container.background = AlbumUtils.expandBackground(albumManagerConfig.theme, this)
         tvTitle.text = "全部"
         ivBack.setOnClickListener { onBackPressed() }
         llTitle.setOnClickListener {
@@ -222,9 +222,9 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 
                 albumManagerCollectionInstance.saveAlbumFolderType(albumFolder.displayName)
 
-                if (albumFolder.displayName == "全部") {
+                if (albumFolder.displayName == AlbumConstant.ALBUM_FOLDER_TYPE_DEFAULT) {
                     currentSelectedAllAlbum = true
-                    tvTitle.text = "全部"
+                    tvTitle.text = AlbumConstant.ALBUM_FOLDER_TYPE_DEFAULT
                     if (mAllAlbumDataList.size > 0) {
                         showAlbumData()
                         mAlbumDataAdapter?.refreshData(mAllAlbumDataList)
@@ -248,6 +248,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
             }
 
         } else if (type == "albumData") {
+            printD("albumData~~~~~~`")
             showPreview(
                 AlbumPreviewMethod.MULTIPLE,
                 position, AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_ITEM
@@ -281,62 +282,82 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 
     private fun handleSelectEvent(position: Int, dataList: MutableList<AlbumData>) {
         val albumData = dataList[position]
-        if (mSelectList.size == 0) {
-            albumData.selected = true
-            albumData.selectedIndex = 1
-            dataList[position] = albumData
-            var map: MutableMap<Int, AlbumData> = HashMap()
-            albumData.key = position
-            map[position] = albumData
-            mSelectList.add(map)
-            mSelectedAlbumDataList.add(albumData)
-        } else {
-            if (albumData.selected) {//选中的都在集合中存储，获取改集合
-                val iterator = mSelectList.iterator()
-                while (iterator.hasNext()) {
-                    val next = iterator.next()
-
-                    if (next[position] == dataList[position]) {
-                        mSelectedAlbumDataList.remove(albumData)
-                        iterator.remove()
-                        albumData.selected = false
-                        albumData.selectedIndex = -1
-                        dataList[position] = albumData
-                    }
-                }
-                printD("mSelectList.Size=${mSelectList.size},mSelectedAlbumDataList.size=${mSelectedAlbumDataList.size}")
-                for (index in 0 until mSelectList.size) {
-                    val mutableMap = mSelectList[index]
-                    for ((key, value) in mutableMap) {
-                        val albumDataX = dataList[key]
-                        albumDataX.selectedIndex = index + 1
-                        dataList[key] = albumDataX
-
-                    }
-                }
-
-            } else {//不在集合中
-                albumData.selected = true
-                albumData.selectedIndex = mSelectList.size + 1
-                dataList[position] = albumData
-                var map: MutableMap<Int, AlbumData> = HashMap()
-                albumData.key = position
-                map[position] = albumData
-                mSelectList.add(map)
-                mSelectedAlbumDataList.add(albumData)
-            }
+        printD("mSelectList.size=${mSelectList.size}")
+        val selectedAlbumDataSize = albumManagerCollectionInstance.getSelectedAlbumDataSize()
+        if(selectedAlbumDataSize> albumManagerConfig.maxSelectedNum&&!albumData.selected){
+            ToastUtils.showShort("最多只能选择${albumManagerConfig.maxSelectedNum}个文件")
+            return
         }
-        if (mSelectList.size > 0) {
+        if (albumManagerCollectionInstance.hasSelectedAlbumData()) {
             tv_send.isEnabled = true
             tv_preview.setTextColor(Color.BLACK)
             tv_preview.isClickable = true
+            tv_preview.text="预览($selectedAlbumDataSize)"
         } else {
             tv_send.isEnabled = false
             tv_preview.setTextColor(ContextCompat.getColor(this, R.color.gray))
             tv_preview.isClickable = false
+            tv_preview.text="预览"
         }
-        albumManagerCollectionInstance.saveSelectionData(mSelectedAlbumDataList)
-        albumManagerCollectionInstance.saveSelectionList(mSelectList)
+//        if (mSelectList.size == 0) {
+//            albumData.selected = true
+//            albumData.selectedIndex = 1
+//            dataList[position] = albumData
+//            var map: MutableMap<Int, AlbumData> = HashMap()
+//            albumData.key = position
+//            map[position] = albumData
+//            mSelectList.add(map)
+//            mSelectedAlbumDataList.add(albumData)
+//        } else {
+//            if (albumData.selected) {//选中的都在集合中存储，获取改集合
+//                val iterator = mSelectList.iterator()
+//                while (iterator.hasNext()) {
+//                    val next = iterator.next()
+//
+//                    if (next[position] == dataList[position]) {
+//                        mSelectedAlbumDataList.remove(albumData)
+//                        iterator.remove()
+//                        albumData.selected = false
+//                        albumData.selectedIndex = -1
+//                        dataList[position] = albumData
+//                    }
+//                }
+//                printD("mSelectList.Size=${mSelectList.size},mSelectedAlbumDataList.size=${mSelectedAlbumDataList.size}")
+//                for (index in 0 until mSelectList.size) {
+//                    val mutableMap = mSelectList[index]
+//                    for ((key, value) in mutableMap) {
+//                        val albumDataX = dataList[key]
+//                        albumDataX.selectedIndex = index + 1
+//                        dataList[key] = albumDataX
+//
+//                    }
+//                }
+//
+//            } else {//不在集合中
+//                albumData.selected = true
+//                albumData.selectedIndex = mSelectList.size + 1
+//                dataList[position] = albumData
+//                var map: MutableMap<Int, AlbumData> = HashMap()
+//                albumData.key = position
+//                map[position] = albumData
+//                mSelectList.add(map)
+//                mSelectedAlbumDataList.add(albumData)
+//            }
+//        }
+//        if (mSelectList.size > 0) {
+//            tv_send.isEnabled = true
+//            tv_preview.setTextColor(Color.BLACK)
+//            tv_preview.isClickable = true
+//            tv_preview.text="预览(${mSelectList.size})"
+//        } else {
+//            tv_send.isEnabled = false
+//            tv_preview.setTextColor(ContextCompat.getColor(this, R.color.gray))
+//            tv_preview.isClickable = false
+//            tv_preview.text="预览"
+//        }
+//        albumManagerConfig.canSelected = mSelectList.size < albumManagerConfig.maxSelectedNum
+//        albumManagerCollectionInstance.saveSelectionData(mSelectedAlbumDataList)
+//        albumManagerCollectionInstance.saveSelectionList(mSelectList)
         mAlbumDataAdapter?.refreshData(dataList)
     }
 

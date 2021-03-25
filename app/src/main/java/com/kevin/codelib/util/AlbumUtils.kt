@@ -52,34 +52,31 @@ object AlbumUtils {
         return "$l$l1:$l2$l3"
     }
 
-    fun expandBackground(theme:AlbumTheme): GradientDrawable {
-        if (mContext == null) {
-            throw NullPointerException("You must init AlbumUtils before calling this method")
-        }
+    fun expandBackground(theme:AlbumTheme,context: Context): GradientDrawable {
         var drawable = GradientDrawable()
         drawable.shape = GradientDrawable.RECTANGLE
-        drawable.cornerRadius = DensityUtil.dp2px(mContext, 25).toFloat()
+        drawable.cornerRadius = DensityUtil.dp2px(context, 25).toFloat()
         val color=when(theme){
-            AlbumTheme.Default -> getColor(R.color.lightBlue)
-            AlbumTheme.Red -> getColor(R.color.redPrimaryAlpha)
-            AlbumTheme.Pink -> getColor(R.color.pinkPrimaryAlpha)
-            AlbumTheme.Purple -> getColor(R.color.purplePrimaryAlpha)
-            AlbumTheme.DeepPurple -> getColor(R.color.deepPurplePrimaryAlpha)
-            AlbumTheme.Indigo -> getColor(R.color.indigoPrimaryAlpha)
-            AlbumTheme.LightBlue -> getColor(R.color.lightBluePrimaryAlpha)
-            AlbumTheme.Cyan -> getColor(R.color.cyanPrimaryAlpha)
-            AlbumTheme.Teal -> getColor(R.color.tealPrimaryAlpha)
-            AlbumTheme.Green -> getColor(R.color.greenPrimaryAlpha)
-            AlbumTheme.Amber -> getColor(R.color.amberPrimaryAlpha)
-            AlbumTheme.Orange -> getColor(R.color.orangePrimaryAlpha)
-            AlbumTheme.BlueGrey -> getColor(R.color.blueGreyPrimaryAlpha)
+            AlbumTheme.Default -> getColor(context,R.color.lightBlue)
+            AlbumTheme.Red -> getColor(context,R.color.redPrimaryAlpha)
+            AlbumTheme.Pink -> getColor(context,R.color.pinkPrimaryAlpha)
+            AlbumTheme.Purple -> getColor(context,R.color.purplePrimaryAlpha)
+            AlbumTheme.DeepPurple -> getColor(context,R.color.deepPurplePrimaryAlpha)
+            AlbumTheme.Indigo -> getColor(context,R.color.indigoPrimaryAlpha)
+            AlbumTheme.LightBlue -> getColor(context,R.color.lightBluePrimaryAlpha)
+            AlbumTheme.Cyan -> getColor(context,R.color.cyanPrimaryAlpha)
+            AlbumTheme.Teal -> getColor(context,R.color.tealPrimaryAlpha)
+            AlbumTheme.Green -> getColor(context,R.color.greenPrimaryAlpha)
+            AlbumTheme.Amber -> getColor(context,R.color.amberPrimaryAlpha)
+            AlbumTheme.Orange -> getColor(context,R.color.orangePrimaryAlpha)
+            AlbumTheme.BlueGrey -> getColor(context,R.color.blueGreyPrimaryAlpha)
         }
         drawable.setColor(AppUtils.addAlphaForColor(0.3f,color))
         return drawable
     }
 
-    private fun getColor(@ColorRes resId:Int):Int {
-      return ContextCompat.getColor(mContext!!, resId)
+    private fun getColor(context: Context,@ColorRes resId:Int):Int {
+      return ContextCompat.getColor(context, resId)
     }
 
     fun getTheme(theme: AlbumTheme): Int {
@@ -101,16 +98,8 @@ object AlbumUtils {
         }
     }
 
-    var mContext: Context? = null
-    fun initAlbumUtils(context: Context) {
-        mContext = context
-    }
-
-    fun formatCustomFont(textView: TextView) {
-        if (mContext == null) {
-            throw NullPointerException("You must init AlbumUtils before calling this method")
-        }
-        val typeFace = Typeface.createFromAsset(mContext?.assets, "font/iconfont.ttf")
+    fun formatCustomFont(context: Context,textView: TextView) {
+        val typeFace = Typeface.createFromAsset(context.assets, "font/iconfont.ttf")
         textView.typeface=typeFace
     }
 

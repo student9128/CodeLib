@@ -48,6 +48,7 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
                     .openAlbum(AlbumConstant.TYPE_ALL)
                     .setTheme(AlbumTheme.Red)
                     .showSelectedWithNum(false)
+                    .maxSelectedNum(3)
                     .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
             }
             R.id.btn_get_gif -> {

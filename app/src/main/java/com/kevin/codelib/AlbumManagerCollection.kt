@@ -3,6 +3,7 @@ package com.kevin.codelib
 import com.kevin.codelib.bean.AlbumData
 import com.kevin.codelib.bean.AlbumFolder
 import com.kevin.codelib.constant.AlbumConstant
+import com.kevin.codelib.util.LogUtils
 
 /**
  * Created by Kevin on 2021/2/8<br/>
@@ -36,6 +37,10 @@ class AlbumManagerCollection {
         selectionList?.let {
             mSelectionCollection = it
         }
+        LogUtils.logD(
+            "AlbumManagerCollection",
+            "mSelectionCollection.size=${mSelectionCollection.size},,$mSelectionCollection"
+        )
     }
 
     fun getSelectionData() = mSelectionCollection
@@ -101,4 +106,32 @@ class AlbumManagerCollection {
         clearCurrentAlbumData()
         clearAlbumFolderData()
     }
+
+    fun isSelected(album: AlbumData): Boolean {
+        LogUtils.logI("AlbumManagerCollection", "albume=$album")
+        return mSelectionCollection?.contains(album)
+    }
+
+    fun checkedNum(album: AlbumData): Int {
+        var index = mSelectionCollection.indexOf(album)
+        return if (index == -1) {
+            -1
+        } else {
+            index + 1
+        }
+    }
+
+    fun removeSelectedAlbumData(album: AlbumData) {
+        mSelectionCollection?.remove(album)
+    }
+
+    fun addSelectedAlbumData(album: AlbumData) {
+        mSelectionCollection?.add(album)
+    }
+
+    fun hasSelectedAlbumData(): Boolean {
+        return mSelectionCollection?.size > 0
+    }
+
+    fun getSelectedAlbumDataSize(): Int = mSelectionCollection?.size
 }

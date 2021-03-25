@@ -1,5 +1,6 @@
 package com.kevin.codelib.activity
 
+import android.content.Context
 import com.kevin.codelib.R
 import com.kevin.codelib.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_main.*

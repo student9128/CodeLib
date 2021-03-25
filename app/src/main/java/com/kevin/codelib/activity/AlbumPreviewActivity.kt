@@ -50,7 +50,11 @@ class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
         mPreviewMethod = intent.getStringExtra(AlbumConstant.PREVIEW_METHOD)!!
         val position = intent.getIntExtra("position", 0)
         mCurrentPosition = position
-        mDataList = albumManagerCollectionInstance.getCurrentAlbumData()
+        if (mPreviewMethod == AlbumPreviewMethod.MULTIPLE.name) {
+            mDataList = albumManagerCollectionInstance.getCurrentAlbumData()
+        } else {
+            mDataList = albumManagerCollectionInstance.getSelectionData()
+        }
         albumPreviewAdapter = AlbumPreviewAdapter(
             mDataList, supportFragmentManager,
             FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
@@ -59,15 +63,17 @@ class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
         vpViewPagerPreview.currentItem = position
         val albumData = mDataList[position]
         val selectedIndex = albumData.selectedIndex
-        if (albumData.selected) {
-            tv_select_view.isEnabled = albumData.selected
+        if (albumManagerCollectionInstance.isSelected(albumData)) {
+            printD("AlbumPreviewActivity")
+            tv_select_view.isEnabled = true
             if (albumManagerConfig.showNum) {
-                tv_select_view.text = selectedIndex.toString()
+                tv_select_view.text =
+                    albumManagerCollectionInstance.checkedNum(albumData).toString()
             } else {
                 showSelectedWithTick()
             }
         }
-        val selectionList = albumManagerCollectionInstance.getSelectionList()
+        val selectionList = albumManagerCollectionInstance.getSelectionData()
         checkBtnSendEnabled(selectionList)
 //        val mimeType = intent.getStringExtra("mimeType")
 //        val albumPath = intent.getStringExtra("albumPath")
@@ -121,10 +127,12 @@ class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
 //                val dataList = albumManagerCollectionInstance.getCurrentAlbumData()
                 val albumData = mDataList[position]
                 val selectedIndex = albumData.selectedIndex
-                tv_select_view.isEnabled = albumData.selected
-                if (albumData.selected) {
+                val selected = albumManagerCollectionInstance.isSelected(albumData)
+                tv_select_view.isEnabled = selected
+                if (selected) {
                     if (albumManagerConfig.showNum) {
-                        tv_select_view.text = selectedIndex.toString()
+                        tv_select_view.text =
+                            albumManagerCollectionInstance.checkedNum(albumData).toString()
                     } else {
                         showSelectedWithTick()
                     }
@@ -142,12 +150,12 @@ class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
     }
 
     private fun showSelectedWithTick() {
-        AlbumUtils.formatCustomFont(tv_select_view)
+        AlbumUtils.formatCustomFont(this, tv_select_view)
         tv_select_view.textSize = 10f
         tv_select_view.text = getString(R.string.icon_tick)
     }
 
-    private fun checkBtnSendEnabled(selectionList: MutableList<MutableMap<Int, AlbumData>>) {
+    private fun checkBtnSendEnabled(selectionList: ArrayList<AlbumData>) {
         tv_send.isEnabled = selectionList.size > 0
     }
 
@@ -237,10 +245,22 @@ class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
                 onBackPressed()
             }
             R.id.ll_select_view -> {
-                if (mPreviewMethod == AlbumPreviewMethod.MULTIPLE.name) {
-                    handleMultiple()
+                val albumData = mDataList[mCurrentPosition]
+                if (albumManagerCollectionInstance.isSelected(albumData)) {
+                    albumManagerCollectionInstance.removeSelectedAlbumData(albumData)
+                    tv_select_view.isEnabled = false
+                    tv_select_view.text = ""
                 } else {
-                    handleSingle()
+                    albumManagerCollectionInstance.addSelectedAlbumData(albumData)
+                    tv_select_view.isEnabled = true
+                    tv_select_view.text = albumManagerCollectionInstance.checkedNum(albumData).toString()
+                }
+                checkBtnSendEnabled(albumManagerCollectionInstance.getSelectionData())
+                albumPreviewAdapter?.refreshData(mDataList)
+                if (mPreviewMethod == AlbumPreviewMethod.MULTIPLE.name) {
+//                    handleMultiple()
+                } else {
+//                    handleSingle()
                 }
             }
         }
@@ -309,7 +329,7 @@ class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
                 selectionData.add(albumData)
             }
         }
-        checkBtnSendEnabled(selectionList)
+//        checkBtnSendEnabled(selectionList)
         printD("selectionList.size=${selectionList.size},selectionData.size=${selectionData.size}")
         albumManagerCollectionInstance.saveSelectionData(selectionData)
         albumManagerCollectionInstance.saveSelectionList(selectionList)
@@ -392,7 +412,7 @@ class AlbumPreviewActivity : AlbumBaseActivity(), View.OnClickListener {
                 selectionData.add(albumData)
             }
         }
-        checkBtnSendEnabled(selectionList)
+//        checkBtnSendEnabled(selectionList)
         printD("selectionList.size=${selectionList.size},selectionData.size=${selectionData.size}")
         albumManagerCollectionInstance.saveSelectionData(selectionData)
         albumManagerCollectionInstance.saveSelectionList(selectionList)

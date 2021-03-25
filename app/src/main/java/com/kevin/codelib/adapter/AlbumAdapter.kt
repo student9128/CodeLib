@@ -1,19 +1,27 @@
 package com.kevin.codelib.adapter
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.AnimationUtils
+import android.view.animation.OvershootInterpolator
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.kevin.codelib.AlbumManagerCollection
 import com.kevin.codelib.AlbumManagerConfig
 import com.kevin.codelib.R
 import com.kevin.codelib.bean.AlbumData
 import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
 import com.kevin.codelib.util.AlbumUtils
-import com.kevin.codelib.util.DensityUtil
 import com.kevin.codelib.util.DisplayUtils
+import com.kevin.codelib.util.LogUtils
 import kotlinx.android.synthetic.main.adapter_album.view.*
 
 /**
@@ -29,6 +37,10 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
     private val TYPE_CONTENT = 0
     private val TYPE_FOOTER = 1
     private val TYPE_EMPTY = 2
+    private var clickedImagePath: String? = null
+    private val albumManagerCollectionInstance =
+        AlbumManagerCollection.albumManagerCollectionInstance
+    private val albumManagerConfig: AlbumManagerConfig = AlbumManagerConfig.albumManagerConfig
     fun refreshData(d: MutableList<AlbumData>) {
         data = d
         notifyDataSetChanged()
@@ -42,6 +54,10 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
             layoutParams.width = width
             layoutParams.height = width
             view.ivImageView.layoutParams = layoutParams
+            val llLayoutParams = view.ll_modal.layoutParams
+            llLayoutParams.width = width
+            llLayoutParams.height = width
+            view.ll_modal.layoutParams = llLayoutParams
             return AlbumHolder(view)
         } else if (viewType == TYPE_FOOTER) {
             val view = LayoutInflater.from(parent.context)
@@ -56,8 +72,7 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-//        when (getItemViewType(position)) {
-//            TYPE_CONTENT -> {
+
         if (holder is AlbumHolder) {
             val albumHolder = holder as AlbumHolder
             val albumData = data[position]
@@ -77,25 +92,72 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
                     listener?.onItemClick(position, it, "albumData")
                 }
                 llSelectView.setOnClickListener {
+                    clickedImagePath = albumData.path
+                    if (albumManagerCollectionInstance.isSelected(albumData)) {
+                        albumManagerCollectionInstance.removeSelectedAlbumData(albumData)
+                    } else {
+                        albumManagerCollectionInstance.addSelectedAlbumData(albumData)
+                    }
                     listener?.onChildItemClick(position, it, "selectView")
                 }
-                tvSelectView.isEnabled = albumData.selected
-                if (albumData.selected) {
-                    if (AlbumManagerConfig.albumManagerConfig.showNum) {
-                        tvSelectView.text = albumData.selectedIndex.toString()
+                if (AlbumUtils.isVideo(albumData.mimeType)) {
+                    albumHolder.tvDuration.text = AlbumUtils.parseTime(albumData.duration)
+                } else {
+                    albumHolder.tvDuration.text = ""
+                }
+                tvSelectView.isEnabled = albumManagerCollectionInstance.isSelected(albumData)
+                if (!albumManagerConfig.canSelected) {
+                    if (!albumHolder.tvSelectView.isEnabled) {
+                        llModal.visibility = View.GONE
                     } else {
-                        AlbumUtils.formatCustomFont(tvSelectView)
-                        tvSelectView.textSize = 10f
-                        tvSelectView.text = mContext.getString(R.string.icon_tick)
+                        llModal.visibility = View.VISIBLE
+                        if (AlbumManagerConfig.albumManagerConfig.showNum) {
+                            tvSelectView.text = albumData.selectedIndex.toString()
+                        } else {
+                            AlbumUtils.formatCustomFont(mContext, tvSelectView)
+                            tvSelectView.textSize = 10f
+                            tvSelectView.text = mContext.getString(R.string.icon_tick)
+                        }
+//                        if (albumData.path == clickedImagePath) {
+//                            showAnim()
+//                        }
                     }
                 } else {
-                    tvSelectView.text = ""
+                    if (albumManagerCollectionInstance.isSelected(albumData)) {
+                        llModal.visibility = View.VISIBLE
+                        if (AlbumManagerConfig.albumManagerConfig.showNum) {
+//                            tvSelectView.text = albumData.selectedIndex.toString()
+                            tvSelectView.text =
+                                albumManagerCollectionInstance.checkedNum(albumData).toString()
+                        } else {
+                            AlbumUtils.formatCustomFont(mContext, tvSelectView)
+                            tvSelectView.textSize = 10f
+                            tvSelectView.text = mContext.getString(R.string.icon_tick)
+                        }
+//                        if (albumData.path == clickedImagePath) {
+//                            showAnim()
+//                        }
+                    } else {
+                        llModal.visibility = View.GONE
+                        tvSelectView.text = ""
+                    }
                 }
             }
-//                }
-//            }
+
         }
 
+    }
+
+    private fun AlbumHolder.showAnim() {
+        var set = AnimatorSet()
+        set.playTogether(
+            ObjectAnimator.ofFloat(llSelectView, "scaleX", 0.9f, 1.15f, 1f),
+            ObjectAnimator.ofFloat(llSelectView, "scaleY", 0.9f, 1.15f, 1f)
+        )
+        set.interpolator = AccelerateDecelerateInterpolator()
+        set.duration = 150
+
+        set.start()
     }
 
     override fun getItemCount(): Int {
@@ -128,6 +190,7 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
         var tvDuration = itemView.tv_duration
         var tvSelectView = itemView.tv_select_view
         var llSelectView = itemView.ll_select_view
+        var llModal = itemView.ll_modal
 
     }
 
