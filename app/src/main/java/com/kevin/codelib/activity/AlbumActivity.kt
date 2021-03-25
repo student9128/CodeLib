@@ -282,22 +282,22 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 
     private fun handleSelectEvent(position: Int, dataList: MutableList<AlbumData>) {
         val albumData = dataList[position]
-        printD("mSelectList.size=${mSelectList.size}")
         val selectedAlbumDataSize = albumManagerCollectionInstance.getSelectedAlbumDataSize()
-        if(selectedAlbumDataSize> albumManagerConfig.maxSelectedNum&&!albumData.selected){
-            ToastUtils.showShort("最多只能选择${albumManagerConfig.maxSelectedNum}个文件")
-            return
-        }
+        printD("selectedAlbumDataSize=$selectedAlbumDataSize")
+//        if(selectedAlbumDataSize>= albumManagerConfig.maxSelectedNum){
+//            ToastUtils.showShort("最多只能选择${albumManagerConfig.maxSelectedNum}个文件")
+//            return
+//        }
         if (albumManagerCollectionInstance.hasSelectedAlbumData()) {
             tv_send.isEnabled = true
             tv_preview.setTextColor(Color.BLACK)
             tv_preview.isClickable = true
-            tv_preview.text="预览($selectedAlbumDataSize)"
+            tv_preview.text = "预览($selectedAlbumDataSize)"
         } else {
             tv_send.isEnabled = false
             tv_preview.setTextColor(ContextCompat.getColor(this, R.color.gray))
             tv_preview.isClickable = false
-            tv_preview.text="预览"
+            tv_preview.text = "预览"
         }
 //        if (mSelectList.size == 0) {
 //            albumData.selected = true

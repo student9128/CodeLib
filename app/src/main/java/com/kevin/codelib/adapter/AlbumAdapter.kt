@@ -12,6 +12,7 @@ import android.view.animation.AnimationUtils
 import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.kevin.codelib.AlbumManagerCollection
@@ -96,7 +97,11 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
                     if (albumManagerCollectionInstance.isSelected(albumData)) {
                         albumManagerCollectionInstance.removeSelectedAlbumData(albumData)
                     } else {
-                        albumManagerCollectionInstance.addSelectedAlbumData(albumData)
+                        if (albumManagerConfig.maxSelectedNum > albumManagerCollectionInstance.getSelectedAlbumDataSize()) {
+                            albumManagerCollectionInstance.addSelectedAlbumData(albumData)
+                        } else {
+                            ToastUtils.showShort("最多只能选择${albumManagerConfig.maxSelectedNum}个文件")
+                        }
                     }
                     listener?.onChildItemClick(position, it, "selectView")
                 }
@@ -118,9 +123,9 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
                             tvSelectView.textSize = 10f
                             tvSelectView.text = mContext.getString(R.string.icon_tick)
                         }
-//                        if (albumData.path == clickedImagePath) {
-//                            showAnim()
-//                        }
+                        if (albumData.path == clickedImagePath) {
+                            showAnim()
+                        }
                     }
                 } else {
                     if (albumManagerCollectionInstance.isSelected(albumData)) {
@@ -134,9 +139,9 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
                             tvSelectView.textSize = 10f
                             tvSelectView.text = mContext.getString(R.string.icon_tick)
                         }
-//                        if (albumData.path == clickedImagePath) {
-//                            showAnim()
-//                        }
+                        if (albumData.path == clickedImagePath) {
+                            showAnim()
+                        }
                     } else {
                         llModal.visibility = View.GONE
                         tvSelectView.text = ""
@@ -158,6 +163,7 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
         set.duration = 150
 
         set.start()
+        clickedImagePath = ""
     }
 
     override fun getItemCount(): Int {
