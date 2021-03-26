@@ -7,14 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.AnimationUtils
-import android.view.animation.OvershootInterpolator
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.kevin.codelib.AlbumManager
 import com.kevin.codelib.AlbumManagerCollection
 import com.kevin.codelib.AlbumManagerConfig
 import com.kevin.codelib.R
@@ -22,7 +20,6 @@ import com.kevin.codelib.bean.AlbumData
 import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
 import com.kevin.codelib.util.AlbumUtils
 import com.kevin.codelib.util.DisplayUtils
-import com.kevin.codelib.util.LogUtils
 import kotlinx.android.synthetic.main.adapter_album.view.*
 
 /**
@@ -42,6 +39,20 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
     private val albumManagerCollectionInstance =
         AlbumManagerCollection.albumManagerCollectionInstance
     private val albumManagerConfig: AlbumManagerConfig = AlbumManagerConfig.albumManagerConfig
+    val requestOptionVideo = RequestOptions()
+        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+        .skipMemoryCache(false)
+        .error(R.drawable.ic_image_error)
+        .placeholder(R.drawable.ic_image_placehodler)
+    val requestOptionImage = RequestOptions()
+        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+        .skipMemoryCache(true)
+        .centerCrop()
+        .dontAnimate()
+        .dontTransform()
+        .error(R.drawable.ic_image_error)
+        .placeholder(R.drawable.ic_image_placehodler)
+
     fun refreshData(d: MutableList<AlbumData>) {
         data = d
         notifyDataSetChanged()
@@ -81,11 +92,10 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
                 albumHolder.tvDuration.text = AlbumUtils.parseTime(albumData.duration)
             }
             with(albumHolder) {
+
                 Glide.with(mContext)
                     .applyDefaultRequestOptions(
-                        RequestOptions().skipMemoryCache(false)
-                            .error(R.drawable.ic_image_error)
-                            .placeholder(R.drawable.ic_image_placehodler)
+                        if (AlbumUtils.isVideo(albumData.mimeType)) requestOptionVideo else requestOptionImage
                     )
                     .load(albumData.path)
                     .into(imageView)
