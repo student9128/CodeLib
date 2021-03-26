@@ -295,11 +295,6 @@ class AlbumLoader {
             AlbumConstant.QUERY_URI,
             AlbumConstant.PROJECTION,
             SELECTION_BY_BUCKET_ID,
-//            when (mMimeType) {
-//                "gif" -> AlbumConstant.SELECTION_ONLY_GIF_WITH_DISPLAY_NAME
-//                "noGif" -> AlbumConstant.SELECTION_NO_GIF_WITH_DISPLAY_NAME
-//                else -> AlbumConstant.SELECTION_IMAGE_WITH_DISPLAY_NAME
-//            },
             AlbumConstant.selectMediaWithDisplayName(mimeType, bucketId),
             AlbumConstant.ORDER_BY
         )
@@ -323,12 +318,18 @@ class AlbumLoader {
                     val mimeType =
                         data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[2]))
 //                    printD("id=$id,displayName=$displayName,count=$countX,mimeType=$mimeType")
+                    var duration = 0L
+                    if (AlbumUtils.isVideo(mimeType)) {
+                        duration =
+                            data.getLong(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[5]))
+                    }
                     var albumData = AlbumData()
                     albumData.id = id
                     albumData.path = path
                     albumData.width = width
                     albumData.height = height
                     albumData.mimeType = mimeType
+                    albumData.duration = duration
                     dataList.add(albumData)
                 } while (it.moveToNext())
             }

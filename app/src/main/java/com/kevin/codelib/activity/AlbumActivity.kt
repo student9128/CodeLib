@@ -87,11 +87,8 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
         rvRecyclerView.layoutManager = GridLayoutManager(this, 4)
 
         albumLoaderInstance.setParams(this)
-//        albumLoaderInstance.loadAlbumFolder()
 
         loadAlbumJob = coroutineScope.launch {
-//            loadAlbum()
-//            loadX()
             mAllAlbumDataList =
                 async(Dispatchers.IO) { albumLoaderInstance.loadAlbumDataX() }.await()
             mAlbumFolderList = async(Dispatchers.IO) { albumLoaderInstance.loadFolderX() }.await()
@@ -208,7 +205,6 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
     override fun onItemClick(position: Int, view: View, type: String) {
         if (type == "albumFolder") {
             val albumFolder = mAlbumFolderList[position]
-//            albumFolder.displayName=="全部"
             if (albumFolder.checked) {
                 mPopupWindow?.dismiss()
             } else {
@@ -235,6 +231,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                     currentSelectedAllAlbum = false
                     tvTitle.text = albumFolder.displayName
                     val mimeType = albumFolder.mimeType
+                    printD("mimeType=$mimeType,displayName=${albumFolder.displayName},bucketId=${albumFolder.bucketId}")
                     coroutineScope.launch {
                         mOtherAlbumDataList = async(Dispatchers.IO) {
                             albumLoaderInstance.loadImageByBucketIdX(
@@ -283,7 +280,8 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
     private fun handleSelectEvent(position: Int, dataList: MutableList<AlbumData>) {
         val albumData = dataList[position]
         val selectedAlbumDataSize = albumManagerCollectionInstance.getSelectedAlbumDataSize()
-        printD("selectedAlbumDataSize=$selectedAlbumDataSize")
+//        printD("selectedAlbumDataSize=$selectedAlbumDataSize")
+//        printD("selectedAlbumDataSize=${albumManagerCollectionInstance.getSelectionData()}")
 //        if(selectedAlbumDataSize>= albumManagerConfig.maxSelectedNum){
 //            ToastUtils.showShort("最多只能选择${albumManagerConfig.maxSelectedNum}个文件")
 //            return
@@ -418,7 +416,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
         val intent = Intent()
         intent.putParcelableArrayListExtra(
             AlbumConstant.SET_RESULT_FOR_SELECTION,
-            mSelectedAlbumDataList
+            albumManagerCollectionInstance.getSelectionData()
         )
         setResult(RESULT_OK, intent)
         finish()

@@ -51,7 +51,6 @@ class AlbumFolderAdapter(var mContext: Context, var data: MutableList<AlbumFolde
                holder.thisChecked.visibility = if (checked) View.VISIBLE else View.INVISIBLE
         }
         holder.container?.setOnClickListener {
-            LogUtils.d("点击了吗~~~~~~~~~~~~~~")
             listener?.onItemClick(position, it, "albumFolder") }
 
     }
