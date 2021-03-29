@@ -55,6 +55,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="图片查看" />
+                <Button
+                    android:id="@+id/btn_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="调取相机拍照" />
 
             </com.google.android.flexbox.FlexboxLayout>
 

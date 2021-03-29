@@ -8,14 +8,13 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
-import android.util.TypedValue
+import android.provider.MediaStore
 import android.view.View
 import com.blankj.utilcode.util.ToastUtils
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.XXPermissions
 import com.kevin.codelib.R
 import com.kevin.codelib.base.BaseActivity
-import com.kevin.codelib.util.AppUtils
 import com.kevin.codelib.util.LogUtils
 import kotlinx.android.synthetic.main.activity_function.*
 
@@ -29,7 +28,8 @@ import kotlinx.android.synthetic.main.activity_function.*
 class FunctionActivity : BaseActivity() {
     private val permissionList = arrayListOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.CAMERA
     )
 
     override fun getLayoutResID(): Int {
@@ -82,6 +82,44 @@ class FunctionActivity : BaseActivity() {
                     }
 
                 })
+        }
+        btn_camera.setOnClickListener {
+            XXPermissions.with(this)
+                .permission(permissionList)
+                .request(object : OnPermissionCallback {
+                    override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
+//                        val getImageByCamera = Intent("android.media.action.IMAGE_CAPTURE")
+                        // 图片路径？照相后图片要存储的位置
+                        // 图片路径？照相后图片要存储的位置
+//                        picPath = getPicName()
+//                        // 指定输出路径
+//                        // 指定输出路径
+//                        getImageByCamera.putExtra(
+//                            MediaStore.EXTRA_OUTPUT,
+//                            Uri.fromFile(File(picPath))
+//                        )
+//                        getImageByCamera.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1)
+//                        startActivityForResult(getImageByCamera, 1001)
+                        startNewActivity(CameraActivity::class.java)
+                    }
+
+                    override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
+//                    if(never){
+//                    XXPermissions.startPermissionActivity(this@PhotoActivity, permissions)
+//                    }else{
+                        ToastUtils.showShort("授权失败")
+//                    }
+//                        val intent = Intent()
+//                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+//                        val packageName: String = packageName
+//                        intent.setAction("com.meizu.safe.security.SHOW_APPSEC");
+//                        intent.addCategory(Intent.CATEGORY_DEFAULT);
+//                        intent.putExtra("packageName", packageName);
+//                        startActivity(intent)
+                    }
+
+                })
+
         }
     }
 
