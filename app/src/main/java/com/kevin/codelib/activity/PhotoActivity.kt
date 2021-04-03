@@ -47,6 +47,7 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
                 AlbumManager.withContext(this)
                     .openAlbum(AlbumConstant.TYPE_ALL)
                     .setTheme(AlbumTheme.Red)
+                    .showCameraShot(true)
                     .showSelectedWithNum(false)
                     .maxSelectedNum(3)
                     .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)

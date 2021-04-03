@@ -20,6 +20,7 @@ import com.kevin.codelib.bean.AlbumData
 import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
 import com.kevin.codelib.util.AlbumUtils
 import com.kevin.codelib.util.DisplayUtils
+import com.kevin.codelib.util.LogUtils
 import kotlinx.android.synthetic.main.adapter_album.view.*
 
 /**
@@ -35,6 +36,7 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
     private val TYPE_CONTENT = 0
     private val TYPE_FOOTER = 1
     private val TYPE_EMPTY = 2
+    private val TYPE_CMAERA = 3
     private var clickedImagePath: String? = null
     private val albumManagerCollectionInstance =
         AlbumManagerCollection.albumManagerCollectionInstance
@@ -46,12 +48,17 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
         .placeholder(R.drawable.ic_image_placehodler)
     val requestOptionImage = RequestOptions()
         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-        .skipMemoryCache(true)
+        .skipMemoryCache(false)
         .centerCrop()
         .dontAnimate()
         .dontTransform()
         .error(R.drawable.ic_image_error)
         .placeholder(R.drawable.ic_image_placehodler)
+
+    fun addShotAlbum(albumData: AlbumData) {
+        data.add(1, albumData)
+        notifyItemInserted(1)
+    }
 
     fun refreshData(d: MutableList<AlbumData>) {
         data = d
@@ -88,79 +95,95 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
         if (holder is AlbumHolder) {
             val albumHolder = holder as AlbumHolder
             val albumData = data[position]
-            if (AlbumUtils.isVideo(albumData.mimeType)) {
-                albumHolder.tvDuration.text = AlbumUtils.parseTime(albumData.duration)
-            }
-            with(albumHolder) {
-
-                Glide.with(mContext)
-                    .applyDefaultRequestOptions(
-                        if (AlbumUtils.isVideo(albumData.mimeType)) requestOptionVideo else requestOptionImage
-                    )
-                    .load(albumData.path)
-                    .into(imageView)
-                imageView.setOnClickListener {
-                    listener?.onItemClick(position, it, "albumData")
-                }
-                llSelectView.setOnClickListener {
-                    clickedImagePath = albumData.path
-                    if (albumManagerCollectionInstance.isSelected(albumData)) {
-                        albumManagerCollectionInstance.removeSelectedAlbumData(albumData)
+            LogUtils.logD("Hello", albumData.toString())
+            if (albumData.showCameraPlaceholder) {
+                albumHolder.cameraContainer.visibility = View.VISIBLE
+                albumHolder.contentContainer.visibility = View.GONE
+                albumHolder.cameraContainer.setOnClickListener {
+                    ToastUtils.showShort("点击了拍摄")
+                    if (albumManagerConfig.maxSelectedNum > albumManagerCollectionInstance.getSelectedAlbumDataSize()) {
+                        listener?.onItemClick(position, it, "camera")
                     } else {
-                        if (albumManagerConfig.maxSelectedNum > albumManagerCollectionInstance.getSelectedAlbumDataSize()) {
-                            albumManagerCollectionInstance.addSelectedAlbumData(albumData)
-                        } else {
-                            ToastUtils.showShort("最多只能选择${albumManagerConfig.maxSelectedNum}个文件")
-                        }
+                        ToastUtils.showShort("最多只能选择${albumManagerConfig.maxSelectedNum}个文件")
                     }
-                    listener?.onChildItemClick(position, it, "selectView")
                 }
+            } else {
+                albumHolder.cameraContainer.visibility = View.GONE
+                albumHolder.contentContainer.visibility = View.VISIBLE
                 if (AlbumUtils.isVideo(albumData.mimeType)) {
                     albumHolder.tvDuration.text = AlbumUtils.parseTime(albumData.duration)
-                } else {
-                    albumHolder.tvDuration.text = ""
                 }
-                tvSelectView.isEnabled = albumManagerCollectionInstance.isSelected(albumData)
-                if (!albumManagerConfig.canSelected) {
-                    if (!albumHolder.tvSelectView.isEnabled) {
-                        llModal.visibility = View.GONE
-                    } else {
-                        llModal.visibility = View.VISIBLE
-                        if (AlbumManagerConfig.albumManagerConfig.showNum) {
-                            tvSelectView.text = albumData.selectedIndex.toString()
-                        } else {
-                            AlbumUtils.formatCustomFont(mContext, tvSelectView)
-                            tvSelectView.textSize = 10f
-                            tvSelectView.text = mContext.getString(R.string.icon_tick)
-                        }
-                        if (albumData.path == clickedImagePath) {
-                            showAnim()
-                        }
+                with(albumHolder) {
+
+                    Glide.with(mContext)
+                        .applyDefaultRequestOptions(
+                            if (AlbumUtils.isVideo(albumData.mimeType)) requestOptionVideo else requestOptionImage
+                        )
+                        .load(albumData.path)
+                        .into(imageView)
+                    imageView.setOnClickListener {
+                        listener?.onItemClick(position, it, "albumData")
                     }
-                } else {
-                    if (albumManagerCollectionInstance.isSelected(albumData)) {
-                        llModal.visibility = View.VISIBLE
-                        if (AlbumManagerConfig.albumManagerConfig.showNum) {
-//                            tvSelectView.text = albumData.selectedIndex.toString()
-                            tvSelectView.text =
-                                albumManagerCollectionInstance.checkedNum(albumData).toString()
+                    llSelectView.setOnClickListener {
+                        clickedImagePath = albumData.path
+                        if (albumManagerCollectionInstance.isSelected(albumData)) {
+                            albumManagerCollectionInstance.removeSelectedAlbumData(albumData)
                         } else {
-                            AlbumUtils.formatCustomFont(mContext, tvSelectView)
-                            tvSelectView.textSize = 10f
-                            tvSelectView.text = mContext.getString(R.string.icon_tick)
+                            if (albumManagerConfig.maxSelectedNum > albumManagerCollectionInstance.getSelectedAlbumDataSize()) {
+                                albumManagerCollectionInstance.addSelectedAlbumData(albumData)
+                            } else {
+                                ToastUtils.showShort("最多只能选择${albumManagerConfig.maxSelectedNum}个文件")
+                            }
                         }
-                        if (albumData.path == clickedImagePath) {
-                            showAnim()
+                        listener?.onChildItemClick(position, it, "selectView")
+                    }
+                    if (AlbumUtils.isVideo(albumData.mimeType)) {
+                        albumHolder.tvDuration.text = AlbumUtils.parseTime(albumData.duration)
+                    } else {
+                        albumHolder.tvDuration.text = ""
+                    }
+                    tvSelectView.isEnabled = albumManagerCollectionInstance.isSelected(albumData)
+                    if (!albumManagerConfig.canSelected) {
+                        if (!albumHolder.tvSelectView.isEnabled) {
+                            llModal.visibility = View.GONE
+                        } else {
+                            llModal.visibility = View.VISIBLE
+                            if (AlbumManagerConfig.albumManagerConfig.showNum) {
+                                tvSelectView.text = albumData.selectedIndex.toString()
+                            } else {
+                                AlbumUtils.formatCustomFont(mContext, tvSelectView)
+                                tvSelectView.textSize = 10f
+                                tvSelectView.text = mContext.getString(R.string.icon_tick)
+                            }
+                            if (albumData.path == clickedImagePath) {
+                                showAnim()
+                            }
                         }
                     } else {
-                        llModal.visibility = View.GONE
-                        tvSelectView.text = ""
+                        if (albumManagerCollectionInstance.isSelected(albumData)) {
+
+                            llModal.visibility = View.VISIBLE
+                            if (AlbumManagerConfig.albumManagerConfig.showNum) {
+//                            tvSelectView.text = albumData.selectedIndex.toString()
+                                tvSelectView.text =
+                                    albumManagerCollectionInstance.checkedNum(albumData).toString()
+                            } else {
+                                AlbumUtils.formatCustomFont(mContext, tvSelectView)
+                                tvSelectView.textSize = 10f
+                                tvSelectView.text = mContext.getString(R.string.icon_tick)
+                            }
+                            if (albumData.path == clickedImagePath) {
+                                showAnim()
+                            }
+                        } else {
+                            llModal.visibility = View.GONE
+                            tvSelectView.text = ""
+                        }
                     }
                 }
             }
 
         }
-
     }
 
     private fun AlbumHolder.showAnim() {
@@ -207,6 +230,8 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
         var tvSelectView = itemView.tv_select_view
         var llSelectView = itemView.ll_select_view
         var llModal = itemView.ll_modal
+        var contentContainer = itemView.clContentContainer
+        var cameraContainer = itemView.clCameraContainer
 
     }
 
@@ -215,7 +240,6 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
 
     class EmptyHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
-
 
     private var listener: OnRecyclerItemClickListener? = null
     fun setOnItemClickListener(l: OnRecyclerItemClickListener) {

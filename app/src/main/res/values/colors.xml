@@ -12,6 +12,7 @@
     <color name="alphaWhite">#CCFFFFFF</color>
     <color name="alphaWhite_1">#D9FFFFFF</color>
     <color name="gray">#CCCCCC</color>
+    <color name="gray_1">#f4f9f9</color>
     <color name="dimBackground">#B3000000</color>
     <color name="FF514D50">#FF514D50</color>
     <color name="FF13E7FF">#FF13E7FF</color>

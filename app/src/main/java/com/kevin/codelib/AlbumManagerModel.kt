@@ -34,6 +34,10 @@ class AlbumManagerModel(
         albumManagerConfig.themeId = themeId
         return this
     }
+    fun showCameraShot(b: Boolean):AlbumManagerModel{
+        albumManagerConfig.camera=b
+        return this
+    }
 
     fun showSelectedWithNum(b: Boolean): AlbumManagerModel {
         albumManagerConfig.showNum = b

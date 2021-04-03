@@ -52,6 +52,8 @@ object AlbumConstant {
     const val REQUEST_CODE_ALBUM_RESULT=10097 //获取相册图片
     const val REQUEST_CODE_ALBUM_PREVIEW_ITEM = 10099//全部预览
     const val REQUEST_CODE_ALBUM_PREVIEW_SELECTED = 10098//选中的图片预览
+    const val REQUEST_CODE_ALBUM_CAMERA_PIC = 10096//拍摄照片
+    const val REQUEST_CODE_ALBUM_CAMERA_VIDEO = 10095//拍摄视频
     const val SET_RESULT_FOR_SELECTION = "setResultForSelection"
     const val PREVIEW_METHOD = "preview_method"
     const val ALBUM_FOLDER_TYPE_DEFAULT = "全部"
