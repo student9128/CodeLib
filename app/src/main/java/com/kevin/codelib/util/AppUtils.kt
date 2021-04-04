@@ -178,6 +178,12 @@ class AppUtils {
                 "navigationbar_is_min"
             }
         }
+        fun getAppName():String{
+            val packageManager = mContext?.applicationContext?.packageManager
+            val applicationInfo = packageManager?.getApplicationInfo(mContext?.packageName!!,0)
+            val applicationLabel = packageManager?.getApplicationLabel(applicationInfo!!)
+            return applicationLabel.toString()
+        }
 
     }
 }

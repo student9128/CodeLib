@@ -76,6 +76,7 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
 //                startActivity(intent)
                 AlbumManager.withContext(this)
                     .openAlbum(AlbumConstant.TYPE_VIDEO)
+                    .showCameraShot(true)
                     .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
             }
             R.id.btn_photo_test -> {

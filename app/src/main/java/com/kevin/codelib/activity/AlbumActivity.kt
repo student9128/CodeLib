@@ -12,7 +12,6 @@ import android.os.Build
 import android.os.Environment
 import android.os.Environment.getExternalStoragePublicDirectory
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.PopupWindow
@@ -37,6 +36,7 @@ import com.kevin.codelib.constant.AlbumPreviewMethod
 import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
 import com.kevin.codelib.loader.AlbumLoader
 import com.kevin.codelib.util.AlbumUtils
+import com.kevin.codelib.util.AppUtils
 import com.kevin.codelib.util.DisplayUtils
 import com.kevin.codelib.util.MediaScannerX
 import com.kevin.codelib.widget.DividerItemDecoration
@@ -363,14 +363,41 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 //            ); // 参数常量为自定义的request code, 在取返回结果
 //            gotoCaptureRaw()
 //            takePhoto()
-            openCamera_2()
+            if (albumManagerConfig.mimeType == AlbumConstant.TYPE_VIDEO) {
+                cameraX()
+            } else {
+                openCamera_2()
+            }
         }
+    }
+
+    private fun cameraX() {
+        val fileDir = File(Environment.getExternalStorageDirectory(), "${AppUtils.getAppName()}")
+        if (!fileDir.exists()) {
+            fileDir.mkdir()
+        }
+        fileName = "VIDEO_" + System.currentTimeMillis() + ".mp4"
+        mFilePath = fileDir.absolutePath + "/" + fileName
+        var uri: Uri? = null
+        val contentValues = ContentValues()
+        //设置文件名
+        contentValues.put(MediaStore.Video.Media.DISPLAY_NAME, fileName)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "DCIM/${AppUtils.getAppName()}")
+        } else {
+            contentValues.put(MediaStore.Video.Media.DATA, mFilePath)
+        }
+        contentValues.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4")
+        uri = contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues)
+        val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE) // 启动系统相机
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+        startActivityForResult(intent, 10024)
     }
 
     var fileName = ""
     var mFilePath = ""
     private fun openCamera_2() {
-        val fileDir = File(Environment.getExternalStorageDirectory(), "Pictures")
+        val fileDir = File(Environment.getExternalStorageDirectory(), "${AppUtils.getAppName()}")
         if (!fileDir.exists()) {
             fileDir.mkdir()
         }
@@ -381,7 +408,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
         //设置文件名
         contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM/Pictures")
+            contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM/${AppUtils.getAppName()}")
         } else {
             contentValues.put(MediaStore.Images.Media.DATA, mFilePath)
         }
@@ -575,7 +602,68 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                 10023 -> {
                     try {
                         //查询的条件语句
-                        val selection = MediaStore.Images.Media.DISPLAY_NAME + "=? "
+                        val selection = MediaStore.MediaColumns.DISPLAY_NAME + "=? "
+                        //查询的sql
+                        //Uri：指向外部存储Uri
+                        //projection：查询那些结果
+                        //selection：查询的where条件
+                        //sortOrder：排序
+                        val cursor: Cursor? = contentResolver.query(
+                            AlbumConstant.QUERY_URI,
+                            AlbumConstant.PROJECTION,
+                            selection,
+                            arrayOf(fileName),
+                            null
+                        )
+                        if (cursor != null && cursor.moveToFirst()) {
+                            do {
+                                val uri = ContentUris.withAppendedId(
+                                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                                    cursor.getLong(0)
+                                )
+                                val path =
+                                    cursor.getString(cursor.getColumnIndexOrThrow(AlbumConstant.PROJECTION[1]))
+                                val id = cursor.getLong(
+                                    cursor.getColumnIndexOrThrow(AlbumConstant.PROJECTION[0])
+                                )
+                                var picType =
+                                    cursor.getString(cursor.getColumnIndexOrThrow(AlbumConstant.PROJECTION[2]))
+                                var width =
+                                    cursor.getInt(cursor.getColumnIndexOrThrow(AlbumConstant.PROJECTION[3]))
+                                var height =
+                                    cursor.getInt(cursor.getColumnIndexOrThrow(AlbumConstant.PROJECTION[4]))
+                                printD("uri========$uri,String=$path,picType=$picType,width=$width,height=$height")
+                                var albumData = AlbumData()
+                                albumData.id = id
+                                albumData.path = uri.toString()
+                                albumData.width = width
+                                albumData.height = height
+                                albumData.mimeType = picType
+//                                handleBottomButton()
+//                                mAllAlbumDataList.add(1, albumData)
+//                                if((uri.toString()).indexOf("external/images/media")!=-1){
+//                                    val replace = uri.toString()
+//                                        .replace("external/images/media", "external/file")
+//                                    albumData.path = replace
+//                                }
+//                                albumManagerCollectionInstance.addSelectedAlbumData(albumData)
+//                                mAlbumDataAdapter?.addShotAlbum(albumData)
+                                refreshAlbumData()
+                                val inputStream: InputStream? = contentResolver.openInputStream(uri)
+                                val bitmap = BitmapFactory.decodeStream(inputStream)
+//                                ivShowPicture.setImageBitmap(bitmap) // 显示图片
+                            } while (cursor.moveToNext())
+                        } else {
+                            Toast.makeText(this, "no photo", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                10024 -> {
+                    try {
+                        //查询的条件语句
+                        val selection = MediaStore.MediaColumns.DISPLAY_NAME + "=? "
                         //查询的sql
                         //Uri：指向外部存储Uri
                         //projection：查询那些结果
@@ -612,11 +700,16 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                                 albumData.width = width
                                 albumData.height = height
                                 albumData.mimeType = picType
-                                handleBottomButton()
+//                                handleBottomButton()
 //                                mAllAlbumDataList.add(1, albumData)
-                                albumManagerCollectionInstance.addSelectedAlbumData(albumData)
-                                mAlbumDataAdapter?.addShotAlbum(albumData)
-                                refreshAlbumFolder()
+//                                if((uri.toString()).indexOf("external/images/media")!=-1){
+//                                    val replace = uri.toString()
+//                                        .replace("external/images/media", "external/file")
+//                                    albumData.path = replace
+//                                }
+//                                albumManagerCollectionInstance.addSelectedAlbumData(albumData)
+//                                mAlbumDataAdapter?.addShotAlbum(albumData)
+                                refreshAlbumData()
                                 val inputStream: InputStream? = contentResolver.openInputStream(uri)
                                 val bitmap = BitmapFactory.decodeStream(inputStream)
 //                                ivShowPicture.setImageBitmap(bitmap) // 显示图片
@@ -635,10 +728,18 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
         }
     }
 
-    fun refreshAlbumFolder() {
+    fun refreshAlbumData() {
         refreshAlbumJob = coroutineScope.launch {
+            mAllAlbumDataList =
+                async(Dispatchers.IO) { albumLoaderInstance.loadAlbumDataX() }.await()
+            albumManagerCollectionInstance.addSelectedAlbumData(mAllAlbumDataList[0])
+            var ad = AlbumData()
+            ad.showCameraPlaceholder = true
+            mAllAlbumDataList.add(0, ad)
+            mAlbumDataAdapter?.refreshData(mAllAlbumDataList)
             mAlbumFolderList = async(Dispatchers.IO) { albumLoaderInstance.loadFolderX() }.await()
             mFolderAdapter?.refreshData(mAlbumFolderList)
+            handleBottomButton()
         }
     }
 

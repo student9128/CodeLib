@@ -37,10 +37,10 @@ class AlbumManagerCollection {
         selectionList?.let {
             mSelectionCollection = it
         }
-        LogUtils.logD(
-            "AlbumManagerCollection",
-            "mSelectionCollection.size=${mSelectionCollection.size},,$mSelectionCollection"
-        )
+//        LogUtils.logD(
+//            "AlbumManagerCollection",
+//            "mSelectionCollection.size=${mSelectionCollection.size},,$mSelectionCollection"
+//        )
     }
 
     fun getSelectionData() = mSelectionCollection
@@ -109,8 +109,8 @@ class AlbumManagerCollection {
 
     fun isSelected(album: AlbumData): Boolean {
 
-        LogUtils.logI("AlbumManagerCollection", "albume= $album====${mSelectionCollection?.contains(album)}")
-        LogUtils.logD("AlbumManagerCollection", "albume=${mSelectionCollection}")
+//        LogUtils.logI("AlbumManagerCollection", "albume= $album====${mSelectionCollection?.contains(album)}")
+//        LogUtils.logD("AlbumManagerCollection", "albume=${mSelectionCollection}")
         return mSelectionCollection?.contains(album)
     }
 
@@ -128,9 +128,9 @@ class AlbumManagerCollection {
     }
 
     fun addSelectedAlbumData(album: AlbumData) {
-        LogUtils.logI("AlbumManagerCollection", "addSelectedAlbumData=$album")
+//        LogUtils.logI("AlbumManagerCollection", "addSelectedAlbumData=$album")
         mSelectionCollection.add(album)
-        LogUtils.logI("AlbumManagerCollection", "addSelectedAlbumData=$mSelectionCollection")
+//        LogUtils.logI("AlbumManagerCollection", "addSelectedAlbumData=$mSelectionCollection")
     }
 
     fun hasSelectedAlbumData(): Boolean {
