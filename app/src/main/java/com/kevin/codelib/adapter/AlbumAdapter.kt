@@ -119,6 +119,7 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
                         .applyDefaultRequestOptions(
                             if (AlbumUtils.isVideo(albumData.mimeType)) requestOptionVideo else requestOptionImage
                         )
+                        .asBitmap()
                         .load(albumData.path)
                         .into(imageView)
                     imageView.setOnClickListener {
