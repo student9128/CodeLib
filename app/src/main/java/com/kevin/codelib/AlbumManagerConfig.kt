@@ -25,6 +25,7 @@ class AlbumManagerConfig {
     var theme = AlbumTheme.Default
     var showNum = true
     var canSelected=true
+    var showOriginOption=false//是否显示原图选项
 
     companion object {
         val albumManagerConfig: AlbumManagerConfig by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
