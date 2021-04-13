@@ -1,21 +1,17 @@
 package com.kevin.codelib.activity
 
-import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Intent
-import android.database.Cursor
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.text.TextUtils
 import android.view.View
 import android.view.WindowManager
 import android.widget.PopupWindow
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
@@ -43,10 +39,7 @@ import kotlinx.android.synthetic.main.activity_album.*
 import kotlinx.android.synthetic.main.activity_function.*
 import kotlinx.android.synthetic.main.layout_album_folder_popup_window.view.*
 import kotlinx.coroutines.*
-import top.zibin.luban.Luban
-import top.zibin.luban.OnCompressListener
 import java.io.File
-import java.io.InputStream
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -80,6 +73,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 
     var loadAlbumJob: Job? = null
     var refreshAlbumJob: Job? = null
+    var refreshFolderJob: Job? = null
     val attrArray = intArrayOf(android.R.attr.colorAccent)
     private var fileName = ""
     private var mFilePath = ""
@@ -267,13 +261,11 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
             }
 
         } else if (type == "albumData") {
-            printD("albumData~~~~~~`")
             showPreview(
                 AlbumPreviewMethod.MULTIPLE,
                 position, AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_ITEM
             )
         } else if (type == "camera") {
-            printD("type == camera")
             if (albumManagerConfig.mimeType == AlbumConstant.TYPE_VIDEO) {
                 captureIV(AlbumConstant.TYPE_VIDEO)
             } else {
@@ -284,6 +276,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 
     private fun captureIV(type: String) {
         val fileDir = File(Environment.getExternalStorageDirectory(), "${AppUtils.getAppName()}")
+        printD("fileDir=${fileDir.absolutePath},name=${fileDir.name},exists=${fileDir.exists()}")
         if (!fileDir.exists()) {
             fileDir.mkdir()
         }
@@ -306,7 +299,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
             uri = contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues)
             val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE) // 启动系统相机
             intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-            startActivityForResult(intent, AlbumConstant.REQUEST_CODE_ALBUM_CAMERA_PIC)
+            startActivityForResult(intent, AlbumConstant.REQUEST_CODE_ALBUM_CAMERA_SHOT)
         } else {
             fileName = "IMG_" + System.currentTimeMillis() + ".jpg"
             mFilePath = fileDir.absolutePath + "/" + fileName
@@ -327,7 +320,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                 contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE) // 启动系统相机
             intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-            startActivityForResult(intent, AlbumConstant.REQUEST_CODE_ALBUM_CAMERA_VIDEO)
+            startActivityForResult(intent, AlbumConstant.REQUEST_CODE_ALBUM_CAMERA_SHOT)
         }
     }
 
@@ -388,6 +381,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
         super.onDestroy()
         loadAlbumJob?.let { if (it.isActive) it.cancel() }
         refreshAlbumJob?.let { if (it.isActive) it.cancel() }
+        refreshFolderJob?.let { if (it.isActive) it.cancel() }
         albumManagerCollectionInstance.reset()
         albumManagerConfig.reset()
         btnSendClick = false
@@ -424,11 +418,21 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                     }
                 }
 
-                AlbumConstant.REQUEST_CODE_ALBUM_CAMERA_PIC -> {
-                    refreshAlbumData()
-                }
-                AlbumConstant.REQUEST_CODE_ALBUM_CAMERA_VIDEO -> {
-                    refreshAlbumData()
+                AlbumConstant.REQUEST_CODE_ALBUM_CAMERA_SHOT -> {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                        val file = File(mFilePath)
+                        MediaScannerConnection.scanFile(this@AlbumActivity,
+                            arrayOf(file.toString()),
+                            null,
+                            object : MediaScannerConnection.OnScanCompletedListener {
+                                override fun onScanCompleted(path: String?, uri: Uri?) {
+                                    refreshAlbumData()
+                                }
+                            }
+                        )
+                    } else {
+                        refreshAlbumData()
+                    }
                 }
             }
             if (btnSendClick) {
@@ -446,7 +450,8 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
             ad.showCameraPlaceholder = true
             mAllAlbumDataList.add(0, ad)
             mAlbumDataAdapter?.refreshData(mAllAlbumDataList)
-            mAlbumFolderList = async(Dispatchers.IO) { albumLoaderInstance.loadFolderX() }.await()
+            mAlbumFolderList =
+                async(Dispatchers.IO) { albumLoaderInstance.loadFolderX() }.await()
             mFolderAdapter?.refreshData(mAlbumFolderList)
             handleBottomButton()
         }

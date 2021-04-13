@@ -100,7 +100,6 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
                 albumHolder.cameraContainer.visibility = View.VISIBLE
                 albumHolder.contentContainer.visibility = View.GONE
                 albumHolder.cameraContainer.setOnClickListener {
-                    ToastUtils.showShort("点击了拍摄")
                     if (albumManagerConfig.maxSelectedNum > albumManagerCollectionInstance.getSelectedAlbumDataSize()) {
                         listener?.onItemClick(position, it, "camera")
                     } else {

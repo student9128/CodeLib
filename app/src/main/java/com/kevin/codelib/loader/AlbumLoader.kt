@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import com.kevin.codelib.AlbumManagerConfig
 import com.kevin.codelib.bean.AlbumData
 import com.kevin.codelib.bean.AlbumFolder
@@ -138,7 +139,7 @@ class AlbumLoader {
                     }
                     val displayName =
                         it.getString(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[6]))
-                    //                    printD("path=$duration")
+//                                        LogUtils.logD("AlbumLoader","width=$width,height=$height,path=$path")
                     AlbumUtils.parseTime(duration)
                     var albumData = AlbumData()
                     albumData.id = id
@@ -262,7 +263,7 @@ class AlbumLoader {
                     val withAppendedId = getUri(it)
                     val l = countMap[bucketId]
                     bucketIdSet.add(bucketId)
-//                    printD("id=$id,displayName=$displayName,count=$l,mimeType=$mimeType,withAppendedId=$withAppendedId")
+//                    LogUtils.logD("AlbumLoader","id=$id,displayName=$displayName,count=$l,mimeType=$mimeType,withAppendedId=$withAppendedId")
                     var albumFolder = AlbumFolder()
                     albumFolder.bucketId = bucketId
                     albumFolder.id = id
