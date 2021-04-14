@@ -45,9 +45,9 @@
         <activity android:name=".activity.AppSignMD5Activity" />
         <activity android:name=".activity.PhoneIMEIActivity" />
         <activity android:name=".activity.PhotoActivity" />
-        <activity android:name=".activity.PhotoPreviewActivity"/>
-        <activity android:name=".activity.AlbumActivity" />
-        <activity android:name=".activity.AlbumPreviewActivity" />
+        <activity android:name="com.kevin.albummanager.PhotoPreviewActivity"/>
+        <activity android:name="com.kevin.albummanager.AlbumActivity" />
+        <activity android:name="com.kevin.albummanager.AlbumPreviewActivity" />
         <activity android:name=".activity.AnimationActivity" />
         <activity android:name=".activity.CameraActivity"/>
         <provider

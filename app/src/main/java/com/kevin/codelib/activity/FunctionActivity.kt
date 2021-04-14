@@ -8,13 +8,12 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
-import android.provider.MediaStore
 import android.view.View
 import com.blankj.utilcode.util.ToastUtils
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.XXPermissions
 import com.kevin.codelib.R
-import com.kevin.codelib.base.BaseActivity
+import com.kevin.albummanager.BaseActivity
 import com.kevin.codelib.util.LogUtils
 import kotlinx.android.synthetic.main.activity_function.*
 
@@ -25,7 +24,7 @@ import kotlinx.android.synthetic.main.activity_function.*
  * 公众号：前线开发者Kevin
  * Describe:<br/>
  */
-class FunctionActivity : BaseActivity() {
+class FunctionActivity : com.kevin.albummanager.BaseActivity() {
     private val permissionList = arrayListOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE,

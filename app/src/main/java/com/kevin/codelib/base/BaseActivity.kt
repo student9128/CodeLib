@@ -3,8 +3,6 @@ package com.kevin.codelib.base
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import com.kevin.codelib.R
-import com.kevin.codelib.util.AlbumUtils
 import kotlinx.android.synthetic.main.layout_tool_bar.*
 
 /**

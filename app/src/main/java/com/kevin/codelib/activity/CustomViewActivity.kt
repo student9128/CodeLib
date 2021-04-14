@@ -1,7 +1,7 @@
 package com.kevin.codelib.activity
 
 import com.kevin.codelib.R
-import com.kevin.codelib.base.BaseActivity
+import com.kevin.albummanager.BaseActivity
 import com.kevin.codelib.activity.customviewshow.RegularHexagonActivity
 import com.kevin.codelib.activity.customviewshow.ToggleViewActivity
 import kotlinx.android.synthetic.main.activity_custom_view.*
@@ -12,7 +12,7 @@ import kotlinx.android.synthetic.main.activity_custom_view.*
  * 公众号：前线开发者Kevin
  * Describe:<br/>
  */
-class CustomViewActivity : BaseActivity() {
+class CustomViewActivity : com.kevin.albummanager.BaseActivity() {
     override fun getLayoutResID(): Int =
         R.layout.activity_custom_view
 

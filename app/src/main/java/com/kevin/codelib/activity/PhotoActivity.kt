@@ -3,17 +3,13 @@ package com.kevin.codelib.activity
 
 import android.content.Intent
 import android.view.View
-import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
-import com.kevin.codelib.AlbumManager
+import com.kevin.albummanager.AlbumManager
 import com.kevin.codelib.R
+import com.kevin.albummanager.constant.AlbumConstant
+import com.kevin.albummanager.constant.AlbumTheme
 import com.kevin.codelib.base.BaseActivity
-import com.kevin.codelib.bean.AlbumData
-import com.kevin.codelib.constant.AlbumConstant
-import com.kevin.codelib.constant.AlbumTheme
 import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
-import kotlinx.android.synthetic.main.activity_function.*
-import kotlinx.android.synthetic.main.activity_function.btn_photo
 import kotlinx.android.synthetic.main.activity_photo.*
 
 
@@ -56,7 +52,7 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
 //                var intent = Intent(this, AlbumActivity::class.java)
 //                intent.putExtra("type", "gif")
 //                startActivity(intent)
-                AlbumManager.withContext(this)
+                com.kevin.albummanager.AlbumManager.withContext(this)
                     .openAlbum(AlbumConstant.TYPE_GIF)
                     .setTheme(AlbumTheme.Green)
                     .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
@@ -65,7 +61,7 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
 //                var intent = Intent(this, AlbumActivity::class.java)
 //                intent.putExtra("type", "noGif")
 //                startActivity(intent)
-                AlbumManager.withContext(this)
+                com.kevin.albummanager.AlbumManager.withContext(this)
                     .openAlbum(AlbumConstant.TYPE_IMAGE_NO_GIF)
                     .setTheme(AlbumTheme.Orange)
                     .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
@@ -74,13 +70,13 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
 //                var intent = Intent(this, AlbumActivity::class.java)
 //                intent.putExtra("type", "video")
 //                startActivity(intent)
-                AlbumManager.withContext(this)
+                com.kevin.albummanager.AlbumManager.withContext(this)
                     .openAlbum(AlbumConstant.TYPE_VIDEO)
                     .showCameraShot(true)
                     .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
             }
             R.id.btn_photo_test -> {
-                AlbumManager.withContext(this)
+                com.kevin.albummanager.AlbumManager.withContext(this)
                     .openAlbum(AlbumConstant.TYPE_ALL)
                     .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
             }
@@ -93,7 +89,7 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
             when (requestCode) {
                 AlbumConstant.REQUEST_CODE_ALBUM_RESULT -> {
                     val albumData =
-                        AlbumManager.getAlbumDataResult(data)
+                        com.kevin.albummanager.AlbumManager.getAlbumDataResult(data)
                     printD("$albumData")
                     val path = albumData!![0].path
                     Glide.with(this)

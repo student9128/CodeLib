@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.blankj.utilcode.util.PermissionUtils
 import com.kevin.codelib.R
 import com.kevin.codelib.adapter.ImageAdapter
-import com.kevin.codelib.base.BaseActivity
+import com.kevin.albummanager.BaseActivity
 import com.kevin.codelib.interfaces.ItemClickLisenter
 import kotlinx.android.synthetic.main.activity_share.*
 
@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.activity_share.*
  * 2.在开启界面是生成option=ActivityOptionsCompat将共享的view作为ActivityOptionsCompat的参数
  * 3.开启startActivity(intent, option.toBundle())
  */
-class ShareActivity : BaseActivity() {
+class ShareActivity : com.kevin.albummanager.BaseActivity() {
 
     var list: ArrayList<String> = ArrayList()
     var adapter = ImageAdapter(list, this)

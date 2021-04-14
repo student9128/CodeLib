@@ -66,5 +66,5 @@ dependencies {
     implementation "androidx.camera:camera-view:1.0.0-alpha21"
     // If you want to additionally use the CameraX Extensions library
 //    implementation "androidx.camera:camera-extensions:1.0.0-alpha21"
-    implementation 'top.zibin:Luban:1.1.8'
+    implementation project(':AlbumManager')
 }

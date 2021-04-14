@@ -1,0 +1,5 @@
+<resources>
+    <string name="share_anim">share_anim</string>
+    <string name="share_album_btn_send">share_album_btn_send</string>
+    <string name="icon_tick">&#xe64c;</string>
+</resources>

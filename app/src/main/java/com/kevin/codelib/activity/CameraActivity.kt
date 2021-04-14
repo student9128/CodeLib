@@ -14,7 +14,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import com.kevin.codelib.R
-import com.kevin.codelib.base.BaseActivity
+import com.kevin.albummanager.BaseActivity
 import kotlinx.android.synthetic.main.activity_camera.*
 import java.io.File
 import java.text.SimpleDateFormat
@@ -31,7 +31,7 @@ import java.util.concurrent.Executors
  *
  * Describe:<br/>
  */
-class CameraActivity : BaseActivity() {
+class CameraActivity : com.kevin.albummanager.BaseActivity() {
     private lateinit var cameraExecutor: ExecutorService
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     var imageCapture:ImageCapture?=null

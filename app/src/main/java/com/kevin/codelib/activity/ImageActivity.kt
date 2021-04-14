@@ -2,7 +2,7 @@ package com.kevin.codelib.activity
 
 import com.bumptech.glide.Glide
 import com.kevin.codelib.R
-import com.kevin.codelib.base.BaseActivity
+import com.kevin.albummanager.BaseActivity
 import com.kevin.codelib.util.AppUtils
 import kotlinx.android.synthetic.main.activity_image.*
 import java.io.File
@@ -10,7 +10,7 @@ import java.io.File
 /**
  * 显示图片
  */
-class ImageActivity : BaseActivity() {
+class ImageActivity : com.kevin.albummanager.BaseActivity() {
     override fun getLayoutResID(): Int {
         return R.layout.activity_image
     }

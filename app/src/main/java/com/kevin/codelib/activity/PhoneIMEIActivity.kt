@@ -12,8 +12,7 @@ import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
 import com.kevin.codelib.R
-import com.kevin.codelib.activity.PhoneIMEIActivity
-import com.kevin.codelib.base.BaseActivity
+import com.kevin.albummanager.BaseActivity
 import kotlinx.android.synthetic.main.activity_phone_imei.*
 
 /**
@@ -22,7 +21,7 @@ import kotlinx.android.synthetic.main.activity_phone_imei.*
  * 公众号：前线开发者Kevin
  * Describe:<br></br>
  */
-class PhoneIMEIActivity : BaseActivity() {
+class PhoneIMEIActivity : com.kevin.albummanager.BaseActivity() {
     override fun getLayoutResID(): Int {
         return R.layout.activity_phone_imei
     }

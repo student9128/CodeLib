@@ -6,7 +6,7 @@ import android.content.Context
 import android.text.TextUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.kevin.codelib.R
-import com.kevin.codelib.base.BaseActivity
+import com.kevin.albummanager.BaseActivity
 import com.kevin.codelib.util.AppUtils
 import kotlinx.android.synthetic.main.activity_app_sign_md5.*
 
@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.activity_app_sign_md5.*
  * 公众号：前线开发者Kevin
  * Describe:<br/>
  */
-class AppSignMD5Activity : BaseActivity() {
+class AppSignMD5Activity : com.kevin.albummanager.BaseActivity() {
     override fun getLayoutResID(): Int {
         return R.layout.activity_app_sign_md5
     }
