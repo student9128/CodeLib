@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.kevin.albummanager">
-
+    <uses-sdk tools:overrideLibrary="no.danielzeller.blurbehindlib" />
+    <application>
+        <activity android:name=".AlbumActivity"></activity>
+        <activity android:name=".AlbumPreviewActivity"></activity>
+        <activity android:name=".PhotoPreviewActivity"></activity>
+    </application>
 </manifest>

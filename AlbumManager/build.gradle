@@ -54,3 +54,23 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2'
     implementation 'com.blankj:utilcodex:1.26.0'
 }
+ext {
+    PUBLISH_GROUP_ID = "io.github.student9128"        //项目包名
+    PUBLISH_ARTIFACT_ID = 'albummanager'            //项目名
+    PUBLISH_VERSION = '1.0.1'                    //版本号
+}
+apply from: '../publish.gradle'
+
+//生成jar包
+//便于复制
+task makeJar(type:Copy){
+    //删除build/libs下的test.jar目录
+    delete 'build/libs/AlbumManager.jar'
+    //从build/intermediates/bundles/debug/目录下的classes.jar导入到build/libs/目录下
+    from('build/intermediates/bundles/debug/')
+    into('build/libs/')
+    include('classes.jar')
+    //重新命名
+    rename('classes.jar','AlbumManager.jar')
+}
+makeJar.dependsOn(build)

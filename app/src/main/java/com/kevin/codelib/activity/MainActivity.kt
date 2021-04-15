@@ -1,6 +1,8 @@
 package com.kevin.codelib.activity
 
 import android.Manifest
+import android.app.AppOpsManager
+import android.app.NotificationManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -16,13 +18,8 @@ import com.hjq.permissions.XXPermissions
 import com.kevin.codelib.R
 import com.kevin.codelib.base.BaseActivity
 import com.kevin.codelib.util.LogUtils
-import kotlinx.android.synthetic.main.activity_function.*
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.btn_camera
-import kotlinx.android.synthetic.main.activity_main.btn_get_app_sign_md5
-import kotlinx.android.synthetic.main.activity_main.btn_get_imei
-import kotlinx.android.synthetic.main.activity_main.btn_go_market
-import kotlinx.android.synthetic.main.activity_main.btn_photo
+import java.lang.reflect.InvocationTargetException
 
 class MainActivity : BaseActivity() {
     private val permissionList = arrayListOf(
@@ -203,6 +200,61 @@ class MainActivity : BaseActivity() {
         } catch (e: ActivityNotFoundException) {
             e.printStackTrace()
             false
+        }
+    }
+    //判断通知权限是否打开
+    private fun isEnableV19(context: Context): Boolean {
+        val CHECK_OP_NO_THROW = "checkOpNoThrow"
+        val OP_POST_NOTIFICATION = "OP_POST_NOTIFICATION"
+        val mAppOps = context.getSystemService(APP_OPS_SERVICE) as AppOpsManager
+        val appInfo = context.applicationInfo
+        val pkg = context.applicationContext.packageName
+        val uid = appInfo.uid
+        var appOpsClass: Class<*>? = null /* Context.APP_OPS_MANAGER */
+        try {
+            appOpsClass = Class.forName(AppOpsManager::class.java.name)
+            val checkOpNoThrowMethod = appOpsClass.getMethod(
+                CHECK_OP_NO_THROW, Integer.TYPE, Integer.TYPE,
+                String::class.java
+            )
+            val opPostNotificationValue = appOpsClass.getDeclaredField(OP_POST_NOTIFICATION)
+            val value = opPostNotificationValue[Int::class.java] as Int
+            return checkOpNoThrowMethod.invoke(
+                mAppOps,
+                value,
+                uid,
+                pkg
+            ) as Int == AppOpsManager.MODE_ALLOWED
+        } catch (e: ClassNotFoundException) {
+        } catch (e: NoSuchMethodException) {
+        } catch (e: NoSuchFieldException) {
+        } catch (e: InvocationTargetException) {
+        } catch (e: IllegalAccessException) {
+        } catch (e: Exception) {
+        }
+        return false
+    }
+
+    //判断通知权限是否打开
+    private fun isEnableV26(context: Context): Boolean {
+        val appInfo = context.applicationInfo
+        val pkg = context.applicationContext.packageName
+        val uid = appInfo.uid
+        return try {
+            val notificationManager =
+                context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            val sServiceField = notificationManager.javaClass.getDeclaredMethod("getService")
+            sServiceField.isAccessible = true
+            val sService = sServiceField.invoke(notificationManager)
+            val method = sService.javaClass.getDeclaredMethod(
+                "areNotificationsEnabledForPackage",
+                String::class.java,
+                Integer.TYPE
+            )
+            method.isAccessible = true
+            method.invoke(sService, pkg, uid) as Boolean
+        } catch (e: Exception) {
+            true
         }
     }
 }
