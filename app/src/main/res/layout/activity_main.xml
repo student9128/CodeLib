@@ -41,17 +41,64 @@
                     android:layout_height="wrap_content"
                     android:text="共享动画" />
 
-                <Button
-                    android:id="@+id/btn_function"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="常用功能" />
+                <!--                <Button-->
+                <!--                    android:id="@+id/btn_function"-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:text="常用功能" />-->
 
                 <Button
                     android:id="@+id/btn_animation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="lottie动画" />
+
+                <Button
+                    android:id="@+id/btn_go_market"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="跳转应用市场" />
+
+                <Button
+                    android:id="@+id/btn_get_app_sign_md5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="获取App的MD5签名" />
+
+                <Button
+                    android:id="@+id/btn_get_imei"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="获取手机IMEI" />
+
+                <Button
+                    android:id="@+id/btn_photo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="获取手机相册" />
+
+                <Button
+                    android:id="@+id/btn_photo_preview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="图片查看" />
+
+                <Button
+                    android:id="@+id/btn_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="调取相机拍照" />
+
+                <Button
+                    android:id="@+id/btn_go_setting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="跳转到设置" />
+                <Button
+                    android:id="@+id/btn_go_notification"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="跳转到打开通知" />
             </com.google.android.flexbox.FlexboxLayout>
 
         </LinearLayout>
