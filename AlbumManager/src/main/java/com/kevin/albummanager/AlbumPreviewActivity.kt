@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.MediaController
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
+import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.kevin.albummanager.adapter.AlbumPreviewAdapter
@@ -247,9 +248,18 @@ class AlbumPreviewActivity : com.kevin.albummanager.AlbumBaseActivity(), View.On
                     tv_select_view.isEnabled = false
                     tv_select_view.text = ""
                 } else {
-                    albumManagerCollectionInstance.addSelectedAlbumData(albumData)
-                    tv_select_view.isEnabled = true
-                    tv_select_view.text = albumManagerCollectionInstance.checkedNum(albumData).toString()
+                    if (albumManagerConfig.maxSelectedNum > albumManagerCollectionInstance.getSelectedAlbumDataSize()) {
+                        albumManagerCollectionInstance.addSelectedAlbumData(albumData)
+                        tv_select_view.isEnabled = true
+                        if (albumManagerConfig.showNum) {
+                        tv_select_view.text =
+                            albumManagerCollectionInstance.checkedNum(albumData).toString()
+                        }else{
+                            showSelectedWithTick()
+                        }
+                    } else {
+                        ToastUtils.showShort("最多只能选择${albumManagerConfig.maxSelectedNum}个文件")
+                    }
                 }
                 checkBtnSendEnabled(albumManagerCollectionInstance.getSelectionData())
                 albumPreviewAdapter?.refreshData(mDataList)

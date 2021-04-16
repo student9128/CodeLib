@@ -12,6 +12,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.kevin.albummanager.AlbumManagerConfig
 import com.kevin.albummanager.OnRecyclerItemClickListener
 import com.kevin.albummanager.R
 import com.kevin.albummanager.bean.AlbumData
@@ -145,7 +146,7 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
                             llModal.visibility = View.GONE
                         } else {
                             llModal.visibility = View.VISIBLE
-                            if (com.kevin.albummanager.AlbumManagerConfig.albumManagerConfig.showNum) {
+                            if (AlbumManagerConfig.albumManagerConfig.showNum) {
                                 tvSelectView.text = albumData.selectedIndex.toString()
                             } else {
                                 AlbumUtils.formatCustomFont(mContext, tvSelectView)
