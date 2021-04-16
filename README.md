@@ -10,6 +10,11 @@
 [![Generic badge](https://img.shields.io/badge/download-39k-brightgreen.svg)](https://github.com/student9128/CodeLib/releases/tag/V1.0.0)
 [![Generic badge](https://img.shields.io/badge/license-Apache_2-green.svg)](https://shields.io/)
 
+<div>
+<img src="snapshots/snapshot1.png" width = "50%" />
+<img src="snapshots/snapshot2.png" width = "50%" />
+</div>
+
 ### DownLoad
 ```
 dependencies {
