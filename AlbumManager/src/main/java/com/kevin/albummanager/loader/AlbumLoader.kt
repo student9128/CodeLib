@@ -134,7 +134,7 @@ class AlbumLoader {
                     var height =
                         it.getInt(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[4]))
                     var duration = 0L
-                    if (com.kevin.albummanager.util.AlbumUtils.isVideo(picType)) {
+                    if (AlbumUtils.isVideo(picType)) {
                         duration =
                             data.getLong(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[5]))
                     }
@@ -152,50 +152,59 @@ class AlbumLoader {
                     albumData.mimeType = picType
                     albumData.duration = duration
                     albumData.size = size
-                    if (mMimeType == AlbumConstant.TYPE_VIDEO) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            val withAppendedPath = Uri.withAppendedPath(
-                                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                                id.toString()
-                            )
-                            val thumbnail = mContext?.contentResolver?.loadThumbnail(
-                                withAppendedPath,
-                                Size(
-                                   100,100
-                                ),
-                                null
-                            )
-//                            val cover = mContext?.contentResolver?.loadThumbnail(
-//                                withAppendedPath,
-//                                Size( 500,500),
-//                                null
-//                            )
-                            LogUtils.logD("AlbumLoader", "width=$width,height=$height")
-                            albumData.videoCoverThumbnail = thumbnail
-//                            albumData.videoCover = cover
-                        } else {
-                            val thumbnail = MediaStore.Video.Thumbnails.getThumbnail(
-                                mContext?.contentResolver,
-                                id,
-                                MediaStore.Video.Thumbnails.MINI_KIND,
-                                null
-                            )
-                            val cover = MediaStore.Video.Thumbnails.getThumbnail(
-                                mContext?.contentResolver,
-                                id,
-                                MediaStore.Video.Thumbnails.MINI_KIND,
-                                null
-                            )
-                            albumData.videoCoverThumbnail = thumbnail
-//                            albumData.videoCover = cover
-                        }
-                    }
+                    loadVideoThumbnail(id, width, height, albumData)
                     //                            mAllAlbumDataList.add(albumData)
                     dataList.add(albumData)
                 } while (it.moveToNext())
             }
         }
         return dataList
+    }
+
+    private fun loadVideoThumbnail(
+        id: Long,
+        width: Int,
+        height: Int,
+        albumData: AlbumData
+    ) {
+        if (mMimeType == AlbumConstant.TYPE_VIDEO) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val withAppendedPath = Uri.withAppendedPath(
+                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                    id.toString()
+                )
+                val thumbnail = mContext?.contentResolver?.loadThumbnail(
+                    withAppendedPath,
+                    Size(
+                        100, 100
+                    ),
+                    null
+                )
+    //                            val cover = mContext?.contentResolver?.loadThumbnail(
+    //                                withAppendedPath,
+    //                                Size( 500,500),
+    //                                null
+    //                            )
+                LogUtils.logD("AlbumLoader", "width=$width,height=$height")
+                albumData.videoCoverThumbnail = thumbnail
+    //                            albumData.videoCover = cover
+            } else {
+                val thumbnail = MediaStore.Video.Thumbnails.getThumbnail(
+                    mContext?.contentResolver,
+                    id,
+                    MediaStore.Video.Thumbnails.MINI_KIND,
+                    null
+                )
+                val cover = MediaStore.Video.Thumbnails.getThumbnail(
+                    mContext?.contentResolver,
+                    id,
+                    MediaStore.Video.Thumbnails.MINI_KIND,
+                    null
+                )
+                albumData.videoCoverThumbnail = thumbnail
+    //                            albumData.videoCover = cover
+            }
+        }
     }
 
     fun loadFolderX(): ArrayList<AlbumFolder> {
@@ -362,10 +371,12 @@ class AlbumLoader {
                         data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[2]))
 //                    printD("id=$id,displayName=$displayName,count=$countX,mimeType=$mimeType")
                     var duration = 0L
-                    if (com.kevin.albummanager.util.AlbumUtils.isVideo(mimeType)) {
+                    if (AlbumUtils.isVideo(mimeType)) {
                         duration =
                             data.getLong(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[5]))
                     }
+                    val size =
+                        it.getLong(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[8]))
                     var albumData = AlbumData()
                     albumData.id = id
                     albumData.path = path
@@ -373,6 +384,8 @@ class AlbumLoader {
                     albumData.height = height
                     albumData.mimeType = mimeType
                     albumData.duration = duration
+                    albumData.size = size
+                    loadVideoThumbnail(id, width, height, albumData)
                     dataList.add(albumData)
                 } while (it.moveToNext())
             }
