@@ -1,5 +1,7 @@
 package com.kevin.albummanager
 
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -8,10 +10,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.MediaController
 import androidx.fragment.app.Fragment
+import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.kevin.albummanager.bean.AlbumData
 import com.kevin.albummanager.util.AlbumUtils
+import com.kevin.albummanager.util.PathUtils
 import kotlinx.android.synthetic.main.fragment_album_preview.*
 
 /**
@@ -51,17 +55,31 @@ class AlbumPreviewFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val albumData = arguments?.getParcelable<AlbumData>(ARGS)
         val mimeType = albumData?.mimeType
-        val albumPath = albumData?.path
+        val albumPath =if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                PathUtils.getPath(this.activity, Uri.parse(albumData?.path))
+            } else {
+                albumData?.path
+            }
         if (AlbumUtils.isVideo(mimeType!!)) {
             ivImageViewPreview.visibility = View.VISIBLE
             videoViewPreview.visibility = View.GONE
             ivImageViewPreview.doubleTapEnabled = false
-            ivImageViewPreview.loadImageIfAvailable(albumPath)
+            Glide.with(this.activity)
+                .applyDefaultRequestOptions(
+                    RequestOptions()
+                        .frame(1000)
+                        .placeholder(R.drawable.ic_image_placehodler)
+                )
+                .asBitmap()
+                .load(albumPath)
+                .into(ivImageViewPreview)
+//            ivImageViewPreview.loadImageIfAvailable(albumPath)
             ivPlay.visibility = View.VISIBLE
             ivPlay.setOnClickListener {
                 ivPlay.visibility = View.GONE
                 postLoadVideo(albumPath!!)
             }
+            ToastUtils.showShort(albumPath)
         } else {
             ivPlay.visibility = View.GONE
             ivImageViewPreview.visibility = View.VISIBLE

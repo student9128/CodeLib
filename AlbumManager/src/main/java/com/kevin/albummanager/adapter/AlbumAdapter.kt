@@ -2,18 +2,24 @@ package com.kevin.albummanager.adapter
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.ContentResolver
 import android.content.Context
+import android.database.Cursor
+import android.media.ThumbnailUtils
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore.MediaColumns
+import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import coil.decode.VideoFrameDecoder
 import coil.fetch.VideoFrameFileFetcher
 import coil.fetch.VideoFrameUriFetcher
-import coil.load
-import coil.request.videoFrameMillis
 import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -24,8 +30,9 @@ import com.kevin.albummanager.R
 import com.kevin.albummanager.bean.AlbumData
 import com.kevin.albummanager.util.AlbumUtils
 import com.kevin.albummanager.util.DisplayUtils
-import com.kevin.albummanager.util.LogUtils
 import kotlinx.android.synthetic.main.adapter_album.view.*
+import java.io.File
+
 
 /**
  * Created by Kevin on 2021/1/20<br/>
@@ -118,6 +125,7 @@ class AlbumAdapter(var mContext: Context, private var data: MutableList<AlbumDat
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
         if (holder is AlbumHolder) {
@@ -140,14 +148,21 @@ class AlbumAdapter(var mContext: Context, private var data: MutableList<AlbumDat
                     albumHolder.tvDuration.text = AlbumUtils.parseTime(albumData.duration)
                 }
                 with(albumHolder) {
-
-                    Glide.with(mContext)
-                        .applyDefaultRequestOptions(
-                            if (AlbumUtils.isVideo(albumData.mimeType)) requestOptionVideo else requestOptionImage
-                        )
-                        .asBitmap()
-                        .load(albumData.path)
-                        .into(imageView)
+                    if (AlbumUtils.isVideo(albumData.mimeType)) {
+                        Glide.with(mContext)
+                            .applyDefaultRequestOptions(requestOptionImage)
+                            .asBitmap()
+                            .load(albumData.videoCoverThumbnail)
+                            .into(imageView)
+                    } else {
+                        Glide.with(mContext)
+                            .applyDefaultRequestOptions(
+                                if (AlbumUtils.isVideo(albumData.mimeType)) requestOptionVideo else requestOptionImage
+                            )
+                            .asBitmap()
+                            .load(albumData.path)
+                            .into(imageView)
+                    }
                     imageView.setOnClickListener {
                         listener?.onItemClick(position, it, "albumData")
                     }
@@ -211,6 +226,29 @@ class AlbumAdapter(var mContext: Context, private var data: MutableList<AlbumDat
             }
 
         }
+    }
+
+    /**
+     * Gets the corresponding path to a file from the given content:// URI
+     * @param selectedVideoUri The content:// URI to find the file path from
+     * @param contentResolver The content resolver to use to perform the query.
+     * @return the file path as a string
+     */
+    fun getFilePathFromContentUri(
+        selectedVideoUri: Uri,
+        contentResolver: ContentResolver
+    ): String? {
+        val filePath: String
+        val filePathColumn = arrayOf(MediaColumns.DATA)
+        val cursor: Cursor? =
+            contentResolver.query(selectedVideoUri, filePathColumn, null, null, null)
+        //	    也可用下面的方法拿到cursor
+//	    Cursor cursor = this.context.managedQuery(selectedVideoUri, filePathColumn, null, null, null);
+        cursor?.moveToFirst()
+        val columnIndex: Int? = cursor?.getColumnIndex(filePathColumn[0])
+        filePath = cursor?.getString(columnIndex!!)!!
+        cursor.close()
+        return filePath
     }
 
     private fun AlbumHolder.showAnim() {

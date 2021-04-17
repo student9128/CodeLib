@@ -1,5 +1,6 @@
 package com.kevin.albummanager.bean
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
@@ -26,7 +27,9 @@ data class AlbumData(
     var selectedIndex: Int = -1,
     var original: Boolean = false,
     var key: Int = -1,//再相册数据集合中的位置,必须设置
-    var showCameraPlaceholder:Boolean = false
+    var showCameraPlaceholder:Boolean = false,
+    var videoCover:Bitmap?= null,
+    var videoCoverThumbnail:Bitmap?= null
 ) : Parcelable
 
 /**

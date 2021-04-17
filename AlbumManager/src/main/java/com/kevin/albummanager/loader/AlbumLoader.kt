@@ -6,9 +6,12 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Size
 import com.kevin.albummanager.bean.AlbumData
 import com.kevin.albummanager.bean.AlbumFolder
 import com.kevin.albummanager.constant.AlbumConstant
+import com.kevin.albummanager.util.AlbumUtils
+import com.kevin.albummanager.util.DisplayUtils
 import com.kevin.albummanager.util.LogUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -100,6 +103,7 @@ class AlbumLoader {
     }
 
     fun loadAlbumDataX(): ArrayList<AlbumData> {
+        val screenWidth = DisplayUtils.getScreenWidth(mContext!!)
         var dataList: ArrayList<AlbumData> = ArrayList<AlbumData>()
         //                mAllAlbumDataList.clear()
         val data: Cursor? = mContext!!.contentResolver.query(
@@ -139,7 +143,7 @@ class AlbumLoader {
                     val size =
                         it.getLong(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[8]))
 //                    LogUtils.logD("AlbumLoader", "width=$width,height=$height,path=$path,size=$size")
-                    com.kevin.albummanager.util.AlbumUtils.parseTime(duration)
+                    AlbumUtils.parseTime(duration)
                     var albumData = AlbumData()
                     albumData.id = id
                     albumData.path = path
@@ -147,7 +151,45 @@ class AlbumLoader {
                     albumData.height = height
                     albumData.mimeType = picType
                     albumData.duration = duration
-                    albumData.size=size
+                    albumData.size = size
+                    if (mMimeType == AlbumConstant.TYPE_VIDEO) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            val withAppendedPath = Uri.withAppendedPath(
+                                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                                id.toString()
+                            )
+                            val thumbnail = mContext?.contentResolver?.loadThumbnail(
+                                withAppendedPath,
+                                Size(
+                                   100,100
+                                ),
+                                null
+                            )
+//                            val cover = mContext?.contentResolver?.loadThumbnail(
+//                                withAppendedPath,
+//                                Size( 500,500),
+//                                null
+//                            )
+                            LogUtils.logD("AlbumLoader", "width=$width,height=$height")
+                            albumData.videoCoverThumbnail = thumbnail
+//                            albumData.videoCover = cover
+                        } else {
+                            val thumbnail = MediaStore.Video.Thumbnails.getThumbnail(
+                                mContext?.contentResolver,
+                                id,
+                                MediaStore.Video.Thumbnails.MINI_KIND,
+                                null
+                            )
+                            val cover = MediaStore.Video.Thumbnails.getThumbnail(
+                                mContext?.contentResolver,
+                                id,
+                                MediaStore.Video.Thumbnails.MINI_KIND,
+                                null
+                            )
+                            albumData.videoCoverThumbnail = thumbnail
+//                            albumData.videoCover = cover
+                        }
+                    }
                     //                            mAllAlbumDataList.add(albumData)
                     dataList.add(albumData)
                 } while (it.moveToNext())
