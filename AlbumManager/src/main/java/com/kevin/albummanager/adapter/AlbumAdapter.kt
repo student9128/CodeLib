@@ -8,6 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.recyclerview.widget.RecyclerView
+import coil.ImageLoader
+import coil.decode.VideoFrameDecoder
+import coil.fetch.VideoFrameFileFetcher
+import coil.fetch.VideoFrameUriFetcher
+import coil.load
+import coil.request.videoFrameMillis
 import com.blankj.utilcode.util.ToastUtils
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -27,7 +33,7 @@ import kotlinx.android.synthetic.main.adapter_album.view.*
  * 公众号：前线开发者Kevin
  * Describe:<br/>
  */
-class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
+class AlbumAdapter(var mContext: Context, private var data: MutableList<AlbumData>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val screenWidth = DisplayUtils.getScreenWidth(mContext)
     val width = (screenWidth - 30) / 4
@@ -38,9 +44,11 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
     private var clickedImagePath: String? = null
     private val albumManagerCollectionInstance =
         com.kevin.albummanager.AlbumManagerCollection.albumManagerCollectionInstance
-    private val albumManagerConfig: com.kevin.albummanager.AlbumManagerConfig = com.kevin.albummanager.AlbumManagerConfig.albumManagerConfig
+    private val albumManagerConfig: com.kevin.albummanager.AlbumManagerConfig =
+        com.kevin.albummanager.AlbumManagerConfig.albumManagerConfig
     val requestOptionVideo = RequestOptions()
         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+//        .frame(1)
         .skipMemoryCache(false)
         .error(R.drawable.ic_image_error)
         .placeholder(R.drawable.ic_image_placehodler)
@@ -52,10 +60,32 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
         .dontTransform()
         .error(R.drawable.ic_image_error)
         .placeholder(R.drawable.ic_image_placehodler)
+    val imageLoader = ImageLoader.Builder(mContext)
+        .componentRegistry {
+            add(VideoFrameFileFetcher(mContext))
+            add(VideoFrameUriFetcher(mContext))
+            add(VideoFrameDecoder(mContext))
+        }
+        .build()
 
     fun addShotAlbum(albumData: AlbumData) {
         data.add(1, albumData)
         notifyItemInserted(1)
+    }
+
+    fun refreshDataItem(position: Int) {
+        notifyItemChanged(position)
+    }
+
+    fun refreshSelectData() {
+        val selectionData = albumManagerCollectionInstance.getSelectionData()
+        if (selectionData.size == 0) return
+        for (da in selectionData) {
+            val indexOf = data.indexOf(da)
+            if (indexOf >= 0) {
+                notifyItemChanged(indexOf)
+            }
+        }
     }
 
     fun refreshData(d: MutableList<AlbumData>) {
@@ -93,7 +123,6 @@ class AlbumAdapter(var mContext: Context, var data: MutableList<AlbumData>) :
         if (holder is AlbumHolder) {
             val albumHolder = holder as AlbumHolder
             val albumData = data[position]
-            LogUtils.logD("Hello", albumData.toString())
             if (albumData.showCameraPlaceholder) {
                 albumHolder.cameraContainer.visibility = View.VISIBLE
                 albumHolder.contentContainer.visibility = View.GONE

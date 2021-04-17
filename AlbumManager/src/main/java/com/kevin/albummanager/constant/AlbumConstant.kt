@@ -26,7 +26,8 @@ enum class AlbumPreviewMethod {
     SINGLE,//预览选中的
     MULTIPLE//预览全部
 }
-enum class AlbumTheme{
+
+enum class AlbumTheme {
     Default,
     Red,
     Pink,
@@ -46,7 +47,7 @@ object AlbumConstant {
     /**
      * 跳转到预览页面
      */
-    const val REQUEST_CODE_ALBUM_RESULT=10097 //获取相册图片
+    const val REQUEST_CODE_ALBUM_RESULT = 10097 //获取相册图片
     const val REQUEST_CODE_ALBUM_PREVIEW_ITEM = 10099//全部预览
     const val REQUEST_CODE_ALBUM_PREVIEW_SELECTED = 10098//选中的图片预览
     const val REQUEST_CODE_ALBUM_CAMERA_SHOT = 10096//打开相机
@@ -78,7 +79,8 @@ object AlbumConstant {
     /**
      * 所有的媒体文件
      */
-    const val SELECTION = MEDIA_TYPE + OR + MEDIA_TYPE + AND + VALID_SIZE
+    const val SELECTION = MEDIA_TYPE + AND + VALID_SIZE
+//    const val SELECTION = MEDIA_TYPE + OR + MEDIA_TYPE + AND + VALID_SIZE
 
     const val SELECTION_IMAGE_OR_VIDEO = MEDIA_TYPE + AND + VALID_SIZE
 
@@ -187,7 +189,8 @@ object AlbumConstant {
         MediaStore.MediaColumns.HEIGHT,
         MediaStore.MediaColumns.DURATION,
         MediaStore.MediaColumns.BUCKET_DISPLAY_NAME,
-        MediaStore.MediaColumns.BUCKET_ID
+        MediaStore.MediaColumns.BUCKET_ID,
+        MediaStore.MediaColumns.SIZE
     )
 
     fun selectMediaWithDisplayName(mimeType: String, displayName: String): Array<String> {

@@ -21,6 +21,7 @@ data class AlbumData(
     var height: Int = 0,
     var mimeType: String = "",
     var duration: Long = 0,
+    var size:Long=0,
     var selected: Boolean = false,
     var selectedIndex: Int = -1,
     var original: Boolean = false,

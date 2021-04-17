@@ -41,7 +41,7 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
 //                intent.putExtra("type", "all")
 //                startActivity(intent)
                 AlbumManager.withContext(this)
-                    .openAlbum(AlbumConstant.TYPE_ALL)
+                    .openAlbum(AlbumConstant.TYPE_IMAGE)
                     .setTheme(AlbumTheme.Red)
                     .showCameraShot(true)
                     .showSelectedWithNum(false)

@@ -90,6 +90,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
         }
         rvRecyclerView.addItemDecoration(GridSpacingItemDecoration(4, 10, false))
         rvRecyclerView.layoutManager = GridLayoutManager(this, 4)
+        rvRecyclerView.setHasFixedSize(true)
 
         albumLoaderInstance.setParams(this)
 
@@ -155,7 +156,8 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
             R.anim.photo_fade_in,
             R.anim.photo_fade_out_nothing
         )
-        ActivityCompat.startActivityForResult(this, intent, requestCode, customAnimation.toBundle())
+        startActivityForResult( intent, requestCode, customAnimation.toBundle())
+//        ActivityCompat.startActivityForResult(this, intent, requestCode, customAnimation.toBundle())
     }
 
     private fun showSelectableWindow() {
@@ -167,10 +169,10 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
         val screenHeight = DisplayUtils.getScreenHeight(this)
         val realScreenHeight = DisplayUtils.getRealScreenHeight(this)
         val i = screenHeight - DisplayUtils.dp2px(this, 80f)
-        printD(
-            "statusBarHeight=$dimensionPixelSize,dpV=$dp2px,dp2px56=$dp2px56," +
-                    "screenHeight=$screenHeight,realScreenHeight=$realScreenHeight,i=$i"
-        )
+//        printD(
+//            "statusBarHeight=$dimensionPixelSize,dpV=$dp2px,dp2px56=$dp2px56," +
+//                    "screenHeight=$screenHeight,realScreenHeight=$realScreenHeight,i=$i"
+//        )
         val rvAlbumFolderRecyclerView = view.rvAlbumFolder
         val layoutParams = rvAlbumFolderRecyclerView.layoutParams
         val i1 = screenHeight - DisplayUtils.dp2px(this, 80f) + 1
@@ -242,7 +244,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                     currentSelectedAllAlbum = false
                     tvTitle.text = albumFolder.displayName
                     val mimeType = albumFolder.mimeType
-                    printD("mimeType=$mimeType,displayName=${albumFolder.displayName},bucketId=${albumFolder.bucketId}")
+//                    printD("mimeType=$mimeType,displayName=${albumFolder.displayName},bucketId=${albumFolder.bucketId}")
                     coroutineScope.launch {
                         mOtherAlbumDataList = async(Dispatchers.IO) {
                             albumLoaderInstance.loadImageByBucketIdX(
@@ -271,7 +273,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 
     private fun captureIV(type: String) {
         val fileDir = File(Environment.getExternalStorageDirectory(), "${AppUtils.getAppName()}")
-        printD("fileDir=${fileDir.absolutePath},name=${fileDir.name},exists=${fileDir.exists()}")
+//        printD("fileDir=${fileDir.absolutePath},name=${fileDir.name},exists=${fileDir.exists()}")
         if (!fileDir.exists()) {
             fileDir.mkdir()
         }
@@ -319,7 +321,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
             } else {
                 contentValues.put(MediaStore.Images.Media.DATA, mFilePath)
             }
-            contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/JPEG")
+            contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
             uri =
                 contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE) // 启动系统相机
@@ -346,16 +348,17 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
     override fun onChildItemClick(position: Int, view: View, type: String) {
         super.onChildItemClick(position, view, type)
         if (currentSelectedAllAlbum) {//当前为全部相册内容
-            handleSelectEvent(mAllAlbumDataList)
+            handleSelectEvent(mAllAlbumDataList,position)
         } else {//其他文件夹相册内容
-            handleSelectEvent(mOtherAlbumDataList)
+            handleSelectEvent(mOtherAlbumDataList,position)
         }
 
     }
 
-    private fun handleSelectEvent(dataList: MutableList<AlbumData>) {
+    private fun handleSelectEvent(dataList: MutableList<AlbumData>,position: Int) {
         handleBottomButton()
-        mAlbumDataAdapter?.refreshData(dataList)
+//        mAlbumDataAdapter?.refreshDataItem(position)
+        mAlbumDataAdapter?.notifyDataSetChanged()
     }
 
     private fun handleBottomButton() {
@@ -393,7 +396,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        printD("resultCode=$resultCode,requestCode=$requestCode")
+//        printD("resultCode=$resultCode,requestCode=$requestCode")
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_ITEM -> {
@@ -402,7 +405,9 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                     mSelectedAlbumDataList = selectionData
                     mSelectList = selectionList
                     val currentAlbumData = albumManagerCollectionInstance.getCurrentAlbumData()
-                    mAlbumDataAdapter?.refreshData(currentAlbumData)
+                    val allAlbumData = albumManagerCollectionInstance.getAllAlbumData()
+//                    mAlbumDataAdapter?.refreshData(currentAlbumData)
+                    mAlbumDataAdapter?.notifyDataSetChanged()
                     if (mSelectList.size > 0) {
                         tv_preview.setTextColor(Color.BLACK)
                         tv_preview.isClickable = true
@@ -424,6 +429,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 
                 AlbumConstant.REQUEST_CODE_ALBUM_CAMERA_SHOT -> {
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+//                        printD("mFilePath=$mFilePath")
                         val file = File(mFilePath)
                         MediaScannerConnection.scanFile(this@AlbumActivity,
                             arrayOf(file.toString()),

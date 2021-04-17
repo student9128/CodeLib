@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import com.kevin.albummanager.bean.AlbumData
 import com.kevin.albummanager.bean.AlbumFolder
 import com.kevin.albummanager.constant.AlbumConstant
+import com.kevin.albummanager.util.LogUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -135,7 +136,9 @@ class AlbumLoader {
                     }
                     val displayName =
                         it.getString(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[6]))
-//                                        LogUtils.logD("AlbumLoader","width=$width,height=$height,path=$path")
+                    val size =
+                        it.getLong(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[8]))
+//                    LogUtils.logD("AlbumLoader", "width=$width,height=$height,path=$path,size=$size")
                     com.kevin.albummanager.util.AlbumUtils.parseTime(duration)
                     var albumData = AlbumData()
                     albumData.id = id
@@ -144,6 +147,7 @@ class AlbumLoader {
                     albumData.height = height
                     albumData.mimeType = picType
                     albumData.duration = duration
+                    albumData.size=size
                     //                            mAllAlbumDataList.add(albumData)
                     dataList.add(albumData)
                 } while (it.moveToNext())
@@ -286,7 +290,7 @@ class AlbumLoader {
         return dataList
     }
 
-    fun loadImageByBucketIdX(mimeType: String, bucketId: String):ArrayList<AlbumData> {
+    fun loadImageByBucketIdX(mimeType: String, bucketId: String): ArrayList<AlbumData> {
         var dataList: ArrayList<AlbumData> = ArrayList()
         val data = mContext?.contentResolver?.query(
             AlbumConstant.QUERY_URI,
