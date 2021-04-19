@@ -243,6 +243,7 @@ class AlbumPreviewActivity : com.kevin.albummanager.AlbumBaseActivity(), View.On
             }
             R.id.ll_select_view -> {
                 val albumData = mDataList[mCurrentPosition]
+                albumManagerCollectionInstance.savePreviewSelectionData(albumData)
                 if (albumManagerCollectionInstance.isSelected(albumData)) {
                     albumManagerCollectionInstance.removeSelectedAlbumData(albumData)
                     tv_select_view.isEnabled = false

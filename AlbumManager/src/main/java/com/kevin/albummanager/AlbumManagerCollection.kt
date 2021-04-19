@@ -22,6 +22,7 @@ class AlbumManagerCollection {
     private var mCurrentAlbumDataList: ArrayList<AlbumData> = ArrayList()
     private var mAllAlbumDataList: ArrayList<AlbumData> = ArrayList()
     private var mCurrentAlbumFolderType: String = AlbumConstant.ALBUM_FOLDER_TYPE_DEFAULT
+    private var mPreviewSelectionCollection: ArrayList<AlbumData> = ArrayList()
     var mSelectionList: MutableList<MutableMap<Int, AlbumData>> = mutableListOf()
 
     companion object {
@@ -29,6 +30,20 @@ class AlbumManagerCollection {
             AlbumManagerCollection()
         }
     }
+
+    fun savePreviewSelectionData(data: AlbumData) {
+        if (mPreviewSelectionCollection.size == 0) {
+            mPreviewSelectionCollection.add(data)
+        } else {
+            if (mPreviewSelectionCollection.contains(data)) {
+                mPreviewSelectionCollection.remove(data)
+            } else {
+                mPreviewSelectionCollection.add(data)
+            }
+        }
+    }
+
+    fun getPreviewSelectionData() = mPreviewSelectionCollection
 
     /**
      * 存储已经选择的数据集合
@@ -98,6 +113,9 @@ class AlbumManagerCollection {
     fun clearAlbumFolderData() {
         mAlbumFolderDataList.let { it.clear() }
     }
+    fun clearPreviewSelectionData(){
+        mPreviewSelectionCollection?.let { it.clear() }
+    }
 
     fun reset() {
         clearSelectionData()
@@ -105,6 +123,7 @@ class AlbumManagerCollection {
         clearAllAlbumData()
         clearCurrentAlbumData()
         clearAlbumFolderData()
+        clearPreviewSelectionData()
     }
 
     fun isSelected(album: AlbumData): Boolean {

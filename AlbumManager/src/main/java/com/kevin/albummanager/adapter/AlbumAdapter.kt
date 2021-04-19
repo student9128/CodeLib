@@ -96,8 +96,11 @@ class AlbumAdapter(var mContext: Context, private var data: MutableList<AlbumDat
     }
 
     fun refreshData(d: MutableList<AlbumData>) {
-        data = d
-        notifyDataSetChanged()
+        val previewSelectionData = albumManagerCollectionInstance.getPreviewSelectionData()
+        for (da in previewSelectionData){
+            val index = data.indexOf(da)
+            notifyItemChanged(index)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

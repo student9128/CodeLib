@@ -105,6 +105,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
             }
             mAlbumDataAdapter = AlbumAdapter(this@AlbumActivity, mAllAlbumDataList)
             rvRecyclerView.adapter = mAlbumDataAdapter
+            mAlbumDataAdapter?.refreshData(mAllAlbumDataList)
             mAlbumDataAdapter?.setOnItemClickListener(this@AlbumActivity)
             if (mAlbumFolderList.size > 0) {
                 showAlbumData()
@@ -156,7 +157,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
             R.anim.photo_fade_in,
             R.anim.photo_fade_out_nothing
         )
-        startActivityForResult( intent, requestCode, customAnimation.toBundle())
+        startActivityForResult(intent, requestCode, customAnimation.toBundle())
 //        ActivityCompat.startActivityForResult(this, intent, requestCode, customAnimation.toBundle())
     }
 
@@ -348,17 +349,16 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
     override fun onChildItemClick(position: Int, view: View, type: String) {
         super.onChildItemClick(position, view, type)
         if (currentSelectedAllAlbum) {//当前为全部相册内容
-            handleSelectEvent(mAllAlbumDataList,position)
+            handleSelectEvent(mAllAlbumDataList, position)
         } else {//其他文件夹相册内容
-            handleSelectEvent(mOtherAlbumDataList,position)
+            handleSelectEvent(mOtherAlbumDataList, position)
         }
 
     }
 
-    private fun handleSelectEvent(dataList: MutableList<AlbumData>,position: Int) {
+    private fun handleSelectEvent(dataList: MutableList<AlbumData>, position: Int) {
         handleBottomButton()
-//        mAlbumDataAdapter?.refreshDataItem(position)
-        mAlbumDataAdapter?.notifyDataSetChanged()
+        mAlbumDataAdapter?.refreshDataItem(position)
     }
 
     private fun handleBottomButton() {
@@ -406,8 +406,13 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                     mSelectList = selectionList
                     val currentAlbumData = albumManagerCollectionInstance.getCurrentAlbumData()
                     val allAlbumData = albumManagerCollectionInstance.getAllAlbumData()
-//                    mAlbumDataAdapter?.refreshData(currentAlbumData)
-                    mAlbumDataAdapter?.notifyDataSetChanged()
+//                    rvRecyclerView.itemAnimator=null
+                    val previewSelectionData =
+                        albumManagerCollectionInstance.getPreviewSelectionData()
+                    if (previewSelectionData.size > 0) {
+                        mAlbumDataAdapter?.refreshData(currentAlbumData)
+                        albumManagerCollectionInstance.clearPreviewSelectionData()
+                    }
                     if (mSelectList.size > 0) {
                         tv_preview.setTextColor(Color.BLACK)
                         tv_preview.isClickable = true
@@ -420,7 +425,12 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                     mSelectList = selectionList
                     val currentAlbumData = albumManagerCollectionInstance.getCurrentAlbumData()
                     val allAlbumData = albumManagerCollectionInstance.getAllAlbumData()
-                    mAlbumDataAdapter?.refreshData(allAlbumData)
+                    val previewSelectionData =
+                        albumManagerCollectionInstance.getPreviewSelectionData()
+                    if (previewSelectionData.size > 0) {
+                        mAlbumDataAdapter?.refreshData(allAlbumData)
+                        albumManagerCollectionInstance.clearPreviewSelectionData()
+                    }
                     if (mSelectList.size > 0) {
                         tv_preview.setTextColor(Color.BLACK)
                         tv_preview.isClickable = true
@@ -448,6 +458,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
             if (btnSendClick) {
                 setResultAlbum()
             }
+            handleBottomButton()
         }
     }
 
@@ -463,7 +474,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
             mAlbumFolderList =
                 async(Dispatchers.IO) { albumLoaderInstance.loadFolderX() }.await()
             mFolderAdapter?.refreshData(mAlbumFolderList)
-            handleBottomButton()
+//            handleBottomButton()
         }
     }
 
