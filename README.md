@@ -4,7 +4,7 @@
 目前发布的库：
 ## 手机相册图片视频选择库：<font color=#2196F3 size=16>AlbumManager</font>
 
-[![Generic badge](https://img.shields.io/badge/release-v1.0.1-blue.svg)](https://github.com/student9128/CodeLib)
+[![Generic badge](https://img.shields.io/badge/release-v1.0.2-blue.svg)](https://github.com/student9128/CodeLib)
 [![Generic badge](https://img.shields.io/badge/platform-android-brightgreen.svg)](https://github.com/student9128/CodeLib/releases/tag/V1.0.0)
 
 [![Generic badge](https://img.shields.io/badge/download-39k-brightgreen.svg)](https://github.com/student9128/CodeLib/releases/tag/V1.0.0)
@@ -19,7 +19,7 @@
 ### DownLoad
 ```
 dependencies {
-    implementation 'io.github.student9128:albummanager:1.0.1'
+    implementation 'io.github.student9128:albummanager:1.0.2'
 }
 ```
 ### How to use?

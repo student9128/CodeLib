@@ -64,7 +64,7 @@ dependencies {
 ext {
     PUBLISH_GROUP_ID = "io.github.student9128"        //项目包名
     PUBLISH_ARTIFACT_ID = 'albummanager'            //项目名
-    PUBLISH_VERSION = '1.0.1'                    //版本号
+    PUBLISH_VERSION = '1.0.2'                    //版本号
 }
 apply from: '../publish.gradle'
 
