@@ -79,7 +79,7 @@ object AlbumConstant {
     /**
      * 所有的媒体文件
      */
-    const val SELECTION = MEDIA_TYPE + AND + VALID_SIZE
+    const val SELECTION = MEDIA_TYPE + AND + VALID_SIZE + OR + MEDIA_TYPE + AND + VALID_SIZE
 //    const val SELECTION = MEDIA_TYPE + OR + MEDIA_TYPE + AND + VALID_SIZE
 
     const val SELECTION_IMAGE_OR_VIDEO = MEDIA_TYPE + AND + VALID_SIZE

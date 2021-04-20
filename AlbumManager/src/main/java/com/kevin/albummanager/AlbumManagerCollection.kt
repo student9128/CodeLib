@@ -3,6 +3,8 @@ package com.kevin.albummanager
 import com.kevin.albummanager.bean.AlbumData
 import com.kevin.albummanager.bean.AlbumFolder
 import com.kevin.albummanager.constant.AlbumConstant
+import com.kevin.albummanager.util.AlbumUtils
+import com.kevin.albummanager.util.LogUtils
 
 
 /**
@@ -36,7 +38,7 @@ class AlbumManagerCollection {
             mPreviewSelectionCollection.add(data)
         } else {
             if (mPreviewSelectionCollection.contains(data)) {
-                mPreviewSelectionCollection.remove(data)
+//                mPreviewSelectionCollection.remove(data)
             } else {
                 mPreviewSelectionCollection.add(data)
             }
@@ -127,7 +129,13 @@ class AlbumManagerCollection {
     }
 
     fun isSelected(album: AlbumData): Boolean {
-
+        if (AlbumUtils.isVideo(album.mimeType)) {
+            for (albumData in mSelectionCollection){
+                if(album.id==albumData.id&&album.path==albumData.path){
+                    return true
+                }
+            }
+        }
 //        LogUtils.logI("AlbumManagerCollection", "albume= $album====${mSelectionCollection?.contains(album)}")
 //        LogUtils.logD("AlbumManagerCollection", "albume=${mSelectionCollection}")
         return mSelectionCollection?.contains(album)

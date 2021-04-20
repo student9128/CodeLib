@@ -81,7 +81,9 @@ class AlbumAdapter(var mContext: Context, private var data: MutableList<AlbumDat
     }
 
     fun refreshDataItem(position: Int) {
-        notifyItemChanged(position)
+//        notifyItemChanged(position)
+//        refreshSelectData()
+        notifyDataSetChanged()
     }
 
     fun refreshSelectData() {
@@ -95,7 +97,11 @@ class AlbumAdapter(var mContext: Context, private var data: MutableList<AlbumDat
         }
     }
 
-    fun refreshData(d: MutableList<AlbumData>) {
+    fun refreshData(d: MutableList<AlbumData>){
+        data=d
+        notifyDataSetChanged()
+    }
+    fun refreshData() {
         val previewSelectionData = albumManagerCollectionInstance.getPreviewSelectionData()
         for (da in previewSelectionData){
             val index = data.indexOf(da)
@@ -171,6 +177,7 @@ class AlbumAdapter(var mContext: Context, private var data: MutableList<AlbumDat
                     }
                     llSelectView.setOnClickListener {
                         clickedImagePath = albumData.path
+                        albumManagerCollectionInstance.savePreviewSelectionData(albumData)
                         if (albumManagerCollectionInstance.isSelected(albumData)) {
                             albumManagerCollectionInstance.removeSelectedAlbumData(albumData)
                         } else {

@@ -44,9 +44,10 @@ android.permission.WRITE_EXTERNAL_STORAGE
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 AlbumConstant.REQUEST_CODE_ALBUM_RESULT -> {
-                    val albumData = AlbumManager.getAlbumDataResult(data)
-                    printD("$albumData")
-                    val path = albumData!![0].path
+                    val albumManagerCollectionInstance =
+                                           AlbumManagerCollection.albumManagerCollectionInstance
+                    val selectionData = albumManagerCollectionInstance.getSelectionData()
+                    val path = selectionData!![0].path
                     Glide.with(this)
                         .load(path)
                         .into(iv_preview)

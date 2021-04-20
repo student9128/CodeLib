@@ -5,6 +5,7 @@ import android.content.Intent
 import android.view.View
 import com.bumptech.glide.Glide
 import com.kevin.albummanager.AlbumManager
+import com.kevin.albummanager.AlbumManagerCollection
 import com.kevin.codelib.R
 import com.kevin.albummanager.constant.AlbumConstant
 import com.kevin.albummanager.constant.AlbumTheme
@@ -28,6 +29,7 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
 
     override fun initView() {
         btn_photo.setOnClickListener(this)
+        btn_photo2.setOnClickListener(this)
         btn_get_gif.setOnClickListener(this)
         btn_get_image.setOnClickListener(this)
         btn_get_video.setOnClickListener(this)
@@ -41,11 +43,20 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
 //                intent.putExtra("type", "all")
 //                startActivity(intent)
                 AlbumManager.withContext(this)
-                    .openAlbum(AlbumConstant.TYPE_IMAGE)
+                    .openAlbum(AlbumConstant.TYPE_ALL)
                     .setTheme(AlbumTheme.Red)
                     .showCameraShot(true)
                     .showSelectedWithNum(false)
                     .maxSelectedNum(3)
+                    .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
+            }
+            R.id.btn_photo2->{
+                AlbumManager.withContext(this)
+                    .openAlbum()
+                    .setTheme(AlbumTheme.Green)
+                    .showCameraShot(true)
+                    .showSelectedWithNum(true)
+                    .maxSelectedNum(10)
                     .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
             }
             R.id.btn_get_gif -> {
@@ -88,10 +99,13 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 AlbumConstant.REQUEST_CODE_ALBUM_RESULT -> {
-                    val albumData =
-                        com.kevin.albummanager.AlbumManager.getAlbumDataResult(data)
-                    printD("$albumData")
-                    val path = albumData!![0].path
+                    val albumManagerCollectionInstance =
+                        AlbumManagerCollection.albumManagerCollectionInstance
+                    val selectionData = albumManagerCollectionInstance.getSelectionData()
+//                    val albumData =
+//                        AlbumManager.getAlbumDataResult(data)
+//                    printD("$albumData")
+                    val path = selectionData!![0].path
                     Glide.with(this)
                         .load(path)
                         .into(iv_preview)

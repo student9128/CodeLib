@@ -152,7 +152,7 @@ class AlbumLoader {
                     albumData.mimeType = picType
                     albumData.duration = duration
                     albumData.size = size
-                    loadVideoThumbnail(id, width, height, albumData)
+                    loadVideoThumbnail(id, width, height, albumData,picType)
                     //                            mAllAlbumDataList.add(albumData)
                     dataList.add(albumData)
                 } while (it.moveToNext())
@@ -165,9 +165,10 @@ class AlbumLoader {
         id: Long,
         width: Int,
         height: Int,
-        albumData: AlbumData
+        albumData: AlbumData,
+        mimeType: String
     ) {
-        if (mMimeType == AlbumConstant.TYPE_VIDEO) {
+        if (AlbumUtils.isVideo(mimeType)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val withAppendedPath = Uri.withAppendedPath(
                     MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
@@ -385,7 +386,7 @@ class AlbumLoader {
                     albumData.mimeType = mimeType
                     albumData.duration = duration
                     albumData.size = size
-                    loadVideoThumbnail(id, width, height, albumData)
+                    loadVideoThumbnail(id, width, height, albumData,mimeType)
                     dataList.add(albumData)
                 } while (it.moveToNext())
             }

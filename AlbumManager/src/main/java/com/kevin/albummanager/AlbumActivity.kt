@@ -91,7 +91,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
         rvRecyclerView.addItemDecoration(GridSpacingItemDecoration(4, 10, false))
         rvRecyclerView.layoutManager = GridLayoutManager(this, 4)
         rvRecyclerView.setHasFixedSize(true)
-
+        rvRecyclerView.itemAnimator = null
         albumLoaderInstance.setParams(this)
 
         loadAlbumJob = coroutineScope.launch {
@@ -105,7 +105,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
             }
             mAlbumDataAdapter = AlbumAdapter(this@AlbumActivity, mAllAlbumDataList)
             rvRecyclerView.adapter = mAlbumDataAdapter
-            mAlbumDataAdapter?.refreshData(mAllAlbumDataList)
+//            mAlbumDataAdapter?.refreshData(mAllAlbumDataList)
             mAlbumDataAdapter?.setOnItemClickListener(this@AlbumActivity)
             if (mAlbumFolderList.size > 0) {
                 showAlbumData()
@@ -409,8 +409,9 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 //                    rvRecyclerView.itemAnimator=null
                     val previewSelectionData =
                         albumManagerCollectionInstance.getPreviewSelectionData()
+                    printD("preview.Size=${previewSelectionData.size}")
                     if (previewSelectionData.size > 0) {
-                        mAlbumDataAdapter?.refreshData(currentAlbumData)
+                        mAlbumDataAdapter?.refreshData()
                         albumManagerCollectionInstance.clearPreviewSelectionData()
                     }
                     if (mSelectList.size > 0) {
@@ -428,7 +429,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                     val previewSelectionData =
                         albumManagerCollectionInstance.getPreviewSelectionData()
                     if (previewSelectionData.size > 0) {
-                        mAlbumDataAdapter?.refreshData(allAlbumData)
+                        mAlbumDataAdapter?.refreshData()
                         albumManagerCollectionInstance.clearPreviewSelectionData()
                     }
                     if (mSelectList.size > 0) {
@@ -480,6 +481,13 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 
     private fun setResultAlbum() {
         val selectionData = albumManagerCollectionInstance.getSelectionData()
+        var tempData = ArrayList<AlbumData>()
+//        for (data in selectionData) {
+//            var albumData = AlbumData()
+//            albumData.path = data.path
+//            albumData.id = data.id
+//            tempData.add(albumData)
+//        }
 //        for (data in selectionData) {
 ////            printW("xxx====$data")
 //            Luban.with(this)
@@ -501,10 +509,10 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 //                .launch()
 //        }
         val intent = Intent()
-        intent.putParcelableArrayListExtra(
-            AlbumConstant.SET_RESULT_FOR_SELECTION,
-            selectionData
-        )
+//        intent.putParcelableArrayListExtra(
+//            AlbumConstant.SET_RESULT_FOR_SELECTION,
+//            tempData
+//        )
         setResult(RESULT_OK, intent)
         finish()
     }

@@ -79,7 +79,6 @@ class AlbumPreviewFragment : Fragment() {
                 ivPlay.visibility = View.GONE
                 postLoadVideo(albumPath!!)
             }
-            ToastUtils.showShort(albumPath)
         } else {
             ivPlay.visibility = View.GONE
             ivImageViewPreview.visibility = View.VISIBLE
