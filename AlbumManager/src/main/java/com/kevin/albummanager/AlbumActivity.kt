@@ -413,6 +413,9 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                     if (previewSelectionData.size > 0) {
                         mAlbumDataAdapter?.refreshData()
                         albumManagerCollectionInstance.clearPreviewSelectionData()
+                        for (d in selectionData) {
+                            albumManagerCollectionInstance.savePreviewSelectionData(d)
+                        }
                     }
                     if (mSelectList.size > 0) {
                         tv_preview.setTextColor(Color.BLACK)
@@ -431,6 +434,9 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                     if (previewSelectionData.size > 0) {
                         mAlbumDataAdapter?.refreshData()
                         albumManagerCollectionInstance.clearPreviewSelectionData()
+                        for (d in selectionData) {
+                            albumManagerCollectionInstance.savePreviewSelectionData(d)
+                        }
                     }
                     if (mSelectList.size > 0) {
                         tv_preview.setTextColor(Color.BLACK)
