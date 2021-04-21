@@ -58,16 +58,17 @@ class AlbumPreviewActivity : com.kevin.albummanager.AlbumBaseActivity(), View.On
         )
         vpViewPagerPreview.adapter = albumPreviewAdapter
         vpViewPagerPreview.currentItem = position
-        val albumData = mDataList[position]
-        val selectedIndex = albumData.selectedIndex
-        if (albumManagerCollectionInstance.isSelected(albumData)) {
-            printD("AlbumPreviewActivity")
-            tv_select_view.isEnabled = true
-            if (albumManagerConfig.showNum) {
-                tv_select_view.text =
-                    albumManagerCollectionInstance.checkedNum(albumData).toString()
-            } else {
-                showSelectedWithTick()
+        if (mDataList.size > 0) {
+            val albumData = mDataList[position]
+            if (albumManagerCollectionInstance.isSelected(albumData)) {
+                printD("AlbumPreviewActivity")
+                tv_select_view.isEnabled = true
+                if (albumManagerConfig.showNum) {
+                    tv_select_view.text =
+                        albumManagerCollectionInstance.checkedNum(albumData).toString()
+                } else {
+                    showSelectedWithTick()
+                }
             }
         }
         val selectionList = albumManagerCollectionInstance.getSelectionData()
@@ -253,9 +254,9 @@ class AlbumPreviewActivity : com.kevin.albummanager.AlbumBaseActivity(), View.On
                         albumManagerCollectionInstance.addSelectedAlbumData(albumData)
                         tv_select_view.isEnabled = true
                         if (albumManagerConfig.showNum) {
-                        tv_select_view.text =
-                            albumManagerCollectionInstance.checkedNum(albumData).toString()
-                        }else{
+                            tv_select_view.text =
+                                albumManagerCollectionInstance.checkedNum(albumData).toString()
+                        } else {
                             showSelectedWithTick()
                         }
                     } else {

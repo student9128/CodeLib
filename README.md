@@ -4,10 +4,9 @@
 目前发布的库：
 ## 手机相册图片视频选择库：<font color=#2196F3 size=16>AlbumManager</font>
 
-[![Generic badge](https://img.shields.io/badge/release-v1.0.3-blue.svg)](https://github.com/student9128/CodeLib)
-[![Generic badge](https://img.shields.io/badge/platform-android-brightgreen.svg)](https://github.com/student9128/CodeLib/releases/tag/V1.0.0)
+[![Generic badge](https://img.shields.io/badge/release-v1.0.4-blue.svg)](https://github.com/student9128/CodeLib)
+[![Generic badge](https://img.shields.io/badge/platform-android-brightgreen.svg)](https://github.com/student9128/CodeLib/releases/tag/v1.0.4)
 
-[![Generic badge](https://img.shields.io/badge/download-39k-brightgreen.svg)](https://github.com/student9128/CodeLib/releases/tag/V1.0.0)
 [![Generic badge](https://img.shields.io/badge/license-Apache_2-green.svg)](https://shields.io/)
 
 <div>
@@ -19,15 +18,11 @@
 ### DownLoad
 ```
 dependencies {
-    implementation 'io.github.student9128:albummanager:1.0.3'
+    implementation 'io.github.student9128:albummanager:1.0.4'
 }
 ```
 ### How to use?
-- 添加权限
-```
-android.permission.READ_EXTERNAL_STORAGE
-android.permission.WRITE_EXTERNAL_STORAGE
-```
+
 - 代码使用
 ```kotlin
    AlbumManager.withContext(this)
@@ -35,7 +30,7 @@ android.permission.WRITE_EXTERNAL_STORAGE
                     .setTheme(AlbumTheme.Red)
                     .showCameraShot(true)
                     .showSelectedWithNum(false)
-                    .maxSelectedNum(3)
+                    .maxSelectedNum(9)
                     .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
 
 

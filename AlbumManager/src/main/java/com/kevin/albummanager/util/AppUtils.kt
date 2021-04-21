@@ -58,7 +58,7 @@ class AppUtils {
                 val packageInfo: PackageInfo? =
                     mContext?.packageManager?.getPackageInfo(
                         packageName,
-                        PackageManager.GET_SIGNATURES
+                        PackageManager.GET_SIGNING_CERTIFICATES
                     )
                 val signs = packageInfo?.signatures
                 val sign: Signature? = signs?.get(0)
