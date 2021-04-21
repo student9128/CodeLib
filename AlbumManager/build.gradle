@@ -60,6 +60,7 @@ dependencies {
     implementation("io.coil-kt:coil-video:1.2.0"){
         exclude group: "org.jetbrains.kotlinx"
     }
+    api 'com.hjq:xxpermissions:9.6'
 }
 apply from: '../publish.gradle'
 

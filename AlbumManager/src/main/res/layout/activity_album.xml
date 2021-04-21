@@ -83,11 +83,11 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             app:blurRadius="100.0"
-            app:updateMode="onScroll"
-            app:useTextureView="false"
             app:blurTextureScale="0.5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:updateMode="onScroll"
             app:useChildAlphaAsMask="false"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:useTextureView="false">
 
             <RelativeLayout
                 android:id="@+id/rlMenu"
@@ -115,10 +115,10 @@
                     android:layout_centerInParent="true"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:visibility="invisible"
                     android:text="原图"
                     android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:visibility="invisible" />
 
                 <TextView
                     android:id="@+id/tv_send"
@@ -128,10 +128,10 @@
                     android:layout_centerVertical="true"
                     android:layout_marginRight="15dp"
                     android:background="@drawable/bg_btn_send"
+                    android:enabled="false"
                     android:paddingHorizontal="15dp"
                     android:paddingVertical="5dp"
                     android:text="发送"
-                    android:enabled="false"
                     android:textColor="@color/white"
                     android:textSize="16sp"
                     android:transitionName="@string/share_album_btn_send" />
@@ -163,5 +163,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="还没有图片" />
+
+        <Button
+            android:id="@+id/btn_get_permission"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="去打开权限"
+            android:visibility="gone" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

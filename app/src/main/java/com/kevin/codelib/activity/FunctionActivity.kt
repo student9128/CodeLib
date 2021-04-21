@@ -24,7 +24,7 @@ import kotlinx.android.synthetic.main.activity_function.*
  * 公众号：前线开发者Kevin
  * Describe:<br/>
  */
-class FunctionActivity : com.kevin.albummanager.BaseActivity() {
+class FunctionActivity : BaseActivity() {
     private val permissionList = arrayListOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE,

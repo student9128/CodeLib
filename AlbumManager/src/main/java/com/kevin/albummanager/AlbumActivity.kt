@@ -1,6 +1,8 @@
 package com.kevin.albummanager
 
+import android.Manifest
 import android.content.ContentValues
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
@@ -12,6 +14,7 @@ import android.provider.MediaStore
 import android.view.View
 import android.view.WindowManager
 import android.widget.PopupWindow
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
@@ -19,6 +22,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blankj.utilcode.util.ToastUtils
+import com.google.android.material.snackbar.Snackbar
+import com.hjq.permissions.OnPermissionCallback
+import com.hjq.permissions.XXPermissions
 import com.kevin.albummanager.adapter.AlbumAdapter
 import com.kevin.albummanager.adapter.AlbumFolderAdapter
 import com.kevin.albummanager.bean.AlbumData
@@ -48,7 +54,8 @@ import kotlin.collections.ArrayList
  *
  * Describe:<br/>
  */
-class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnClickListener {
+class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnClickListener,
+    OnPermissionListener {
 
     var mAllAlbumDataList: ArrayList<AlbumData> = ArrayList<AlbumData>()
     var mOtherAlbumDataList: ArrayList<AlbumData> = ArrayList<AlbumData>()
@@ -72,6 +79,11 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
     val attrArray = intArrayOf(android.R.attr.colorAccent)
     private var fileName = ""
     private var mFilePath = ""
+    private val permissionList = arrayListOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.CAMERA
+    )
 
     override fun getLayoutResID(): Int {
         return R.layout.activity_album
@@ -93,7 +105,47 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
         rvRecyclerView.setHasFixedSize(true)
         rvRecyclerView.itemAnimator = null
         albumLoaderInstance.setParams(this)
+        val checkPermission = checkPermission(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA
+        )
+        setOnPermissionRequestListener(this)
+        if (checkPermission) {
+            showAndInitData()
+        } else {
+            showPermissionTipDialog()
+        }
+    }
 
+    private fun showPermissionTipDialog() {
+        val dialog = AlertDialog.Builder(this).setTitle("权限申请")
+            .setMessage("获取相册数据需要获取相关权限,请允许 :)")
+            .setPositiveButton(
+                "好的"
+            ) { dialog, which ->
+                dialog?.dismiss()
+                requestPermissions()
+            }
+            .setNegativeButton("拒绝") { dialog, which ->
+                dialog?.dismiss()
+                showEmptyNoPermission()
+            }
+            .create()
+        dialog.show()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(
+            AlbumUtils.getThemeColor(
+                albumManagerConfig.theme, this
+            )
+        )
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(
+            AlbumUtils.getThemeColor(
+                albumManagerConfig.theme, this
+            )
+        )
+    }
+
+    private fun initData() {
         loadAlbumJob = coroutineScope.launch {
             mAllAlbumDataList =
                 async(Dispatchers.IO) { albumLoaderInstance.loadAlbumDataX() }.await()
@@ -105,16 +157,16 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
             }
             mAlbumDataAdapter = AlbumAdapter(this@AlbumActivity, mAllAlbumDataList)
             rvRecyclerView.adapter = mAlbumDataAdapter
-//            mAlbumDataAdapter?.refreshData(mAllAlbumDataList)
+            //            mAlbumDataAdapter?.refreshData(mAllAlbumDataList)
             mAlbumDataAdapter?.setOnItemClickListener(this@AlbumActivity)
             if (mAlbumFolderList.size > 0) {
                 showAlbumData()
             } else {
-                showEmpty()
+                showEmpty(false)
+                tvEmpty.text = "还没有数据 :("
             }
 
         }
-        rlMenu.setOnClickListener { }
         tv_preview.setOnClickListener {
             showPreview(
                 AlbumPreviewMethod.SINGLE,
@@ -122,9 +174,7 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                 AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_SELECTED
             )
         }
-        tv_origin.setOnClickListener { }
         tv_send.setOnClickListener(this)
-//        window.navigationBarColor = AppUtils.addAlphaForColor(0.99f,ContextCompat.getColor(this,R.color.colorPrimary))
         blurLayout.viewBehind = rvRecyclerView
     }
 
@@ -239,7 +289,8 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
                         showAlbumData()
                         mAlbumDataAdapter?.refreshData(mAllAlbumDataList)
                     } else {
-                        showEmpty()
+                        showEmpty(false)
+                        tvEmpty.text = "还没有数据 :("
                     }
                 } else {
                     currentSelectedAllAlbum = false
@@ -332,10 +383,14 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
     }
 
 
-    private fun showEmpty() {
+    private fun showEmpty(isShowPermissionButton: Boolean) {
         if (llEmpty.visibility != View.VISIBLE) {
             clContainer.visibility = View.GONE
             llEmpty.visibility = View.VISIBLE
+            btn_get_permission.visibility = if (isShowPermissionButton) View.VISIBLE else View.GONE
+            if (isShowPermissionButton) btn_get_permission.setOnClickListener {
+                XXPermissions.startPermissionActivity(this, permissionList)
+            }
         }
     }
 
@@ -396,8 +451,16 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-//        printD("resultCode=$resultCode,requestCode=$requestCode")
-        if (resultCode == RESULT_OK) {
+        printD("resultCode=$resultCode,requestCode=$requestCode")
+        if (requestCode == XXPermissions.REQUEST_CODE) {
+            val checkPermission = checkPermission(permissionList)
+            printD("checkPermission=$checkPermission")
+            if (checkPermission) {
+                showAndInitData()
+            } else {
+                showEmptyNoPermission()
+            }
+        } else if (resultCode == RESULT_OK) {
             when (requestCode) {
                 AlbumConstant.REQUEST_CODE_ALBUM_PREVIEW_ITEM -> {
                     val selectionData = albumManagerCollectionInstance.getSelectionData()
@@ -446,7 +509,6 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
 
                 AlbumConstant.REQUEST_CODE_ALBUM_CAMERA_SHOT -> {
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-//                        printD("mFilePath=$mFilePath")
                         val file = File(mFilePath)
                         MediaScannerConnection.scanFile(this@AlbumActivity,
                             arrayOf(file.toString()),
@@ -522,5 +584,36 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
         setResult(RESULT_OK, intent)
         finish()
     }
+
+    override fun onPermissionGrated(permissions: ArrayList<String>, all: Boolean) {
+        printD("permissions=onPermissionGrated=$all")
+        if (all) {
+            showAndInitData()
+        } else {
+            if (permissions.contains(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                showAndInitData()
+            } else {
+                showEmptyNoPermission()
+            }
+        }
+    }
+
+    override fun onPermissionDenied(permissions: ArrayList<String>, all: Boolean) {
+        printD("permissions=onPermissionDenied=$all")
+        if (all) {
+            showEmptyNoPermission()
+        }
+    }
+
+    private fun showAndInitData() {
+        showAlbumData()
+        initData()
+    }
+
+    private fun showEmptyNoPermission() {
+        showEmpty(true)
+        tvEmpty.text = "未获得相关权限，无法获取相册数据 :("
+    }
+
 
 }

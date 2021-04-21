@@ -66,29 +66,29 @@ class MainActivity : BaseActivity() {
             startNewActivity(PhoneIMEIActivity::class.java)
         }
         btn_photo.setOnClickListener {
-            XXPermissions.with(this)
-                .permission(permissionList)
-                .request(object : OnPermissionCallback {
-                    override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
+//            XXPermissions.with(this)
+//                .permission(permissionList)
+//                .request(object : OnPermissionCallback {
+//                    override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
                         startNewActivity(PhotoActivity::class.java)
-                    }
-
-                    override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
-//                    if(never){
-//                    XXPermissions.startPermissionActivity(this@PhotoActivity, permissions)
-//                    }else{
-//                        ToastUtils.showShort("授权失败")
 //                    }
-                        val intent = Intent()
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        val packageName: String = packageName
-                        intent.setAction("com.meizu.safe.security.SHOW_APPSEC");
-                        intent.addCategory(Intent.CATEGORY_DEFAULT);
-                        intent.putExtra("packageName", packageName);
-                        startActivity(intent)
-                    }
-
-                })
+//
+//                    override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
+////                    if(never){
+////                    XXPermissions.startPermissionActivity(this@PhotoActivity, permissions)
+////                    }else{
+////                        ToastUtils.showShort("授权失败")
+////                    }
+//                        val intent = Intent()
+//                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+//                        val packageName: String = packageName
+//                        intent.setAction("com.meizu.safe.security.SHOW_APPSEC");
+//                        intent.addCategory(Intent.CATEGORY_DEFAULT);
+//                        intent.putExtra("packageName", packageName);
+//                        startActivity(intent)
+//                    }
+//
+//                })
         }
         btn_camera.setOnClickListener {
             XXPermissions.with(this)

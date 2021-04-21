@@ -1,9 +1,12 @@
 package com.kevin.codelib.activity
 
 
+import android.Manifest
 import android.content.Intent
 import android.view.View
 import com.bumptech.glide.Glide
+import com.hjq.permissions.OnPermissionCallback
+import com.hjq.permissions.XXPermissions
 import com.kevin.albummanager.AlbumManager
 import com.kevin.albummanager.AlbumManagerCollection
 import com.kevin.codelib.R
@@ -22,6 +25,11 @@ import kotlinx.android.synthetic.main.activity_photo.*
  * Describe:<br/>
  */
 class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickListener {
+    private val permissionList = arrayListOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.CAMERA
+    )
 
     override fun getLayoutResID(): Int {
         return R.layout.activity_photo
@@ -42,15 +50,26 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
 //                var intent = Intent(this, AlbumActivity::class.java)
 //                intent.putExtra("type", "all")
 //                startActivity(intent)
-                AlbumManager.withContext(this)
-                    .openAlbum(AlbumConstant.TYPE_ALL)
-                    .setTheme(AlbumTheme.Red)
-                    .showCameraShot(true)
-                    .showSelectedWithNum(false)
-                    .maxSelectedNum(3)
-                    .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
+                XXPermissions.with(this)
+                    .permission(permissionList)
+                    .request(object : OnPermissionCallback {
+                        override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
+                            AlbumManager.withContext(this@PhotoActivity)
+                                .openAlbum(AlbumConstant.TYPE_ALL)
+                                .setTheme(AlbumTheme.Red)
+                                .showCameraShot(true)
+                                .showSelectedWithNum(false)
+                                .maxSelectedNum(3)
+                                .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
+                        }
+
+                        override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
+                            printW("onDenied")
+                        }
+
+                    })
             }
-            R.id.btn_photo2->{
+            R.id.btn_photo2 -> {
                 AlbumManager.withContext(this)
                     .openAlbum()
                     .setTheme(AlbumTheme.Green)

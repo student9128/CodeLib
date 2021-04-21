@@ -96,6 +96,24 @@ object AlbumUtils {
 //            else -> R.style.AppTheme
         }
     }
+    fun getThemeColor(theme:AlbumTheme,context: Context): Int {
+        val color=when(theme){
+            AlbumTheme.Default -> getColor(context, R.color.colorPrimary)
+            AlbumTheme.Red -> getColor(context,R.color.redPrimary)
+            AlbumTheme.Pink -> getColor(context,R.color.pinkPrimary)
+            AlbumTheme.Purple -> getColor(context,R.color.purplePrimary)
+            AlbumTheme.DeepPurple -> getColor(context,R.color.deepPurplePrimary)
+            AlbumTheme.Indigo -> getColor(context,R.color.indigoPrimary)
+            AlbumTheme.LightBlue -> getColor(context,R.color.lightBluePrimary)
+            AlbumTheme.Cyan -> getColor(context,R.color.cyanPrimary)
+            AlbumTheme.Teal -> getColor(context,R.color.tealPrimary)
+            AlbumTheme.Green -> getColor(context,R.color.greenPrimary)
+            AlbumTheme.Amber -> getColor(context,R.color.amberPrimary)
+            AlbumTheme.Orange -> getColor(context,R.color.orangePrimary)
+            AlbumTheme.BlueGrey -> getColor(context,R.color.blueGreyPrimary)
+        }
+        return color
+    }
 
     fun formatCustomFont(context: Context,textView: TextView) {
         val typeFace = Typeface.createFromAsset(context.assets, "font/iconfont.ttf")
