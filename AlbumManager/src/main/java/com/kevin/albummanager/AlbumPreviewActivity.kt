@@ -243,6 +243,10 @@ class AlbumPreviewActivity : com.kevin.albummanager.AlbumBaseActivity(), View.On
                 onBackPressed()
             }
             R.id.ll_select_view -> {
+                printD("mDataList.size=${mDataList.size}")
+                if(mDataList.size>0){
+
+                }
                 val albumData = mDataList[mCurrentPosition]
                 albumManagerCollectionInstance.savePreviewSelectionData(albumData)
                 if (albumManagerCollectionInstance.isSelected(albumData)) {

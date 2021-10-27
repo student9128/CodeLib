@@ -12,6 +12,6 @@ import com.kevin.codelib.util.AppUtils
 class BaseApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-//        AppUtils.initAppUtils(this)
+        AppUtils.initAppUtils(this)
     }
 }

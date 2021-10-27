@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.Settings
 import android.view.View
 import com.blankj.utilcode.util.ToastUtils
@@ -17,8 +18,13 @@ import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.XXPermissions
 import com.kevin.codelib.R
 import com.kevin.codelib.base.BaseActivity
+import com.kevin.codelib.util.DisplayUtils
 import com.kevin.codelib.util.LogUtils
 import kotlinx.android.synthetic.main.activity_main.*
+//import org.apache.poi.hssf.usermodel.HSSFCellStyle
+//import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import java.io.File
+import java.io.FileOutputStream
 import java.lang.reflect.InvocationTargetException
 
 class MainActivity : BaseActivity() {
@@ -70,7 +76,7 @@ class MainActivity : BaseActivity() {
 //                .permission(permissionList)
 //                .request(object : OnPermissionCallback {
 //                    override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
-                        startNewActivity(PhotoActivity::class.java)
+            startNewActivity(PhotoActivity::class.java)
 //                    }
 //
 //                    override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
@@ -165,7 +171,56 @@ class MainActivity : BaseActivity() {
             }
             startActivity(intent)
         }
+        btn_generate_excel.setOnClickListener {
+//            generateExcel()
+        }
     }
+
+//    fun generateExcel() {
+//        val columnString = arrayListOf<String>("A", "B", "C", "D")
+//        try {
+//            val hssfWorkbook = HSSFWorkbook()
+//            val sheet = hssfWorkbook.createSheet()
+//            sheet.setColumnWidth(0, 256*10) // 第一列的宽度为2000
+//            sheet.setColumnWidth(1, 250*30) // 第二列的宽度为3000
+//            for (rowNum in 0..10) {
+//                val createRow = sheet.createRow(rowNum)
+//                for (columnIndex in 0 until columnString.size) {
+//                    if (rowNum == 0) {
+//                        val cell = createRow.createCell(columnIndex)
+//                        cell.setCellValue(columnString[columnIndex])
+//                    } else {
+//                        val cell = createRow.createCell(columnIndex)
+//                        cell.setCellValue("Hello=$columnIndex,rowNum=$rowNum")
+//                    }
+//                }
+//            }
+//            val xx =
+//                getExternalFilesDir(null)?.absolutePath + File.separator + "AAA" + File.separator + "Hello.xls"
+//            val absolutePath = Environment.getStorageDirectory()?.absolutePath
+//            val absolutePath1 = Environment.getRootDirectory()?.absolutePath
+//            val externalStorageDirectory =
+//                Environment.getExternalStorageDirectory()?.absolutePath + File.separator + "AAA" + File.separator + "Hello.xls"
+//            printD("absolutePath=$absolutePath,absolutePath1=$absolutePath1,externalStorageDirectory=$externalStorageDirectory")
+//            printD("xx=$xx")
+//            val file = File(xx)
+//
+//            printD("file.parentFile=${file.parentFile.absolutePath}")
+//            if (!file.parentFile.exists()) {
+//                file.parentFile.mkdirs()
+//            }
+//            printD("file.exists()=${file.exists()}")
+//            if (!file.exists()) {
+//                file.createNewFile()
+//            }
+//            val fileOutputStream = FileOutputStream(file)
+//            hssfWorkbook.write(fileOutputStream)
+//            fileOutputStream.close()
+//        } catch (e: Exception) {
+//
+//        }
+//
+//    }
 
     private fun hasAnyMarketInstalled(context: Context): Boolean {
         val intent = Intent()
@@ -202,6 +257,7 @@ class MainActivity : BaseActivity() {
             false
         }
     }
+
     //判断通知权限是否打开
     private fun isEnableV19(context: Context): Boolean {
         val CHECK_OP_NO_THROW = "checkOpNoThrow"

@@ -67,4 +67,9 @@ dependencies {
     // If you want to additionally use the CameraX Extensions library
 //    implementation "androidx.camera:camera-extensions:1.0.0-alpha21"
     implementation project(':AlbumManager')
+//    implementation group: 'net.sourceforge.jexcelapi', name: 'jxl', version: '2.6.12'
+//    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '3.6'
+//    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.0.0'
+//    implementation group: 'org.apache.poi', name: 'poi', version: '5.0.0'
+
 }
