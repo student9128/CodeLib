@@ -30,6 +30,25 @@
         android:layout_height="30dp"
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="10dp"
+        app:toggleBorderWidth="1.0dp"
+        app:toggleCheckedColor="@color/redPrimary"
+        app:toggleType="rectangle" />
+
+    <com.kevin.codelib.customview.ToggleView
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="10dp"
+        app:toggleBorderWidth="2.0dp"
+        app:toggleShadow="true"
+        app:toggleCheckedColor="@color/orangePrimary"
+        app:toggleType="rectangle" />
+
+    <com.kevin.codelib.customview.ToggleView
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="10dp"
         app:toggleBorderWidth="5.0dp"
         app:toggleChecked="true"
         app:toggleCheckedColor="@color/colorPrimary" />
@@ -50,6 +69,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="10dp"
         app:toggleChecked="true"
+        app:toggleShadow="true"
         app:toggleCheckedColor="@color/orangePrimary"
         app:toggleType="circleWithThinner" />
 
