@@ -13,10 +13,18 @@
     </declare-styleable>
     <declare-styleable name="ToggleView">
         <attr name="toggleColor" format="color" />
-        <attr name="checkedColor" format="color" />
-        <attr name="unCheckedColor" format="color" />
-        <attr name="checked" format="boolean" />
-        <attr name="borderWidth" format="dimension" />
+        <attr name="toggleCheckedColor" format="color" />
+        <attr name="toggleUnCheckedColor" format="color" />
+        <attr name="toggleChecked" format="boolean" />
+        <attr name="toggleBorderWidth" format="dimension" />
+        <attr name="toggleShadow" format="boolean"/>
+        <attr name="toggleType">
+            <enum name="rectangle" value="100"/>
+            <enum name="circle" value="101"/>
+            <enum name="circleWithThin" value="102"/>
+            <enum name="circleWithThinner" value="103"/>
+            <enum name="circleWithThinnest" value="104"/>
+        </attr>
     </declare-styleable>
 
     <declare-styleable name="ReverseProgressBar">
@@ -36,7 +44,7 @@
         <attr name="contentTextSize" format="dimension" />
     </declare-styleable>
     <declare-styleable name="ProgressTextView">
-        <attr name="backgroundTextColor" format="color"/>
-        <attr name="foregroundTextColor" format="color"/>
+        <attr name="backgroundTextColor" format="color" />
+        <attr name="foregroundTextColor" format="color" />
     </declare-styleable>
 </resources>

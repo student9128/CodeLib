@@ -4,7 +4,9 @@ import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
@@ -17,6 +19,7 @@ import androidx.annotation.Nullable;
 
 import com.kevin.codelib.R;
 import com.kevin.codelib.util.DisplayUtils;
+import com.kevin.codelib.util.LogUtils;
 
 /**
  * Created by Kevin on 2020/7/21<br/>
@@ -25,15 +28,22 @@ import com.kevin.codelib.util.DisplayUtils;
  * Describe:<br/>
  */
 public class ToggleView extends View {
+    private static final int rectangle = 100;
+    private static final int circle = 101;
+    private static final int circleWithThin = 102;
+    private static final int circleWithThinner = 103;
+    private static final int circleWithThinnest = 104;
+
     private int mToggleColor,
             mCheckedColor,
             mUnCheckedColor;
     private float mBorderWidth;//使用浮点型，不然mBorderWidth/2回去整数导致绘制效果有差距
     private boolean mChecked;
+    private int mCheckType = circle;
     private final int defaultBackgroundColor = 0xffebebeb,
             defaultToggleColor = 0xffffffff,
             defaultCheckedColor = 0xffff6363;
-    private Paint mPaintBackground, mPaintToggle, mPaintBorder;
+    private Paint mPaintBackground, mPaintToggle, mPaintBorder, mPaintShadow;
     private int mLeft, mTop, mRight, mBottom;
     private float mR;
     private int mDefaultWidth, mDefaultHeight;
@@ -44,6 +54,19 @@ public class ToggleView extends View {
     private int mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom;
     private int mDefaultPadding;
     private RectF rectBackground;
+    private int mRectangleCorner;
+    private boolean mToggleShadow;
+
+    /**
+     * rectangle,//矩形
+     * oval,//椭圆形
+     * ovalWithThin//椭圆形横向比较细
+     */
+    enum ToggleType {
+        rectangle,//矩形
+        circle,//椭圆形
+        circleWithThin//椭圆形横向比较细
+    }
 
     public ToggleView(Context context) {
         this(context, null);
@@ -67,15 +90,18 @@ public class ToggleView extends View {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ToggleView);
         if (typedArray != null) {
             mToggleColor = typedArray.getColor(R.styleable.ToggleView_toggleColor, defaultToggleColor);
-            mBorderWidth = (int) typedArray.getDimension(R.styleable.ToggleView_borderWidth, DisplayUtils.dip2px(context, 2));
-            mCheckedColor = typedArray.getColor(R.styleable.ToggleView_checkedColor, defaultCheckedColor);
-            mUnCheckedColor = typedArray.getColor(R.styleable.ToggleView_unCheckedColor, defaultBackgroundColor);
-            mChecked = typedArray.getBoolean(R.styleable.ToggleView_checked, false);
+            mBorderWidth = (int) typedArray.getDimension(R.styleable.ToggleView_toggleBorderWidth, DisplayUtils.dip2px(context, 2));
+            mCheckedColor = typedArray.getColor(R.styleable.ToggleView_toggleCheckedColor, defaultCheckedColor);
+            mUnCheckedColor = typedArray.getColor(R.styleable.ToggleView_toggleUnCheckedColor, defaultBackgroundColor);
+            mChecked = typedArray.getBoolean(R.styleable.ToggleView_toggleChecked, false);
+            mCheckType = typedArray.getInt(R.styleable.ToggleView_toggleType, circle);
+            mToggleShadow = typedArray.getBoolean(R.styleable.ToggleView_toggleShadow, false);
             typedArray.recycle();
         }
         mDefaultWidth = DisplayUtils.dip2px(getContext(), 50);
         mDefaultHeight = DisplayUtils.dip2px(getContext(), 20);
         mDefaultPadding = DisplayUtils.dip2px(getContext(), 5);
+        mRectangleCorner = DisplayUtils.dip2px(getContext(), 2);
         argbEvaluator = new ArgbEvaluator();
         mAnimator = ValueAnimator.ofFloat(0, 1);
         startAnimation();
@@ -85,6 +111,7 @@ public class ToggleView extends View {
         mPaintBackground = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaintToggle = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPaintBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaintShadow = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
 
     @Override
@@ -151,12 +178,21 @@ public class ToggleView extends View {
         mPaddingBottom = getPaddingBottom();
         mPaddingLeft = Math.max(mPaddingLeft, mDefaultPadding);
         mPaddingTop = Math.max(mPaddingTop, mDefaultPadding);
-        ;
         mPaddingRight = Math.max(mPaddingRight, mDefaultPadding);
-        ;
         mPaddingBottom = Math.max(mPaddingBottom, mDefaultPadding);
-        ;
-        mR = (height - mPaddingTop - mPaddingBottom) / 2;
+        switch (mCheckType) {
+            case rectangle:
+                mR = (height - mPaddingTop - mPaddingBottom) / 2 - mBorderWidth;
+                break;
+            case circle:
+            case circleWithThin:
+            case circleWithThinner:
+            case circleWithThinnest:
+            default:
+                mR = (height - mPaddingTop - mPaddingBottom) / 2;
+                break;
+        }
+        LogUtils.INSTANCE.logD(TAG, "mR===" + mR);
     }
 
     @Override
@@ -165,13 +201,44 @@ public class ToggleView extends View {
         mPaintToggle.setColor(mToggleColor);
         mPaintBorder.setStyle(Paint.Style.STROKE);
         mPaintBorder.setStrokeWidth(mBorderWidth);
+//        mPaintShadow.setColor(Color.parseColor("#7f2196f3"));
+//        mPaintShadow.setStyle(Paint.Style.FILL);
+//        mPaintShadow.setStrokeWidth(2f);
+        LogUtils.INSTANCE.logD(TAG, "mCheckType=" + mCheckType);
+        if (mToggleShadow) {
+            mPaintToggle.setShadowLayer(5f, 3, 3, Color.LTGRAY);
+            setLayerType(LAYER_TYPE_SOFTWARE,null);
+        }
+        switch (mCheckType) {
+            case circleWithThin:
+            case circleWithThinner:
+            case circleWithThinnest:
+                drawCircleWithThin(canvas, mCheckType);
+                break;
+            case rectangle:
+                drawRectangle(canvas);
+                break;
+            case circle:
+            default:
+                drawCircle(canvas);
+                break;
+        }
+//        mPaintBackground.setColor(Color.parseColor("#ff1e56"));
+//        mPaintBackground.setStrokeWidth(1);
+//        canvas.save();
+//        canvas.translate(-left, -top);
+//        canvas.drawLine(513,0,513,500,mPaintBackground);
+//        canvas.drawLine(520.5f,0,520.5f,500,mPaintBackground);
+    }
+
+    private void drawCircle(Canvas canvas) {
         int left = mLeft + mPaddingLeft;
         int top = mTop + mPaddingTop;
         int right = mRight - mPaddingRight;
         int bottom = mBottom - mPaddingBottom;
         rectBackground = new RectF(left, top, right, bottom);
         float cy = top + mR;
-        float cxUnChecked = left + mR;
+        float cxUnChecked = left + mR;//unChecked时候圆形按钮在做成
         float cxChecked = right - mR;
         float moveWidth = getWidth() - mPaddingLeft - mPaddingRight - mR * 2;
         if (mChecked) {
@@ -183,30 +250,116 @@ public class ToggleView extends View {
             canvas.translate(-left, -top);
             canvas.drawRoundRect(rectBackground, mR, mR, mPaintBackground);//Toggle椭圆背景
             canvas.drawCircle(cxUnChecked + fraction * moveWidth, cy, mR - 1, mPaintToggle);//Toggle悬浮圆形
-//            canvas.drawRoundRect(rectBorder, mR - mBorderWidth / 2, mR - mBorderWidth / 2, mPaintBorder);//Toggle悬浮圆形边线，这一个可以不要，修改圆形半径，这样无法修改边线颜色
             canvas.drawCircle(cxUnChecked + fraction * moveWidth, cy, mR - mBorderWidth / 2, mPaintBorder);
             canvas.restore();
         } else {
             int evaluate = (int) argbEvaluator.evaluate(fraction, mCheckedColor, mUnCheckedColor);
             mPaintBackground.setColor(evaluate);
             mPaintBorder.setColor(evaluate);
-//            Log.d(TAG, "x=" + (right - mR * 2 + mBorderWidth / 2 - fraction * moveWidth));
-//            RectF rectBorder = new RectF(right - mR * 2 + mBorderWidth / 2 - fraction * moveWidth, top + mBorderWidth / 2, right - mBorderWidth / 2 - fraction * moveWidth, bottom - mBorderWidth / 2);
             canvas.save();
             canvas.translate(-left, -top);
             canvas.drawRoundRect(rectBackground, mR, mR, mPaintBackground);
             canvas.drawCircle(cxChecked - fraction * moveWidth, cy, mR, mPaintToggle);
-//            Log.d(TAG, "borderWidth=" + mBorderWidth + ",w/2=" + mBorderWidth / 2);
-//            Log.d(TAG, "cx---left=" + (cxChecked - fraction * moveWidth - mR + mBorderWidth / 2));
             canvas.drawCircle(cxChecked - fraction * moveWidth, cy, mR - mBorderWidth / 2, mPaintBorder);
             canvas.restore();
         }
-//        mPaintBackground.setColor(Color.parseColor("#ff1e56"));
-//        mPaintBackground.setStrokeWidth(1);
-//        canvas.save();
-//        canvas.translate(-left, -top);
-//        canvas.drawLine(513,0,513,500,mPaintBackground);
-//        canvas.drawLine(520.5f,0,520.5f,500,mPaintBackground);
+    }
+
+    private void drawCircleWithThin(Canvas canvas, int thinLevel) {
+        // 1/2 1/3
+        int left = mLeft + mPaddingLeft;
+        float top = mTop + mPaddingTop;
+        int right = mRight - mPaddingRight;
+        float bottom = mBottom - mPaddingBottom;
+        float containerTop = 0;
+        float containerBottom = 0;
+        if (thinLevel == circleWithThin) {
+            containerTop = top + mR / 3;
+            containerBottom = bottom - mR / 3;
+        } else if (thinLevel == circleWithThinner) {
+            containerTop = top + mR * 3 / 4;
+            containerBottom = bottom - mR * 3 / 4;
+        } else if (thinLevel == circleWithThinnest) {
+            containerTop = top + mR * 5 / 6;
+            containerBottom = bottom - mR * 5 / 6;
+            LogUtils.INSTANCE.logD(TAG, "containerBottom=" + containerBottom + "," + containerTop);
+        }
+        rectBackground = new RectF(left, containerTop, right, containerBottom);
+        float containerRadius = (containerBottom - containerTop) / 2;
+        LogUtils.INSTANCE.logD(TAG, "containerRadius=" + thinLevel + "," + containerRadius);
+        float cy = top + mR;
+        float cxUnChecked = left + mR;//unChecked时候圆形按钮在做成
+        float cxChecked = right - mR;
+        float moveWidth = getWidth() - mPaddingLeft - mPaddingRight - mR * 2;
+        if (mChecked) {
+            int evaluate = (int) argbEvaluator.evaluate(fraction, mUnCheckedColor, mCheckedColor);
+            mPaintBackground.setColor(evaluate);
+            mPaintBorder.setColor(evaluate);
+//            RectF rectBorder = new RectF(left + mBorderWidth / 2 + fraction * moveWidth, top + mBorderWidth / 2, left + mBorderWidth / 2 + mR * 2 - mBorderWidth + fraction * moveWidth, bottom - mBorderWidth / 2);
+            canvas.save();
+            canvas.translate(-left, -top);
+            canvas.drawRoundRect(rectBackground, containerRadius, containerRadius, mPaintBackground);//Toggle椭圆背景
+            canvas.drawCircle(cxUnChecked + fraction * moveWidth, cy, mR + 1, mPaintToggle);//Toggle悬浮圆形
+//            mPaintShadow.setShadowLayer(5f,3,3,Color.RED);
+//            canvas.drawCircle(cxUnChecked + fraction * moveWidth, cy, mR + 10, mPaintShadow);
+            canvas.restore();
+        } else {
+            int evaluate = (int) argbEvaluator.evaluate(fraction, mCheckedColor, mUnCheckedColor);
+            mPaintBackground.setColor(evaluate);
+            mPaintBorder.setColor(evaluate);
+            canvas.save();
+            canvas.translate(-left, -top);
+            canvas.drawRoundRect(rectBackground, containerRadius, containerRadius, mPaintBackground);
+            canvas.drawCircle(cxChecked - fraction * moveWidth, cy, mR + 1, mPaintToggle);
+//            canvas.drawCircle(cxChecked - fraction * moveWidth, cy, mR + 10, mPaintShadow);
+            canvas.restore();
+        }
+    }
+
+    private void drawRectangle(Canvas canvas) {
+//        setLayerType(LAYER_TYPE_SOFTWARE, null);
+        float containerLeft = mLeft + mPaddingLeft;
+        float containerTop = mTop + mPaddingTop;
+        float containerRight = mRight - mPaddingRight;
+        float containerBottom = mBottom - mPaddingBottom;
+        rectBackground = new RectF(containerLeft, containerTop, containerRight, containerBottom);
+        float left = mLeft + mPaddingLeft + mBorderWidth;
+        float top = mTop + mPaddingTop + mBorderWidth;
+        float right = mRight - mPaddingRight - mBorderWidth;
+        float bottom = mBottom - mPaddingBottom - mBorderWidth;
+        float cy = top + mR;
+        float cxUnChecked = left + mR;//unChecked时候圆形按钮在做成
+        float cxChecked = right - mR;
+        float moveWidth = getWidth() - mPaddingLeft - mPaddingRight - mR * 2 - mBorderWidth * 2;
+        int evaluate;
+        if (mChecked) {
+            evaluate = (int) argbEvaluator.evaluate(fraction, mUnCheckedColor, mCheckedColor);
+            mPaintBackground.setColor(evaluate);
+            mPaintBorder.setColor(evaluate);
+            canvas.save();
+            canvas.translate(-containerLeft, -containerTop);
+            canvas.drawRoundRect(rectBackground, mRectangleCorner, mRectangleCorner, mPaintBackground);//Toggle椭圆背景
+            mPaintToggle.setShadowLayer(5f, 2, 2, Color.GRAY);
+            RectF rectF = new RectF(left + fraction * moveWidth, top, left + fraction * moveWidth + mR * 2, bottom);//方形
+            canvas.drawRoundRect(rectF, mRectangleCorner, mRectangleCorner, mPaintToggle);//方形
+        } else {
+            evaluate = (int) argbEvaluator.evaluate(fraction, mCheckedColor, mUnCheckedColor);
+            mPaintBackground.setColor(evaluate);
+            mPaintBorder.setColor(evaluate);
+//            Log.d(TAG, "x=" + (right - mR * 2 + mBorderWidth / 2 - fraction * moveWidth));
+//            RectF rectBorder = new RectF(right - mR * 2 + mBorderWidth / 2 - fraction * moveWidth, top + mBorderWidth / 2, right - mBorderWidth / 2 - fraction * moveWidth, bottom - mBorderWidth / 2);
+            canvas.save();
+            canvas.translate(-containerLeft, -containerTop);
+            canvas.drawRoundRect(rectBackground, mRectangleCorner, mRectangleCorner, mPaintBackground);
+            mPaintToggle.setShadowLayer(5f, 2, 2, Color.GRAY);
+            RectF rectF = new RectF(right - fraction * moveWidth, top, right - fraction * moveWidth - mR * 2, bottom);//方形
+            canvas.drawRoundRect(rectF, mRectangleCorner, mRectangleCorner, mPaintToggle);//方形
+//            canvas.drawCircle(cxChecked - fraction * moveWidth, cy, mR, mPaintToggle);
+//            Log.d(TAG, "borderWidth=" + mBorderWidth + ",w/2=" + mBorderWidth / 2);
+//            Log.d(TAG, "cx---left=" + (cxChecked - fraction * moveWidth - mR + mBorderWidth / 2));
+//            canvas.drawCircle(cxChecked - fraction * moveWidth, cy, mR - mBorderWidth / 2, mPaintBorder);
+        }
+        canvas.restore();
     }
 
     private void startAnimation() {
