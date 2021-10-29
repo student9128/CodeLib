@@ -40,7 +40,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="10dp"
         app:toggleBorderWidth="2.0dp"
-        app:toggleShadow="true"
+        app:toggleShadow="false"
         app:toggleCheckedColor="@color/orangePrimary"
         app:toggleType="rectangle" />
 
@@ -69,7 +69,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="10dp"
         app:toggleChecked="true"
-        app:toggleShadow="true"
+        app:toggleShadow="false"
         app:toggleCheckedColor="@color/orangePrimary"
         app:toggleType="circleWithThinner" />
 
@@ -88,7 +88,7 @@
         android:layout_marginVertical="10dp"
         app:toggleChecked="true"
         app:toggleCheckedColor="@color/colorAccent"
-        app:toggleShadow="true"
+        app:toggleShadow="false"
         app:toggleType="circleWithThinner" />
 
     <com.kevin.codelib.customview.ToggleView
@@ -98,7 +98,7 @@
         android:layout_marginVertical="10dp"
         app:toggleChecked="true"
         app:toggleCheckedColor="@color/colorPrimary"
-        app:toggleShadow="true"
+        app:toggleShadow="false"
         app:toggleType="circleWithThinnest" />
 
     <com.kevin.codelib.customview.ToggleView
