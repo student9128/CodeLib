@@ -23,7 +23,10 @@
         android:layout_marginVertical="10dp"
         app:toggleBorderWidth="5.0dp"
         app:toggleCheckedColor="@color/colorAccent"
-        app:toggleType="rectangle" />
+        app:toggleCheckedText="开"
+        app:toggleShowText="true"
+        app:toggleType="rectangle"
+        app:toggleUnCheckedText="关" />
 
     <com.kevin.codelib.customview.ToggleView
         android:layout_width="50dp"
@@ -32,7 +35,22 @@
         android:layout_marginVertical="10dp"
         app:toggleBorderWidth="1.0dp"
         app:toggleCheckedColor="@color/redPrimary"
-        app:toggleType="rectangle" />
+        app:toggleCheckedText="开"
+        app:toggleShowText="true"
+        app:toggleType="rectangle"
+        app:toggleUnCheckedText="关" />
+
+    <com.kevin.codelib.customview.ToggleView
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="10dp"
+        app:toggleBorderWidth="1.0dp"
+        app:toggleCheckedColor="@color/colorPrimary"
+        app:toggleCheckedText="日"
+        app:toggleShowText="true"
+        app:toggleType="rectangle"
+        app:toggleUnCheckedText="夜" />
 
     <com.kevin.codelib.customview.ToggleView
         android:layout_width="50dp"
@@ -40,8 +58,9 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="10dp"
         app:toggleBorderWidth="2.0dp"
-        app:toggleShadow="false"
         app:toggleCheckedColor="@color/orangePrimary"
+        app:toggleShadow="false"
+        app:toggleShowText="true"
         app:toggleType="rectangle" />
 
     <com.kevin.codelib.customview.ToggleView
@@ -60,6 +79,7 @@
         android:layout_marginVertical="10dp"
         app:toggleBorderWidth="5.0dp"
         app:toggleChecked="true"
+        app:toggleShowText="true"
         app:toggleCheckedColor="@android:color/holo_red_dark"
         app:toggleType="circleWithThin" />
 
@@ -69,9 +89,25 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="10dp"
         app:toggleChecked="true"
-        app:toggleShadow="false"
         app:toggleCheckedColor="@color/orangePrimary"
-        app:toggleType="circleWithThinner" />
+        app:toggleCheckedText="开"
+        app:toggleShadow="false"
+        app:toggleShowText="true"
+        app:toggleType="circleWithThinner"
+        app:toggleUnCheckedText="关" />
+
+    <com.kevin.codelib.customview.ToggleView
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="10dp"
+        app:toggleChecked="true"
+        app:toggleCheckedColor="@color/colorPrimary"
+        app:toggleCheckedText="日"
+        app:toggleShadow="true"
+        app:toggleShowText="true"
+        app:toggleType="circleWithThinner"
+        app:toggleUnCheckedText="夜" />
 
     <com.kevin.codelib.customview.ToggleView
         android:layout_width="50dp"
@@ -103,11 +139,30 @@
 
     <com.kevin.codelib.customview.ToggleView
         android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="10dp"
+        app:toggleBorderWidth="3dp"
+        app:toggleChecked="true"
+        app:toggleCheckedColor="#21bf73" />
+
+    <com.kevin.codelib.customview.ToggleView
+        android:layout_width="60dp"
         android:layout_height="40dp"
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="10dp"
         app:toggleChecked="true"
         app:toggleCheckedColor="#21bf73" />
+
+    <com.kevin.codelib.customview.ToggleView
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginVertical="10dp"
+        app:toggleChecked="true"
+        app:toggleCheckedColor="@color/redPrimary"
+        app:toggleType="circleWithConcentric"
+        app:toggleUnCheckedColor="@color/gray_2" />
 
     <com.kevin.codelib.customview.MyTextView
         android:layout_width="100dp"

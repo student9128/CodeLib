@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -34,6 +35,7 @@ public class ToggleView extends View {
     private static final int circleWithThin = 102;
     private static final int circleWithThinner = 103;
     private static final int circleWithThinnest = 104;
+    private static final int circleWithConcentric = 105;
 
     private int mToggleColor,
             mCheckedColor,
@@ -57,17 +59,9 @@ public class ToggleView extends View {
     private RectF rectBackground;
     private int mRectangleCorner;
     private boolean mToggleShadow;
-
-    /**
-     * rectangle,//矩形
-     * oval,//椭圆形
-     * ovalWithThin//椭圆形横向比较细
-     */
-    enum ToggleType {
-        rectangle,//矩形
-        circle,//椭圆形
-        circleWithThin//椭圆形横向比较细
-    }
+    private boolean mShowText;
+    private String mCheckedText, mUnCheckedText;
+    private int mCheckedTextColor, mUnCheckedTextColor;
 
     public ToggleView(Context context) {
         this(context, null);
@@ -97,6 +91,11 @@ public class ToggleView extends View {
             mChecked = typedArray.getBoolean(R.styleable.ToggleView_toggleChecked, false);
             mCheckType = typedArray.getInt(R.styleable.ToggleView_toggleType, circle);
             mToggleShadow = typedArray.getBoolean(R.styleable.ToggleView_toggleShadow, false);
+            mShowText = typedArray.getBoolean(R.styleable.ToggleView_toggleShowText, false);
+            mCheckedText = typedArray.getString(R.styleable.ToggleView_toggleCheckedText);
+            mUnCheckedText = typedArray.getString(R.styleable.ToggleView_toggleUnCheckedText);
+            mUnCheckedTextColor = typedArray.getColor(R.styleable.ToggleView_toggleUnCheckedColor, Color.DKGRAY);
+            mCheckedTextColor = typedArray.getColor(R.styleable.ToggleView_toggleUnCheckedColor, mCheckedColor);
             typedArray.recycle();
         }
         mDefaultWidth = DisplayUtils.dip2px(getContext(), 50);
@@ -204,6 +203,7 @@ public class ToggleView extends View {
         mPaintBorder.setStyle(Paint.Style.STROKE);
         mPaintBorder.setStrokeWidth(mBorderWidth);
         mPaintText.setColor(Color.RED);
+        mPaintText.setTextSize(25);
 //        mPaintShadow.setColor(Color.parseColor("#7f2196f3"));
 //        mPaintShadow.setStyle(Paint.Style.FILL);
 //        mPaintShadow.setStrokeWidth(2f);
@@ -217,6 +217,9 @@ public class ToggleView extends View {
             case circleWithThinner:
             case circleWithThinnest:
                 drawCircleWithThin(canvas, mCheckType);
+                break;
+            case circleWithConcentric:
+                drawCircleConcentric(canvas);
                 break;
             case rectangle:
                 drawRectangle(canvas);
@@ -268,6 +271,42 @@ public class ToggleView extends View {
         }
     }
 
+    private void drawCircleConcentric(Canvas canvas) {
+        int left = mLeft + mPaddingLeft;
+        int top = mTop + mPaddingTop;
+        int right = mRight - mPaddingRight;
+        int bottom = mBottom - mPaddingBottom;
+        rectBackground = new RectF(left, top, right, bottom);
+        float cy = top + mR;
+        float cxUnChecked = left + mR;//unChecked时候圆形按钮在做成
+        float cxChecked = right - mR;
+        float moveWidth = getWidth() - mPaddingLeft - mPaddingRight - mR * 2;
+        mPaintBorder.setColor(Color.WHITE);
+        if (mChecked) {
+            int evaluate = (int) argbEvaluator.evaluate(fraction, mUnCheckedColor, mCheckedColor);
+            mPaintBackground.setColor(evaluate);
+            mPaintToggle.setColor(mCheckedColor);
+//            RectF rectBorder = new RectF(left + mBorderWidth / 2 + fraction * moveWidth, top + mBorderWidth / 2, left + mBorderWidth / 2 + mR * 2 - mBorderWidth + fraction * moveWidth, bottom - mBorderWidth / 2);
+            canvas.save();
+            canvas.translate(-left, -top);
+            canvas.drawRoundRect(rectBackground, mR, mR, mPaintBackground);//Toggle椭圆背景
+            canvas.drawCircle(cxUnChecked + fraction * moveWidth, cy, mR - 1, mPaintToggle);//Toggle悬浮圆形
+            canvas.drawCircle(cxUnChecked + fraction * moveWidth, cy, mR - mBorderWidth, mPaintBorder);
+            canvas.restore();
+        } else {
+            int evaluate = (int) argbEvaluator.evaluate(fraction, mCheckedColor, mUnCheckedColor);
+            mPaintBackground.setColor(evaluate);
+//            mPaintBorder.setColor(evaluate);
+            mPaintToggle.setColor(mUnCheckedColor);
+            canvas.save();
+            canvas.translate(-left, -top);
+            canvas.drawRoundRect(rectBackground, mR, mR, mPaintBackground);
+            canvas.drawCircle(cxChecked - fraction * moveWidth, cy, mR, mPaintToggle);
+            canvas.drawCircle(cxChecked - fraction * moveWidth, cy, mR - mBorderWidth, mPaintBorder);
+            canvas.restore();
+        }
+    }
+
     private void drawCircleWithThin(Canvas canvas, int thinLevel) {
         // 1/2 1/3
         int left = mLeft + mPaddingLeft;
@@ -296,31 +335,56 @@ public class ToggleView extends View {
         float moveWidth = getWidth() - mPaddingLeft - mPaddingRight - mR * 2;
         if (mChecked) {
             int evaluate = (int) argbEvaluator.evaluate(fraction, mUnCheckedColor, mCheckedColor);
+            int textEvaluate = (int) argbEvaluator.evaluate(fraction, Color.DKGRAY, mCheckedColor);
+            mPaintText.setColor(textEvaluate);
             mPaintBackground.setColor(evaluate);
             mPaintBorder.setColor(evaluate);
-//            RectF rectBorder = new RectF(left + mBorderWidth / 2 + fraction * moveWidth, top + mBorderWidth / 2, left + mBorderWidth / 2 + mR * 2 - mBorderWidth + fraction * moveWidth, bottom - mBorderWidth / 2);
             canvas.save();
             canvas.translate(-left, -top);
             canvas.drawRoundRect(rectBackground, containerRadius, containerRadius, mPaintBackground);//Toggle椭圆背景
             canvas.drawCircle(cxUnChecked + fraction * moveWidth, cy, mR + 1, mPaintToggle);//Toggle悬浮圆形
-//            mPaintShadow.setShadowLayer(5f,3,3,Color.RED);
-//            canvas.drawCircle(cxUnChecked + fraction * moveWidth, cy, mR + 10, mPaintShadow);
+            Rect bounds = new Rect();
+            if (mShowText) {
+                mPaintText.setColor(mCheckedTextColor);
+                if (TextUtils.isEmpty(mCheckedText)) {
+                    mPaintText.getTextBounds("ON", 0, 2, bounds);
+                    float textLeft = cxUnChecked + fraction * moveWidth - bounds.width() / 2;
+                    canvas.drawText("ON", mToggleShadow ? textLeft - 3 : textLeft, cy + bounds.height() / 2, mPaintText);
+                } else {
+                    mPaintText.getTextBounds(mCheckedText, 0, mCheckedText.length(), bounds);
+                    float textLeft = cxUnChecked + fraction * moveWidth - bounds.width() / 2;
+                    canvas.drawText(mCheckedText, mToggleShadow ? textLeft - 3 : textLeft, cy + bounds.height() / 2, mPaintText);
+                }
+            }
             canvas.restore();
         } else {
             int evaluate = (int) argbEvaluator.evaluate(fraction, mCheckedColor, mUnCheckedColor);
+            int textEvaluate = (int) argbEvaluator.evaluate(fraction, mCheckedColor, Color.DKGRAY);
+            mPaintText.setColor(textEvaluate);
             mPaintBackground.setColor(evaluate);
             mPaintBorder.setColor(evaluate);
             canvas.save();
             canvas.translate(-left, -top);
             canvas.drawRoundRect(rectBackground, containerRadius, containerRadius, mPaintBackground);
             canvas.drawCircle(cxChecked - fraction * moveWidth, cy, mR + 1, mPaintToggle);
-//            canvas.drawCircle(cxChecked - fraction * moveWidth, cy, mR + 10, mPaintShadow);
+            Rect bounds = new Rect();
+            if (mShowText) {
+                mPaintText.setColor(mUnCheckedTextColor);
+                if (TextUtils.isEmpty(mUnCheckedText)) {
+                    mPaintText.getTextBounds("OFF", 0, 3, bounds);
+                    float textLeft = cxChecked - fraction * moveWidth - bounds.width() / 2;
+                    canvas.drawText("OFF", mToggleShadow ? textLeft - 3 : textLeft, cy + bounds.height() / 2, mPaintText);
+                } else {
+                    mPaintText.getTextBounds(mUnCheckedText, 0, mUnCheckedText.length(), bounds);
+                    float textLeft = cxChecked - fraction * moveWidth - bounds.width() / 2;
+                    canvas.drawText(mUnCheckedText, mToggleShadow ? textLeft - 3 : textLeft, cy + bounds.height() / 2, mPaintText);
+                }
+            }
             canvas.restore();
         }
     }
 
     private void drawRectangle(Canvas canvas) {
-//        setLayerType(LAYER_TYPE_SOFTWARE, null);
         float containerLeft = mLeft + mPaddingLeft;
         float containerTop = mTop + mPaddingTop;
         float containerRight = mRight - mPaddingRight;
@@ -335,18 +399,9 @@ public class ToggleView extends View {
         float cxChecked = right - mR;
         float moveWidth = getWidth() - mPaddingLeft - mPaddingRight - mR * 2 - mBorderWidth * 2;
         float centerY = (top + bottom) / 2;
-        mPaintText.setTextSize(25);
-        Rect bounds = new Rect();
-        mPaintText.getTextBounds("ON", 0, 2, bounds);
-//                canvas.drawText("On", left + getWidth() / 2 - bounds.width() / 2, centerY - (bounds.top + bounds.bottom) / 2, mPaintText);
-        float textLeft = containerLeft + (containerRight - containerLeft) / 4 - bounds.width() / 2;
-
-        RectF rectF1 = new RectF(containerLeft, containerTop, containerLeft + (containerRight - containerLeft) / 2, containerBottom);
-        Rect boundR = new Rect();
-        mPaintText.getTextBounds("OFF", 0, 3, boundR);
-//                canvas.drawText("On", left + getWidth() / 2 - bounds.width() / 2, centerY - (bounds.top + bounds.bottom) / 2, mPaintText);
-//        mPaintText.setColor(Color.YELLOW);
-        float textLRight = containerRight - (containerRight - containerLeft) / 4 - boundR.width() / 2;
+//        Rect bounds = new Rect();
+//        mPaintText.getTextBounds("ON", 0, 2, bounds);
+//        float textLeft = containerLeft + (containerRight - containerLeft) / 4 - bounds.width() / 2;
         int evaluate;
         if (mChecked) {
             evaluate = (int) argbEvaluator.evaluate(fraction, mUnCheckedColor, mCheckedColor);
@@ -355,12 +410,20 @@ public class ToggleView extends View {
             canvas.save();
             canvas.translate(-containerLeft, -containerTop);
             canvas.drawRoundRect(rectBackground, mRectangleCorner, mRectangleCorner, mPaintBackground);//Toggle椭圆背景
-            mPaintToggle.setShadowLayer(5f, 2, 2, Color.GRAY);
             RectF rectF = new RectF(left + fraction * moveWidth, top, left + fraction * moveWidth + mR * 2, bottom);//方形
             canvas.drawRoundRect(rectF, mRectangleCorner, mRectangleCorner, mPaintToggle);//方形
-            if (fraction == 1) {
+            if (mShowText && fraction == 1) {
                 mPaintText.setColor(Color.WHITE);
-                canvas.drawText("ON", textLeft, centerY - (bounds.top + bounds.bottom) / 2, mPaintText);
+                Rect bounds = new Rect();
+                if (TextUtils.isEmpty(mCheckedText)) {
+                    mPaintText.getTextBounds("ON", 0, 2, bounds);
+                    float textLeft = containerLeft + (containerRight - containerLeft) / 4 - bounds.width() / 2;
+                    canvas.drawText("ON", textLeft, centerY - (bounds.top + bounds.bottom) / 2, mPaintText);
+                } else {
+                    mPaintText.getTextBounds(mCheckedText, 0, mCheckedText.length(), bounds);
+                    float textLeft = containerLeft + (containerRight - containerLeft) / 4 - bounds.width() / 2;
+                    canvas.drawText(mCheckedText, textLeft, centerY - (bounds.top + bounds.bottom) / 2, mPaintText);
+                }
             }
         } else {
             evaluate = (int) argbEvaluator.evaluate(fraction, mCheckedColor, mUnCheckedColor);
@@ -371,12 +434,20 @@ public class ToggleView extends View {
             canvas.save();
             canvas.translate(-containerLeft, -containerTop);
             canvas.drawRoundRect(rectBackground, mRectangleCorner, mRectangleCorner, mPaintBackground);
-            mPaintToggle.setShadowLayer(5f, 2, 2, Color.GRAY);
             RectF rectF = new RectF(right - fraction * moveWidth, top, right - fraction * moveWidth - mR * 2, bottom);//方形
             canvas.drawRoundRect(rectF, mRectangleCorner, mRectangleCorner, mPaintToggle);//方形
-            if (fraction == 1) {
-                mPaintText.setColor(Color.DKGRAY);
-                canvas.drawText("OFF", textLRight, centerY - (bounds.top + bounds.bottom) / 2, mPaintText);
+            if (mShowText && fraction == 1) {
+                mPaintText.setColor(mUnCheckedTextColor);
+                Rect boundR = new Rect();
+                if (TextUtils.isEmpty(mUnCheckedText)) {
+                    mPaintText.getTextBounds("OFF", 0, 3, boundR);
+                    float textLRight = containerRight - (containerRight - containerLeft) / 4 - boundR.width() / 2;
+                    canvas.drawText("OFF", textLRight, centerY - (boundR.top + boundR.bottom) / 2, mPaintText);
+                } else {
+                    mPaintText.getTextBounds(mUnCheckedText, 0, mUnCheckedText.length(), boundR);
+                    float textLRight = containerRight - (containerRight - containerLeft) / 4 - boundR.width() / 2;
+                    canvas.drawText(mUnCheckedText, textLRight, centerY - (boundR.top + boundR.bottom) / 2, mPaintText);
+                }
             }
 //            canvas.drawCircle(cxChecked - fraction * moveWidth, cy, mR, mPaintToggle);
 //            Log.d(TAG, "borderWidth=" + mBorderWidth + ",w/2=" + mBorderWidth / 2);

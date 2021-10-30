@@ -55,5 +55,6 @@
     <color name="blueGreyPrimary">#607d8b</color>
     <color name="blueGreyPrimaryDark">#34515e</color>
     <color name="blueGreyPrimaryAlpha">#8eacbb</color>
+    <color name="gray_2">#aaa</color>
 
 </resources>

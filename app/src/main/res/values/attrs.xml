@@ -17,13 +17,19 @@
         <attr name="toggleUnCheckedColor" format="color" />
         <attr name="toggleChecked" format="boolean" />
         <attr name="toggleBorderWidth" format="dimension" />
-        <attr name="toggleShadow" format="boolean"/>
+        <attr name="toggleShadow" format="boolean" />
+        <attr name="toggleShowText" format="boolean" />
+        <attr name="toggleCheckedText" format="string" />
+        <attr name="toggleUnCheckedText" format="string"/>
+        <attr name="toggleCheckedTextColor" format="color|reference" />
+        <attr name="toggleUnCheckedTextColor" format="color|reference" />
         <attr name="toggleType">
-            <enum name="rectangle" value="100"/>
-            <enum name="circle" value="101"/>
-            <enum name="circleWithThin" value="102"/>
-            <enum name="circleWithThinner" value="103"/>
-            <enum name="circleWithThinnest" value="104"/>
+            <enum name="rectangle" value="100" />
+            <enum name="circle" value="101" />
+            <enum name="circleWithThin" value="102" />
+            <enum name="circleWithThinner" value="103" />
+            <enum name="circleWithThinnest" value="104" />
+            <enum name="circleWithConcentric" value="105" />
         </attr>
     </declare-styleable>
 
