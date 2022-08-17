@@ -10,5 +10,6 @@ data class AppInfo(
     var versionCode:Long=0,
     var firstInstallTime: Long = 0,
     var lastUpdateTime: Long = 0,
-    var isSystemApp:Boolean=false
+    var isSystemApp:Boolean=false,
+    var canLaunchThisApp:Boolean=false
 )
