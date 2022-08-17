@@ -2,13 +2,13 @@ package com.kevin.codelib.activity
 
 import android.animation.Animator
 import com.kevin.codelib.R
-import com.kevin.albummanager.BaseActivity
+import com.kevin.codelib.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_lottie_naimation.*
 
 /**
  * lottie动画的使用
  */
-class AnimationActivity : com.kevin.albummanager.BaseActivity() {
+class AnimationActivity : BaseActivity() {
 
     val pingpang: String = "pingpang.json"
     val xigua: String = "xigua.json"

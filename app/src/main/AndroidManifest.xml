@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.kevin.codelib">
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+<!--            <data android:mimeType="image/png" />-->
+        </intent>
+    </queries>
     <uses-feature android:name="android.hardware.camera.any" />
     <uses-permission android:name="android.permission.CAMERA" />
 
@@ -11,7 +17,11 @@
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+
+
     <uses-sdk tools:overrideLibrary="no.danielzeller.blurbehindlib" />
+
     <application
         android:name=".base.BaseApplication"
         android:allowBackup="true"
@@ -48,6 +58,7 @@
         <activity android:name=".activity.PhotoActivity" />
         <activity android:name=".activity.AnimationActivity" />
         <activity android:name=".activity.CameraActivity"/>
+        <activity android:name=".activity.AppInfoListActivity"/>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="fileProvider"

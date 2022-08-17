@@ -174,6 +174,9 @@ class MainActivity : BaseActivity() {
         btn_generate_excel.setOnClickListener {
 //            generateExcel()
         }
+        btn_get_application_info.setOnClickListener {
+            startNewActivity(AppInfoListActivity::class.java)
+        }
     }
 
 //    fun generateExcel() {

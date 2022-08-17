@@ -20,7 +20,7 @@ import kotlin.math.roundToInt
 /**
  * Created by Kevin on 2020/9/6<br/>
  * Blog:http://student9128.top/
- * 公众号：前线开发者Kevin
+ * 公众号：炽热的孤独心
  * Describe:<br/>
  */
 class AppUtils {
