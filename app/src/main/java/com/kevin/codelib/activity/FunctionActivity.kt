@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.activity_function.*
 /**
  * Created by Kevin on 2020/11/12<br/>
  * Blog:http://student9128.top/
- * 公众号：炽热的孤独心
+ * 公众号：零點壹度ideality
  * Describe:<br/>
  */
 class FunctionActivity : BaseActivity() {

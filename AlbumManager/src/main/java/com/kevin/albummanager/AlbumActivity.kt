@@ -50,7 +50,7 @@ import kotlin.collections.ArrayList
  *
  * Blog:http://student9128.top/
  *
- * 公众号：炽热的孤独心
+ * 公众号：零點壹度ideality
  *
  * Describe:<br/>
  */
@@ -175,7 +175,6 @@ class AlbumActivity : AlbumBaseActivity(), OnRecyclerItemClickListener, View.OnC
             )
         }
         tv_send.setOnClickListener(this)
-        blurLayout.viewBehind = rvRecyclerView
     }
 
     private fun showPreview(

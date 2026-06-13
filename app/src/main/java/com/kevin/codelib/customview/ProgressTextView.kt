@@ -7,7 +7,7 @@ import androidx.appcompat.widget.AppCompatTextView
 /**
  * Created by Kevin on 2020/11/13<br></br>
  * Blog:http://student9128.top/
- * 公众号：炽热的孤独心
+ * 公众号：零點壹度ideality
  * Describe:<br></br>
  */
 class ProgressTextView @JvmOverloads constructor(

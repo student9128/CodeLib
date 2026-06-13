@@ -5,7 +5,7 @@ import android.util.Log
 /**
  * Created by Kevin on 2020/9/6<br/>
  * Blog:http://student9128.top/
- * 公众号：炽热的孤独心
+ * 公众号：零點壹度ideality
  * Describe:<br/>
  */
 object LogUtils {

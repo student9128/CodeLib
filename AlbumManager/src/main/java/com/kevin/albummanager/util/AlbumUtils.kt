@@ -14,7 +14,7 @@ import com.kevin.albummanager.constant.AlbumTheme
  *
  * Blog:http://student9128.top/
  *
- * 公众号：炽热的孤独心
+ * 公众号：零點壹度ideality
  *
  * Describe:<br/>
  */

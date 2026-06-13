@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.activity_phone_imei.*
 /**
  * Created by Kevin on 2021/1/8<br></br>
  * Blog:http://student9128.top/
- * 公众号：炽热的孤独心
+ * 公众号：零點壹度ideality
  * Describe:<br></br>
  */
 class PhoneIMEIActivity : com.kevin.albummanager.BaseActivity() {

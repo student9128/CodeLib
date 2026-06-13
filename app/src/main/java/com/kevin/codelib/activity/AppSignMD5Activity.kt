@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.activity_app_sign_md5.*
 /**
  * Created by Kevin on 2021/1/4<br/>
  * Blog:http://student9128.top/
- * 公众号：炽热的孤独心
+ * 公众号：零點壹度ideality
  * Describe:<br/>
  */
 class AppSignMD5Activity : com.kevin.albummanager.BaseActivity() {

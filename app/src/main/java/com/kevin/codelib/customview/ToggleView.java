@@ -26,7 +26,7 @@ import com.kevin.codelib.util.LogUtils;
 /**
  * Created by Kevin on 2020/7/21<br/>
  * Blog:http://student9128.top/
- * 公众号：炽热的孤独心
+ * 公众号：零點壹度ideality
  * Describe:<br/>
  */
 public class ToggleView extends View {

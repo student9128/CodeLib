@@ -11,8 +11,6 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 1
-        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -34,6 +32,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.kevin.albummanager'
 }
 
 dependencies {
@@ -51,11 +50,10 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.4.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.4.0'
     implementation 'it.sephiroth.android.library.imagezoom:library:1.0.4'
-    implementation 'no.danielzeller.blurbehindlib:blurbehindlib:1.0.0'
-    implementation 'top.zibin:Luban:1.1.8'
+    implementation 'com.github.Curzibn:Luban:1.1.8'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2'
-    implementation 'com.blankj:utilcodex:1.26.0'
+    implementation 'com.blankj:utilcodex:1.31.1'
     implementation("io.coil-kt:coil:1.2.0"){
         exclude group: "org.jetbrains.kotlinx"
     }
@@ -63,7 +61,7 @@ dependencies {
     implementation("io.coil-kt:coil-video:1.2.0"){
         exclude group: "org.jetbrains.kotlinx"
     }
-    api 'com.hjq:xxpermissions:9.6'
+    api 'com.github.getActivity:XXPermissions:9.6'
 }
 //apply from: '../publish.gradle'
 

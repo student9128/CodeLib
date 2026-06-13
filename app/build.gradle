@@ -27,6 +27,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    namespace 'com.kevin.codelib'
 
 }
 
@@ -41,8 +42,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    implementation 'com.google.android:flexbox:2.0.1'
-    implementation 'com.blankj:utilcodex:1.26.0'
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
+    implementation 'com.blankj:utilcodex:1.31.1'
     //glide
     implementation 'com.github.bumptech.glide:glide:4.4.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.4.0'
@@ -50,9 +51,8 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2'
 
-    api 'com.hjq:xxpermissions:9.6'
+    api 'com.github.getActivity:XXPermissions:9.6'
     implementation 'it.sephiroth.android.library.imagezoom:library:1.0.4'
-    implementation 'no.danielzeller.blurbehindlib:blurbehindlib:1.0.0'
     implementation 'com.airbnb.android:lottie:3.0.0'
 
     // CameraX core library using the camera2 implementation
