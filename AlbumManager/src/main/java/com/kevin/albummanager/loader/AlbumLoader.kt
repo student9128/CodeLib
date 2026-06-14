@@ -1,12 +1,11 @@
 package com.kevin.albummanager.loader
 
-import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Size
+import android.util.Log
 import com.kevin.albummanager.bean.AlbumData
 import com.kevin.albummanager.bean.AlbumFolder
 import com.kevin.albummanager.constant.AlbumConstant
@@ -98,14 +97,13 @@ class AlbumLoader {
                     val id = data.getLong(
                         data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[0])
                     )
-                    val path =
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) getRealPathAndroidQ(
-                            id
-                        ) else data.getString(
-                            data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[1])
-                        )
                     var picType =
                         it.getString(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[2]))
+                    val uriString = albumContentUri(id, picType).toString()
+                    val path =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) uriString else data.getString(
+                            data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[1])
+                        )
                     var width =
                         it.getInt(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[3]))
                     var height =
@@ -115,73 +113,23 @@ class AlbumLoader {
                         duration =
                             data.getLong(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[5]))
                     }
-                    val displayName =
-                        it.getString(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[6]))
                     val size =
                         it.getLong(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[8]))
-//                    LogUtils.logD("AlbumLoader", "width=$width,height=$height,path=$path,size=$size")
-                    AlbumUtils.parseTime(duration)
-                    var albumData = AlbumData()
-                    albumData.id = id
-                    albumData.path = path
-                    albumData.width = width
-                    albumData.height = height
-                    albumData.mimeType = picType
-                    albumData.duration = duration
-                    albumData.size = size
-                    loadVideoThumbnail(id, width, height, albumData,picType)
-                    dataList.add(albumData)
+
+                    dataList.add(AlbumData(
+                        id = id,
+                        path = path,
+                        width = width,
+                        height = height,
+                        mimeType = picType,
+                        duration = duration,
+                        size = size,
+                        uriString = uriString
+                    ))
                 } while (it.moveToNext())
             }
         }
         return dataList
-    }
-
-    private fun loadVideoThumbnail(
-        id: Long,
-        width: Int,
-        height: Int,
-        albumData: AlbumData,
-        mimeType: String
-    ) {
-        if (AlbumUtils.isVideo(mimeType)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val withAppendedPath = Uri.withAppendedPath(
-                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                    id.toString()
-                )
-                val thumbnail = mContext?.contentResolver?.loadThumbnail(
-                    withAppendedPath,
-                    Size(
-                        100, 100
-                    ),
-                    null
-                )
-    //                            val cover = mContext?.contentResolver?.loadThumbnail(
-    //                                withAppendedPath,
-    //                                Size( 500,500),
-    //                                null
-    //                            )
-                LogUtils.logD("AlbumLoader", "width=$width,height=$height")
-                albumData.videoCoverThumbnail = thumbnail
-    //                            albumData.videoCover = cover
-            } else {
-                val thumbnail = MediaStore.Video.Thumbnails.getThumbnail(
-                    mContext?.contentResolver,
-                    id,
-                    MediaStore.Video.Thumbnails.MINI_KIND,
-                    null
-                )
-                val cover = MediaStore.Video.Thumbnails.getThumbnail(
-                    mContext?.contentResolver,
-                    id,
-                    MediaStore.Video.Thumbnails.MINI_KIND,
-                    null
-                )
-                albumData.videoCoverThumbnail = thumbnail
-    //                            albumData.videoCover = cover
-            }
-        }
     }
 
     fun loadFolderX(): ArrayList<AlbumFolder> {
@@ -190,56 +138,9 @@ class AlbumLoader {
             AlbumConstant.QUERY_URI,
             AlbumConstant.PROJECTION_DISPLAY_NAME_Q,
             SELECTION_FOR_FOLDER,
-//
             SELECTION_ARGS,
             AlbumConstant.ORDER_BY
         )
-//        if (AppUtils.beforeAndroidQ()) {
-//            data?.let {
-//                var count = it.count
-//                printD("count1=$count")
-//
-//                if (count > 0) {
-//                    it.moveToFirst()
-//                    do {
-//                        val id = data.getLong(
-//                            data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[0])
-//                        )
-////                    val path =
-//////                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) getRealPathAndroid_Q(id) else data.getString(
-////                            data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[2])
-//////                        )
-//
-//                        val displayName =
-//                            data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[2]))
-//                        var countX = 0
-//                        if (AppUtils.beforeAndroidQ()) {
-//                            countX = data.getInt(data.getColumnIndexOrThrow("count"))
-//                        }
-//                        val mimeType =
-//                            data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[3]))
-//                        val long = it.getLong(it.getColumnIndex(MediaStore.Files.FileColumns._ID))
-//                        val string =
-//                            it.getString(it.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE))
-//                        if (string.startsWith("image")) {
-//                            var contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-//                            val withAppendedId = ContentUris.withAppendedId(contentUri, id)
-////                        printD("long=$long,string=$string,withAppendedId=$withAppendedId")
-//                        } else if (string.startsWith("video")) {
-//                            var contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-//
-//                        } else {
-//                            var contentUri = MediaStore.Files.getContentUri("external")
-//
-//                        }
-//
-//                        printD("id=$id,displayName=$displayName,count=$countX,mimeType=$mimeType")
-//
-//
-//                    } while (it.moveToNext())
-//                }
-//            }
-//        } else {
         data?.let {
             var count = it.count
             var countMap: MutableMap<Long, Long> = HashMap()
@@ -256,6 +157,7 @@ class AlbumLoader {
                 }
                 countMap[bucketId] = countL
             }
+            Log.d("AlbumLoader", "loadFolderX: count=$count")
             if (count > 0) {
                 it.moveToFirst()
                 val allAlbumCover = getUri(it)
@@ -277,29 +179,27 @@ class AlbumLoader {
                     val withAppendedId = getUri(it)
                     val l = countMap[bucketId]
                     bucketIdSet.add(bucketId)
-                    var albumFolder = AlbumFolder()
-                    albumFolder.bucketId = bucketId
-                    albumFolder.id = id
-                    albumFolder.count = l ?: 0
-                    albumFolder.coverUri = withAppendedId
-                    albumFolder.displayName = displayName
-                    albumFolder.mimeType = mimeType
-                    albumFolder.checked = false
-                    dataList.add(albumFolder)
+                    dataList.add(AlbumFolder(
+                        id = id,
+                        mimeType = mimeType,
+                        displayName = displayName,
+                        bucketId = bucketId,
+                        count = l ?: 0,
+                        coverUriString = withAppendedId.toString(),
+                        checked = false
+                    ))
                 } while (it.moveToNext())
-                var albumFolder = AlbumFolder()
-                albumFolder.bucketId = -1
-                albumFolder.id = -1
-                albumFolder.count = count.toLong()
-                albumFolder.coverUri = allAlbumCover
-                albumFolder.displayName = "全部"
-                albumFolder.mimeType = ""
-                albumFolder.checked = true
-                dataList.add(0, albumFolder)
+                dataList.add(0, AlbumFolder(
+                    id = -1,
+                    displayName = "全部",
+                    bucketId = -1,
+                    count = count.toLong(),
+                    coverUriString = allAlbumCover.toString(),
+                    checked = true
+                ))
             }
-
-//            }
         }
+        Log.d("AlbumLoader", "loadFolderX: $dataList")
         return dataList
     }
 
@@ -320,35 +220,34 @@ class AlbumLoader {
                     val id = data.getLong(
                         data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[0])
                     )
+                    val mimeTypeX =
+                        data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[2]))
+                    val uriString = albumContentUri(id, mimeTypeX).toString()
                     val path =
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) getRealPathAndroidQ(id) else data.getString(
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) uriString else data.getString(
                             data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[1])
                         )
-
-                    val displayName =
-                        data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[6]))
                     var width = it.getInt(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[3]))
                     var height = it.getInt(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[4]))
-                    val mimeType =
-                        data.getString(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[2]))
-//                    printD("id=$id,displayName=$displayName,count=$countX,mimeType=$mimeType")
+                    
                     var duration = 0L
-                    if (AlbumUtils.isVideo(mimeType)) {
+                    if (AlbumUtils.isVideo(mimeTypeX)) {
                         duration =
                             data.getLong(data.getColumnIndexOrThrow(AlbumConstant.PROJECTION[5]))
                     }
                     val size =
                         it.getLong(it.getColumnIndexOrThrow(AlbumConstant.PROJECTION[8]))
-                    var albumData = AlbumData()
-                    albumData.id = id
-                    albumData.path = path
-                    albumData.width = width
-                    albumData.height = height
-                    albumData.mimeType = mimeType
-                    albumData.duration = duration
-                    albumData.size = size
-                    loadVideoThumbnail(id, width, height, albumData,mimeType)
-                    dataList.add(albumData)
+                    
+                    dataList.add(AlbumData(
+                        id = id,
+                        path = path,
+                        width = width,
+                        height = height,
+                        mimeType = mimeTypeX,
+                        duration = duration,
+                        size = size,
+                        uriString = uriString
+                    ))
                 } while (it.moveToNext())
             }
         }
@@ -358,29 +257,11 @@ class AlbumLoader {
     private fun getUri(
         cursor: Cursor
     ): Uri {
-        val string = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE))
+        val string = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.MIME_TYPE))
         val id = cursor.getLong(
             cursor.getColumnIndexOrThrow(AlbumConstant.PROJECTION_DISPLAY_NAME[0])
         )
-        var contentUri: Uri? = null
-        contentUri = when {
-            string.startsWith("image") -> {
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            }
-            string.startsWith("video") -> {
-                MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-            }
-            else -> {
-                MediaStore.Files.getContentUri("external")
-
-            }
-        }
-        return ContentUris.withAppendedId(contentUri, id)
-    }
-
-    private fun getRealPathAndroidQ(id: Long): String? {
-        return AlbumConstant.QUERY_URI.buildUpon()
-            .appendPath(id.toString()).build().toString()
+        return albumContentUri(id, string)
     }
 
     fun getAlbumData(): ArrayList<AlbumData> {

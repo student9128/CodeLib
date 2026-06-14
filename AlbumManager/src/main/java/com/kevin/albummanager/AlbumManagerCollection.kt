@@ -130,15 +130,15 @@ class AlbumManagerCollection {
 
     fun isSelected(album: AlbumData): Boolean {
         if (AlbumUtils.isVideo(album.mimeType)) {
-            for (albumData in mSelectionCollection){
-                if(album.id==albumData.id&&album.path==albumData.path){
+            for (albumData in mSelectionCollection) {
+                if (album.id == albumData.id && album.path == albumData.path) {
                     return true
                 }
             }
         }
 //        LogUtils.logI("AlbumManagerCollection", "albume= $album====${mSelectionCollection?.contains(album)}")
 //        LogUtils.logD("AlbumManagerCollection", "albume=${mSelectionCollection}")
-        return mSelectionCollection?.contains(album)
+        return mSelectionCollection.contains(album)
     }
 
     fun checkedNum(album: AlbumData): Int {
@@ -161,8 +161,8 @@ class AlbumManagerCollection {
     }
 
     fun hasSelectedAlbumData(): Boolean {
-        return mSelectionCollection?.size > 0
+        return mSelectionCollection.size > 0
     }
 
-    fun getSelectedAlbumDataSize(): Int = mSelectionCollection?.size
+    fun getSelectedAlbumDataSize(): Int = mSelectionCollection.size
 }

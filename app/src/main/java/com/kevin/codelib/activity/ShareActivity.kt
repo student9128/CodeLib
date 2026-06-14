@@ -7,12 +7,15 @@ import android.util.Log
 import android.view.View
 import androidx.core.app.ActivityOptionsCompat
 import androidx.recyclerview.widget.GridLayoutManager
-import com.blankj.utilcode.util.PermissionUtils
+import com.hjq.permissions.OnPermissionCallback
+import com.hjq.permissions.XXPermissions
+import com.hjq.permissions.permission.base.IPermission
+import com.kevin.albummanager.util.PermissionUtils
 import com.kevin.codelib.R
 import com.kevin.codelib.adapter.ImageAdapter
 import com.kevin.albummanager.BaseActivity
 import com.kevin.codelib.interfaces.ItemClickLisenter
-import kotlinx.android.synthetic.main.activity_share.*
+import com.kevin.codelib.databinding.ActivityShareBinding
 
 /**
  * 1.在ImageActivity的布局文件的根节点添加属性android:transitionName="@string/share_anim"
@@ -20,15 +23,20 @@ import kotlinx.android.synthetic.main.activity_share.*
  * 3.开启startActivity(intent, option.toBundle())
  */
 class ShareActivity : com.kevin.albummanager.BaseActivity() {
+    private lateinit var binding: ActivityShareBinding
 
     var list: ArrayList<String> = ArrayList()
     var adapter = ImageAdapter(list, this)
-    override fun getLayoutResID(): Int = R.layout.activity_share
+
+    override fun getLayoutView(): View {
+        binding = ActivityShareBinding.inflate(layoutInflater)
+        return binding.root
+    }
 
     override fun initView() {
-        recyclerView.layoutManager = GridLayoutManager(this, 2)
+        binding.recyclerView.layoutManager = GridLayoutManager(this, 2)
 
-        recyclerView.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         adapter.setOnImageClickLisenter(object : ItemClickLisenter {
             override fun onItemClick(position: Int, view: View?) {
@@ -45,19 +53,15 @@ class ShareActivity : com.kevin.albummanager.BaseActivity() {
             }
         })
 
-        PermissionUtils.permission(
-            *arrayOf<kotlin.String?>(
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-        ).callback(
-            object : PermissionUtils.SimpleCallback {
-                override fun onGranted() {
-                    query(contentResolver)
+        XXPermissions.with(this)
+            .permissions(PermissionUtils.getStorageAndCameraPermissions())
+            .request(object : OnPermissionCallback {
+                override fun onResult(grantedList: List<IPermission>, deniedList: List<IPermission>) {
+                    if (deniedList.isEmpty()) {
+                        query(contentResolver)
+                    }
                 }
-
-                override fun onDenied() {}
-            }).request()
+            })
     }
 
 

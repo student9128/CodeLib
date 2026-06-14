@@ -1,10 +1,11 @@
 package com.kevin.codelib.activity
 
+import android.view.View
 import com.kevin.codelib.R
 import com.kevin.albummanager.BaseActivity
 import com.kevin.codelib.activity.customviewshow.RegularHexagonActivity
 import com.kevin.codelib.activity.customviewshow.ToggleViewActivity
-import kotlinx.android.synthetic.main.activity_custom_view.*
+import com.kevin.codelib.databinding.ActivityCustomViewBinding
 
 /**
  * Created by Kevin on 2020/9/7<br/>
@@ -13,16 +14,20 @@ import kotlinx.android.synthetic.main.activity_custom_view.*
  * Describe:<br/>
  */
 class CustomViewActivity : com.kevin.albummanager.BaseActivity() {
-    override fun getLayoutResID(): Int =
-        R.layout.activity_custom_view
+    private lateinit var binding: ActivityCustomViewBinding
+
+    override fun getLayoutView(): View {
+        binding = ActivityCustomViewBinding.inflate(layoutInflater)
+        return binding.root
+    }
 
     override fun initView() {
-        btn_toggle_view.setOnClickListener { startNewActivity(ToggleViewActivity::class.java) }
+        binding.btnToggleView.setOnClickListener { startNewActivity(ToggleViewActivity::class.java) }
 
-        btn_custom_view_regularHexagon.setOnClickListener {
+        binding.btnCustomViewRegularHexagon.setOnClickListener {
             startNewActivity(RegularHexagonActivity::class.java)
         }
-        btnReverseProgress.setOnClickListener {
+        binding.btnReverseProgress.setOnClickListener {
             startNewActivity(RegularHexagonActivity::class.java)
         }
     }

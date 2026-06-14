@@ -5,8 +5,9 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
-import kotlinx.android.synthetic.main.layout_tool_bar.*
 
 /**
  * Created by Kevin on 2020/9/6<br/>
@@ -21,11 +22,19 @@ abstract class BaseActivity : AppBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         doSomethingBeforeOnCreate()
         super.onCreate(savedInstanceState)
-        setContentView(getLayoutResID())
-        setSupportActionBar(toolBar)
-        supportActionBar?.let {
-            it.setDisplayHomeAsUpEnabled(true)
-            it.setHomeButtonEnabled(true)
+        val rootView = getLayoutView()
+        if (rootView != null) {
+            setContentView(rootView)
+        } else {
+            setContentView(getLayoutResID())
+        }
+        val toolBar = findViewById<Toolbar>(R.id.toolBar)
+        if (toolBar != null) {
+            setSupportActionBar(toolBar)
+            supportActionBar?.let {
+                it.setDisplayHomeAsUpEnabled(true)
+                it.setHomeButtonEnabled(true)
+            }
         }
         initView()
     }
@@ -33,7 +42,8 @@ abstract class BaseActivity : AppBaseActivity() {
     open fun doSomethingBeforeOnCreate() {
     }
 
-    abstract fun getLayoutResID(): Int
+    open fun getLayoutResID(): Int = 0
+    open fun getLayoutView(): View? = null
     abstract fun initView()
 
     fun startNewActivity(clazz: Class<*>) {

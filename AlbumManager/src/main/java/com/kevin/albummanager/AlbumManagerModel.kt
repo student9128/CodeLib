@@ -61,7 +61,7 @@ class AlbumManagerModel(
     fun forResult(requestCode: Int) {
         val activity = albumManager.getActivity()
         activity?.let {
-            val intent = Intent(activity, com.kevin.albummanager.AlbumActivity::class.java)
+            val intent = Intent(activity, com.kevin.albummanager.ui.AlbumComposeActivity::class.java)
             val fragment = albumManager.getFragment()
             if (fragment != null) {
                 fragment.startActivityForResult(intent, requestCode)

@@ -8,6 +8,7 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import android.view.View
 import android.webkit.MimeTypeMap
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -15,7 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import com.kevin.codelib.R
 import com.kevin.albummanager.BaseActivity
-import kotlinx.android.synthetic.main.activity_camera.*
+import com.kevin.codelib.databinding.ActivityCameraBinding
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,6 +33,7 @@ import java.util.concurrent.Executors
  * Describe:<br/>
  */
 class CameraActivity : com.kevin.albummanager.BaseActivity() {
+    private lateinit var binding: ActivityCameraBinding
     private lateinit var cameraExecutor: ExecutorService
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     var imageCapture:ImageCapture?=null
@@ -53,14 +55,15 @@ class CameraActivity : com.kevin.albummanager.BaseActivity() {
             )
     }
 
-    override fun getLayoutResID(): Int {
-        return R.layout.activity_camera
+    override fun getLayoutView(): View {
+        binding = ActivityCameraBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun initView() {
         cameraExecutor = Executors.newSingleThreadExecutor()
         startCamera()
-        camera_capture_button.setOnClickListener {
+        binding.cameraCaptureButton.setOnClickListener {
             takePhoto()
         }
     }
@@ -72,10 +75,10 @@ class CameraActivity : com.kevin.albummanager.BaseActivity() {
             val preview = Preview.Builder()
                 .build()
                 .also {
-                    it.setSurfaceProvider(viewFinder.surfaceProvider)
+                    it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
                 }
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-        val rotation = viewFinder.display.rotation
+        val rotation = binding.viewFinder.display.rotation
             imageCapture = ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .setTargetAspectRatio(AspectRatio.RATIO_4_3)
@@ -153,10 +156,10 @@ class CameraActivity : com.kevin.albummanager.BaseActivity() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
                 // Display flash animation to indicate that photo was captured
-                container.postDelayed({
-                    container.foreground = ColorDrawable(Color.WHITE)
-                    container.postDelayed(
-                        { container.foreground = null }, ANIMATION_FAST_MILLIS
+                binding.container.postDelayed({
+                    binding.container.foreground = ColorDrawable(Color.WHITE)
+                    binding.container.postDelayed(
+                        { binding.container.foreground = null }, ANIMATION_FAST_MILLIS
                     )
                 }, ANIMATION_SLOW_MILLIS)
             }

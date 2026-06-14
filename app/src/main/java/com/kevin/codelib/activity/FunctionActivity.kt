@@ -12,10 +12,13 @@ import android.view.View
 import com.blankj.utilcode.util.ToastUtils
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.XXPermissions
+import com.hjq.permissions.permission.PermissionLists
+import com.hjq.permissions.permission.base.IPermission
+import com.kevin.albummanager.util.PermissionUtils
 import com.kevin.codelib.R
 import com.kevin.albummanager.BaseActivity
 import com.kevin.codelib.util.LogUtils
-import kotlinx.android.synthetic.main.activity_function.*
+import com.kevin.codelib.databinding.ActivityFunctionBinding
 
 
 /**
@@ -25,14 +28,13 @@ import kotlinx.android.synthetic.main.activity_function.*
  * Describe:<br/>
  */
 class FunctionActivity : BaseActivity() {
-    private val permissionList = arrayListOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.CAMERA
-    )
+    private lateinit var binding: ActivityFunctionBinding
 
-    override fun getLayoutResID(): Int {
-        return R.layout.activity_function
+    private var permissionList = PermissionUtils.getStorageAndCameraPermissions()
+
+    override fun getLayoutView(): View {
+        binding = ActivityFunctionBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun initView() {
@@ -50,71 +52,43 @@ class FunctionActivity : BaseActivity() {
 //            LogUtils.logD(TAG,"hasAnyMarketInstalled:$hasAnyMarketInstalled")
 
         }
-        btn_go_market.setOnClickListener(function)
-        btn_get_app_sign_md5.setOnClickListener {
+        binding.btnGoMarket.setOnClickListener(function)
+        binding.btnGetAppSignMd5.setOnClickListener {
             startNewActivity(AppSignMD5Activity::class.java)
         }
-        btn_get_imei.setOnClickListener {
+        binding.btnGetImei.setOnClickListener {
             startNewActivity(PhoneIMEIActivity::class.java)
         }
-        btn_photo.setOnClickListener {
+        binding.btnPhoto.setOnClickListener {
             XXPermissions.with(this)
-                .permission(permissionList)
+                .permissions(permissionList)
                 .request(object : OnPermissionCallback {
-                    override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
-                        startNewActivity(PhotoActivity::class.java)
-                    }
-
-                    override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
-//                    if(never){
-//                    XXPermissions.startPermissionActivity(this@PhotoActivity, permissions)
-//                    }else{
-//                        ToastUtils.showShort("授权失败")
-//                    }
-                        val intent = Intent()
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        val packageName: String = packageName
-                        intent.setAction("com.meizu.safe.security.SHOW_APPSEC");
-                        intent.addCategory(Intent.CATEGORY_DEFAULT);
-                        intent.putExtra("packageName", packageName);
-                        startActivity(intent)
+                    override fun onResult(grantedList: List<IPermission>, deniedList: List<IPermission>) {
+                        if (deniedList.isEmpty()) {
+                            startNewActivity(PhotoActivity::class.java)
+                        } else {
+                            val intent = Intent()
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            val packageName: String = packageName
+                            intent.setAction("com.meizu.safe.security.SHOW_APPSEC");
+                            intent.addCategory(Intent.CATEGORY_DEFAULT);
+                            intent.putExtra("packageName", packageName);
+                            startActivity(intent)
+                        }
                     }
 
                 })
         }
-        btn_camera.setOnClickListener {
+        binding.btnCamera.setOnClickListener {
             XXPermissions.with(this)
-                .permission(permissionList)
+                .permissions(permissionList)
                 .request(object : OnPermissionCallback {
-                    override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
-//                        val getImageByCamera = Intent("android.media.action.IMAGE_CAPTURE")
-                        // 图片路径？照相后图片要存储的位置
-                        // 图片路径？照相后图片要存储的位置
-//                        picPath = getPicName()
-//                        // 指定输出路径
-//                        // 指定输出路径
-//                        getImageByCamera.putExtra(
-//                            MediaStore.EXTRA_OUTPUT,
-//                            Uri.fromFile(File(picPath))
-//                        )
-//                        getImageByCamera.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1)
-//                        startActivityForResult(getImageByCamera, 1001)
-                        startNewActivity(CameraActivity::class.java)
-                    }
-
-                    override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
-//                    if(never){
-//                    XXPermissions.startPermissionActivity(this@PhotoActivity, permissions)
-//                    }else{
-                        ToastUtils.showShort("授权失败")
-//                    }
-//                        val intent = Intent()
-//                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                        val packageName: String = packageName
-//                        intent.setAction("com.meizu.safe.security.SHOW_APPSEC");
-//                        intent.addCategory(Intent.CATEGORY_DEFAULT);
-//                        intent.putExtra("packageName", packageName);
-//                        startActivity(intent)
+                    override fun onResult(grantedList: List<IPermission>, deniedList: List<IPermission>) {
+                        if (deniedList.isEmpty()) {
+                            startNewActivity(CameraActivity::class.java)
+                        } else {
+                            ToastUtils.showShort("授权失败")
+                        }
                     }
 
                 })
@@ -161,7 +135,7 @@ class FunctionActivity : BaseActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == XXPermissions.REQUEST_CODE) {
-            if (XXPermissions.isGrantedPermission(this, permissionList)) {
+            if (XXPermissions.isGrantedPermissions(this, permissionList)) {
                 ToastUtils.showShort("获取授权");
             } else {
                 ToastUtils.showShort("没有获取授权");

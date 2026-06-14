@@ -10,138 +10,86 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.provider.Settings
 import android.view.View
 import com.blankj.utilcode.util.ToastUtils
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.XXPermissions
+import com.hjq.permissions.permission.PermissionLists
+import com.hjq.permissions.permission.base.IPermission
+import com.kevin.albummanager.util.PermissionUtils
 import com.kevin.codelib.R
 import com.kevin.codelib.base.BaseActivity
-import com.kevin.codelib.util.DisplayUtils
 import com.kevin.codelib.util.LogUtils
-import kotlinx.android.synthetic.main.activity_main.*
-//import org.apache.poi.hssf.usermodel.HSSFCellStyle
-//import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import java.io.File
-import java.io.FileOutputStream
+import com.kevin.codelib.databinding.ActivityMainBinding
 import java.lang.reflect.InvocationTargetException
 
 class MainActivity : BaseActivity() {
-    private val permissionList = arrayListOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.CAMERA
-    )
+    private lateinit var binding: ActivityMainBinding
 
-    override fun getLayoutResID(): Int = R.layout.activity_main
+    private var permissionList = PermissionUtils.getStorageAndCameraPermissions()
+
+    override fun getLayoutView(): View {
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        return binding.root
+    }
+
+    override fun setupToolbar() {
+        super.setupToolbar()
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(false)
+            it.setHomeButtonEnabled(false)
+        }
+    }
 
     override fun initView() {
-        supportActionBar!!.setDisplayHomeAsUpEnabled(false)
-        btn_custom_view.setOnClickListener {
+        binding.btnCustomView.setOnClickListener {
             startNewActivity(CustomViewActivity::class.java)
         }
-        btn_share_anim.setOnClickListener {
+        binding.btnShareAnim.setOnClickListener {
             startNewActivity(ShareActivity::class.java)
         }
-//        btn_function.setOnClickListener {
-//            startNewActivity(FunctionActivity::class.java)
-//        }
-        btn_animation.setOnClickListener({
+        binding.btnAnimation.setOnClickListener({
             startNewActivity(AnimationActivity::class.java)
         })
         val function: (View) -> Unit = {
-//            var intent = Intent(Intent.ACTION_VIEW)
-//            intent.setData(Uri.parse("market://details?id=" + "com.changqi.yeka_app_2c"))
-//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//            if (intent.resolveActivity(packageManager)!= null) {
-//                startActivity(intent)
-//            }
             LogUtils.logD(TAG, Build.BRAND)
             var x = goToSamsungMarket(this, "com.changqi.yeka_app_2c")
             ToastUtils.showShort("${x}")
             val hasAnyMarketInstalled = hasAnyMarketInstalled(this)
-//            LogUtils.logD(TAG,"hasAnyMarketInstalled:$hasAnyMarketInstalled")
-
         }
-        btn_go_market.setOnClickListener(function)
-        btn_get_app_sign_md5.setOnClickListener {
+        binding.btnGoMarket.setOnClickListener(function)
+        binding.btnGetAppSignMd5.setOnClickListener {
             startNewActivity(AppSignMD5Activity::class.java)
         }
-        btn_get_imei.setOnClickListener {
+        binding.btnGetImei.setOnClickListener {
             startNewActivity(PhoneIMEIActivity::class.java)
         }
-        btn_photo.setOnClickListener {
-//            XXPermissions.with(this)
-//                .permission(permissionList)
-//                .request(object : OnPermissionCallback {
-//                    override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
+        binding.btnPhoto.setOnClickListener {
             startNewActivity(PhotoActivity::class.java)
-//                    }
-//
-//                    override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
-////                    if(never){
-////                    XXPermissions.startPermissionActivity(this@PhotoActivity, permissions)
-////                    }else{
-////                        ToastUtils.showShort("授权失败")
-////                    }
-//                        val intent = Intent()
-//                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                        val packageName: String = packageName
-//                        intent.setAction("com.meizu.safe.security.SHOW_APPSEC");
-//                        intent.addCategory(Intent.CATEGORY_DEFAULT);
-//                        intent.putExtra("packageName", packageName);
-//                        startActivity(intent)
-//                    }
-//
-//                })
         }
-        btn_camera.setOnClickListener {
+        binding.btnCamera.setOnClickListener {
             XXPermissions.with(this)
-                .permission(permissionList)
+                .permissions(permissionList)
                 .request(object : OnPermissionCallback {
-                    override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
-//                        val getImageByCamera = Intent("android.media.action.IMAGE_CAPTURE")
-                        // 图片路径？照相后图片要存储的位置
-                        // 图片路径？照相后图片要存储的位置
-//                        picPath = getPicName()
-//                        // 指定输出路径
-//                        // 指定输出路径
-//                        getImageByCamera.putExtra(
-//                            MediaStore.EXTRA_OUTPUT,
-//                            Uri.fromFile(File(picPath))
-//                        )
-//                        getImageByCamera.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1)
-//                        startActivityForResult(getImageByCamera, 1001)
-                        startNewActivity(CameraActivity::class.java)
+                    override fun onResult(grantedList: List<IPermission>, deniedList: List<IPermission>) {
+                        if (deniedList.isEmpty()) {
+                            startNewActivity(CameraActivity::class.java)
+                        } else {
+                            ToastUtils.showShort("授权失败")
+                        }
                     }
-
-                    override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
-//                    if(never){
-//                    XXPermissions.startPermissionActivity(this@PhotoActivity, permissions)
-//                    }else{
-                        ToastUtils.showShort("授权失败")
-//                    }
-//                        val intent = Intent()
-//                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                        val packageName: String = packageName
-//                        intent.setAction("com.meizu.safe.security.SHOW_APPSEC");
-//                        intent.addCategory(Intent.CATEGORY_DEFAULT);
-//                        intent.putExtra("packageName", packageName);
-//                        startActivity(intent)
-                    }
-
                 })
 
         }
-        btn_go_setting.setOnClickListener {
+        binding.btnGoSetting.setOnClickListener {
             val intent = Intent()
             intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.addCategory(Intent.CATEGORY_DEFAULT)
             intent.setData(Uri.parse("package:" + getPackageName()))
             startActivity(intent)
         }
-        btn_go_notification.setOnClickListener {
+        binding.btnGoNotification.setOnClickListener {
             val intent = Intent()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
@@ -171,59 +119,13 @@ class MainActivity : BaseActivity() {
             }
             startActivity(intent)
         }
-        btn_generate_excel.setOnClickListener {
+        binding.btnGenerateExcel.setOnClickListener {
 //            generateExcel()
         }
-        btn_get_application_info.setOnClickListener {
+        binding.btnGetApplicationInfo.setOnClickListener {
             startNewActivity(AppInfoListActivity::class.java)
         }
     }
-
-//    fun generateExcel() {
-//        val columnString = arrayListOf<String>("A", "B", "C", "D")
-//        try {
-//            val hssfWorkbook = HSSFWorkbook()
-//            val sheet = hssfWorkbook.createSheet()
-//            sheet.setColumnWidth(0, 256*10) // 第一列的宽度为2000
-//            sheet.setColumnWidth(1, 250*30) // 第二列的宽度为3000
-//            for (rowNum in 0..10) {
-//                val createRow = sheet.createRow(rowNum)
-//                for (columnIndex in 0 until columnString.size) {
-//                    if (rowNum == 0) {
-//                        val cell = createRow.createCell(columnIndex)
-//                        cell.setCellValue(columnString[columnIndex])
-//                    } else {
-//                        val cell = createRow.createCell(columnIndex)
-//                        cell.setCellValue("Hello=$columnIndex,rowNum=$rowNum")
-//                    }
-//                }
-//            }
-//            val xx =
-//                getExternalFilesDir(null)?.absolutePath + File.separator + "AAA" + File.separator + "Hello.xls"
-//            val absolutePath = Environment.getStorageDirectory()?.absolutePath
-//            val absolutePath1 = Environment.getRootDirectory()?.absolutePath
-//            val externalStorageDirectory =
-//                Environment.getExternalStorageDirectory()?.absolutePath + File.separator + "AAA" + File.separator + "Hello.xls"
-//            printD("absolutePath=$absolutePath,absolutePath1=$absolutePath1,externalStorageDirectory=$externalStorageDirectory")
-//            printD("xx=$xx")
-//            val file = File(xx)
-//
-//            printD("file.parentFile=${file.parentFile.absolutePath}")
-//            if (!file.parentFile.exists()) {
-//                file.parentFile.mkdirs()
-//            }
-//            printD("file.exists()=${file.exists()}")
-//            if (!file.exists()) {
-//                file.createNewFile()
-//            }
-//            val fileOutputStream = FileOutputStream(file)
-//            hssfWorkbook.write(fileOutputStream)
-//            fileOutputStream.close()
-//        } catch (e: Exception) {
-//
-//        }
-//
-//    }
 
     private fun hasAnyMarketInstalled(context: Context): Boolean {
         val intent = Intent()
@@ -247,7 +149,6 @@ class MainActivity : BaseActivity() {
         packageName: String
     ): Boolean {
         val uri =
-//            Uri.parse("http://www.samsungapps.com/appquery/appDetail.as?appId=$packageName")
             Uri.parse("http://apps.samsung.com/appquery/appDetail.as?appId=" + packageName);
         val intent = Intent(Intent.ACTION_VIEW, uri)
         intent.setPackage("com.sec.android.app.samsungapps")

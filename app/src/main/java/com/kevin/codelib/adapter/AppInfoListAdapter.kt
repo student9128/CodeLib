@@ -11,62 +11,48 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
+import coil.load
 import com.kevin.codelib.R
-import com.kevin.codelib.adapter.AppInfoListAdapter.*
 import com.kevin.codelib.bean.AppInfo
 import com.kevin.codelib.util.LogUtils
-import kotlinx.android.synthetic.main.adapter_item_app_info_list.view.*
+import com.kevin.codelib.databinding.AdapterItemAppInfoListBinding
 import java.text.SimpleDateFormat
+import java.util.Locale
 
 class AppInfoListAdapter(var mContext: Context, var data: MutableList<AppInfo>) :
-    RecyclerView.Adapter<AppInfoListHolder>() {
+    RecyclerView.Adapter<AppInfoListAdapter.AppInfoListHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppInfoListHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.adapter_item_app_info_list, parent, false)
-        return AppInfoListHolder(view)
+        val binding = AdapterItemAppInfoListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return AppInfoListHolder(binding)
     }
 
     override fun onBindViewHolder(holder: AppInfoListHolder, position: Int) {
         with(data[position]) {
-            Glide.with(mContext)
-                .applyDefaultRequestOptions(
-                    RequestOptions().diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                        .skipMemoryCache(true)
-                        .centerCrop()
-                        .dontAnimate()
-                        .dontTransform()
-                        .error(R.drawable.ic_place_holder)
-                        .placeholder(R.drawable.ic_place_holder)
-                ).load(icon)
-                .into(holder.icon)
-            holder.title.text = name
-            holder.describe.text =
+            holder.binding.ivIcon.load(icon) {
+                placeholder(R.drawable.ic_place_holder)
+                error(R.drawable.ic_place_holder)
+                crossfade(false)
+            }
+            holder.binding.tvAppName.text = name
+            holder.binding.tvDescribe.text =
                 "包名：$packageName \n版本名称：$versionName \n版本号：$versionCode \n安装时间：${
                     formatTime(firstInstallTime)
                 } \n最近更新时间：${formatTime(lastUpdateTime)} \n是否系统应用：$isSystemApp"
-//            holder.uninstall.setOnClickListener {
-//                Intent intent = new Intent();
-//                intent.setAction("android.intent.action.DELETE");
-//                intent.addCategory("android.intent.category.DEFAULT");
-//                intent.setData(Uri.parse("package:" + packageName));
-//                startActivityForResult(intent, 0);
-//            }
-                holder.openAppInfo.setOnClickListener {
-                    showAppInfo(packageName)
-                }
+
+            holder.binding.btnOpenInfo.setOnClickListener {
+                showAppInfo(packageName)
+            }
             if (canLaunchThisApp) {
-                holder.launchApp.visibility = View.VISIBLE
-                holder.launchApp.setOnClickListener {
-//                    startMainActivity(mContext, packageName)
+                holder.binding.btnLaunch.visibility = View.VISIBLE
+                holder.binding.btnLaunch.setOnClickListener {
                     var intent = mContext.packageManager.getLaunchIntentForPackage(packageName)
-                    mContext.startActivity(intent)
+                    if (intent != null) {
+                        mContext.startActivity(intent)
+                    }
                 }
             } else {
-                holder.launchApp.visibility = View.GONE
+                holder.binding.btnLaunch.visibility = View.GONE
             }
 
 
@@ -74,7 +60,7 @@ class AppInfoListAdapter(var mContext: Context, var data: MutableList<AppInfo>) 
     }
 
     fun formatTime(time: Long): String {
-        var sdf = SimpleDateFormat("yyyy年MM月dd日")
+        var sdf = SimpleDateFormat("yyyy年MM月dd日", Locale.getDefault())
         return sdf.format(time)
     }
 
@@ -111,12 +97,6 @@ class AppInfoListAdapter(var mContext: Context, var data: MutableList<AppInfo>) 
     }
 
     override fun getItemCount(): Int = data.size
-    class AppInfoListHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var icon = itemView.ivIcon
-        var title = itemView.tvAppName
-        var describe = itemView.tvDescribe
-        var uninstall = itemView.btnUninstall
-        var openAppInfo = itemView.btnOpenInfo
-        var launchApp = itemView.btnLaunch
-    }
+
+    class AppInfoListHolder(val binding: AdapterItemAppInfoListBinding) : RecyclerView.ViewHolder(binding.root)
 }

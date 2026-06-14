@@ -6,14 +6,15 @@ import android.os.Build
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.text.TextUtils
-import android.widget.Button
+import android.view.View
 import com.blankj.utilcode.util.LogUtils
 import com.hjq.permissions.OnPermissionCallback
-import com.hjq.permissions.Permission
 import com.hjq.permissions.XXPermissions
+import com.hjq.permissions.permission.PermissionLists
+import com.hjq.permissions.permission.base.IPermission
 import com.kevin.codelib.R
 import com.kevin.albummanager.BaseActivity
-import kotlinx.android.synthetic.main.activity_phone_imei.*
+import com.kevin.codelib.databinding.ActivityPhoneImeiBinding
 
 /**
  * Created by Kevin on 2021/1/8<br></br>
@@ -22,41 +23,34 @@ import kotlinx.android.synthetic.main.activity_phone_imei.*
  * Describe:<br></br>
  */
 class PhoneIMEIActivity : com.kevin.albummanager.BaseActivity() {
-    override fun getLayoutResID(): Int {
-        return R.layout.activity_phone_imei
+    private lateinit var binding: ActivityPhoneImeiBinding
+
+    override fun getLayoutView(): View {
+        binding = ActivityPhoneImeiBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun initView() {
-        val btn = findViewById<Button>(R.id.btn_get_imei)
-        btn.setOnClickListener {
+        binding.btnGetImei.setOnClickListener {
             XXPermissions.with(this@PhoneIMEIActivity)
-                .permission(Permission.READ_PHONE_STATE)
+                .permission(PermissionLists.getReadPhoneStatePermission())
                 .request(object : OnPermissionCallback {
-                    override fun onGranted(
-                        list: List<String>,
-                        all: Boolean
-                    ) {
-                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                            val imei = getIMEI(this@PhoneIMEIActivity)
-                            tv_imei.text = "IMEI是 $imei"
+                    override fun onResult(grantedList: List<IPermission>, deniedList: List<IPermission>) {
+                        if (deniedList.isEmpty()) {
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                                val imei = getIMEI(this@PhoneIMEIActivity)
+                                binding.tvImei.text = "IMEI是 $imei"
+                            } else {
+                                val string =
+                                    Settings.System.getString(
+                                        this@PhoneIMEIActivity.contentResolver,
+                                        Settings.Secure.ANDROID_ID
+                                    )
+                                binding.tvImei.text = "Android ID替代的imei是 $string"
+                                LogUtils.d("string=$string")
+                            }
                         } else {
-                            val string =
-                                Settings.System.getString(
-                                    this@PhoneIMEIActivity.contentResolver,
-                                    Settings.Secure.ANDROID_ID
-                                )
-                            tv_imei.text = "Android ID替代的imei是 $string"
-                            LogUtils.d("string=$string")
-                        }
-                    }
-
-                    override fun onDenied(
-                        list: List<String>,
-                        never: Boolean
-                    ) {
-                        if (never) {
-                            XXPermissions.startPermissionActivity(this@PhoneIMEIActivity, list)
-                        } else {
+                            XXPermissions.startPermissionActivity(this@PhoneIMEIActivity, deniedList)
                         }
                     }
                 })

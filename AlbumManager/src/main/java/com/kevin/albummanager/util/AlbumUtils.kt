@@ -1,8 +1,11 @@
 package com.kevin.albummanager.util
 
+import android.content.ContentUris
 import android.content.Context
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.net.Uri
+import android.provider.MediaStore
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
@@ -116,6 +119,14 @@ object AlbumUtils {
     fun formatCustomFont(context: Context,textView: TextView) {
         val typeFace = Typeface.createFromAsset(context.assets, "font/iconfont.ttf")
         textView.typeface=typeFace
+    }
+
+    fun albumContentUri(id: Long, mimeType: String): Uri {
+        return if (isVideo(mimeType)) {
+            ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+        } else {
+            ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+        }
     }
 
 }

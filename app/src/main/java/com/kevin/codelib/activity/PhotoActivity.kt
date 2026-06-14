@@ -3,10 +3,14 @@ package com.kevin.codelib.activity
 
 import android.Manifest
 import android.content.Intent
+import android.os.Bundle
 import android.view.View
-import com.bumptech.glide.Glide
+import coil.load
 import com.hjq.permissions.OnPermissionCallback
 import com.hjq.permissions.XXPermissions
+import com.hjq.permissions.permission.PermissionLists
+import com.hjq.permissions.permission.base.IPermission
+import com.kevin.albummanager.util.PermissionUtils
 import com.kevin.albummanager.AlbumManager
 import com.kevin.albummanager.AlbumManagerCollection
 import com.kevin.codelib.R
@@ -14,7 +18,7 @@ import com.kevin.albummanager.constant.AlbumConstant
 import com.kevin.albummanager.constant.AlbumTheme
 import com.kevin.codelib.base.BaseActivity
 import com.kevin.codelib.interfaces.OnRecyclerItemClickListener
-import kotlinx.android.synthetic.main.activity_photo.*
+import com.kevin.codelib.databinding.ActivityPhotoBinding
 
 
 /**
@@ -25,23 +29,22 @@ import kotlinx.android.synthetic.main.activity_photo.*
  * Describe:<br/>
  */
 class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickListener {
-    private val permissionList = arrayListOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.CAMERA
-    )
+    private lateinit var binding: ActivityPhotoBinding
 
-    override fun getLayoutResID(): Int {
-        return R.layout.activity_photo
+    private var permissionList = PermissionUtils.getStorageAndCameraPermissions()
+
+    override fun getLayoutView(): View? {
+        binding = ActivityPhotoBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun initView() {
-        btn_photo.setOnClickListener(this)
-        btn_photo2.setOnClickListener(this)
-        btn_get_gif.setOnClickListener(this)
-        btn_get_image.setOnClickListener(this)
-        btn_get_video.setOnClickListener(this)
-        btn_photo_test.setOnClickListener(this)
+        binding.btnPhoto.setOnClickListener(this)
+        binding.btnPhoto2.setOnClickListener(this)
+        binding.btnGetGif.setOnClickListener(this)
+        binding.btnGetImage.setOnClickListener(this)
+        binding.btnGetVideo.setOnClickListener(this)
+        binding.btnPhotoTest.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
@@ -51,22 +54,21 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
 //                intent.putExtra("type", "all")
 //                startActivity(intent)
                 XXPermissions.with(this)
-                    .permission(permissionList)
+                    .permissions(permissionList)
                     .request(object : OnPermissionCallback {
-                        override fun onGranted(permissions: MutableList<String>?, all: Boolean) {
-                            AlbumManager.withContext(this@PhotoActivity)
-                                .openAlbum(AlbumConstant.TYPE_ALL)
-                                .setTheme(AlbumTheme.Red)
-                                .showCameraShot(true)
-                                .showSelectedWithNum(false)
-                                .maxSelectedNum(3)
-                                .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
+                        override fun onResult(grantedList: List<IPermission>, deniedList: List<IPermission>) {
+                            if (deniedList.isEmpty()) {
+                                AlbumManager.withContext(this@PhotoActivity)
+                                    .openAlbum(AlbumConstant.TYPE_ALL)
+                                    .setTheme(AlbumTheme.Red)
+                                    .showCameraShot(true)
+                                    .showSelectedWithNum(false)
+                                    .maxSelectedNum(3)
+                                    .forResult(AlbumConstant.REQUEST_CODE_ALBUM_RESULT)
+                            } else {
+                                printW("onDenied")
+                            }
                         }
-
-                        override fun onDenied(permissions: MutableList<String>?, never: Boolean) {
-                            printW("onDenied")
-                        }
-
                     })
             }
             R.id.btn_photo2 -> {
@@ -125,10 +127,8 @@ class PhotoActivity : BaseActivity(), OnRecyclerItemClickListener, View.OnClickL
 //                        AlbumManager.getAlbumDataResult(data)
 //                    printD("$albumData")
                     val path = selectionData!![0].path
-                    Glide.with(this)
-                        .load(path)
-                        .into(iv_preview)
-                    tv_preview_path.text = path
+                    binding.ivPreview.load(path)
+                    binding.tvPreviewPath.text = path
                 }
             }
         }

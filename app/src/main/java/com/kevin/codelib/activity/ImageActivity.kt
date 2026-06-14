@@ -1,25 +1,29 @@
 package com.kevin.codelib.activity
 
-import com.bumptech.glide.Glide
+import android.view.View
+import coil.load
 import com.kevin.codelib.R
 import com.kevin.albummanager.BaseActivity
 import com.kevin.codelib.util.AppUtils
-import kotlinx.android.synthetic.main.activity_image.*
+import com.kevin.codelib.databinding.ActivityImageBinding
 import java.io.File
 
 /**
  * 显示图片
  */
 class ImageActivity : com.kevin.albummanager.BaseActivity() {
-    override fun getLayoutResID(): Int {
-        return R.layout.activity_image
+    private lateinit var binding: ActivityImageBinding
+
+    override fun getLayoutView(): View {
+        binding = ActivityImageBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun initView() {
         AppUtils.changeStatusBar(this,android.R.color.black)
         var filePath = intent.getStringExtra("filePath")
         var file: File = File(filePath)
-        Glide.with(this).load(file).into(imageView)
+        binding.imageView.load(file)
 
     }
 

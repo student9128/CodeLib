@@ -4,26 +4,18 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
+import coil.load
 import com.kevin.albummanager.OnRecyclerItemClickListener
 import com.kevin.albummanager.R
 import com.kevin.albummanager.bean.AlbumFolder
-import kotlinx.android.synthetic.main.adapter_album_floder.view.*
 
-/**
- * Created by Kevin on 2021/1/22<br/>
- *
- * Blog:http://student9128.top/
- *
- * 公众号：零點壹度ideality
- *
- * Describe:<br/>
- */
-class AlbumFolderAdapter(var mContext: Context, var data: MutableList<AlbumFolder>) :
+@Deprecated("AlbumManager now uses Compose. This adapter is kept only for binary/source compatibility.")
+class AlbumFolderAdapter(private val context: Context, private var data: MutableList<AlbumFolder>) :
     RecyclerView.Adapter<AlbumFolderAdapter.AlbumFolderHolder>() {
+    private var listener: OnRecyclerItemClickListener? = null
 
     fun refreshData(d: MutableList<AlbumFolder>) {
         data = d
@@ -37,41 +29,31 @@ class AlbumFolderAdapter(var mContext: Context, var data: MutableList<AlbumFolde
     }
 
     override fun onBindViewHolder(holder: AlbumFolderHolder, position: Int) {
-        with(data[position]) {
-            Glide.with(mContext)
-                .applyDefaultRequestOptions(
-                    RequestOptions().diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                        .skipMemoryCache(true)
-                        .centerCrop()
-                        .dontAnimate()
-                        .dontTransform()
-                        .error(R.drawable.ic_image_error)
-                        .placeholder(R.drawable.ic_image_placehodler)
-                )
-                .load(coverUri)
-                .into(holder.coverImage)
-            holder.title.text = displayName
-            holder.count.text = count.toString()
-            holder.thisChecked.visibility = if (checked) View.VISIBLE else View.INVISIBLE
+        val folder = data[position]
+        holder.coverImage.load(folder.coverUri ?: folder.coverUriString) {
+            placeholder(R.drawable.ic_image_placehodler)
+            error(R.drawable.ic_image_error)
+            size(120)
         }
-        holder.container?.setOnClickListener {
+        holder.title.text = folder.displayName
+        holder.count.text = folder.count.toString()
+        holder.checked.visibility = if (folder.checked) View.VISIBLE else View.INVISIBLE
+        holder.container.setOnClickListener {
             listener?.onItemClick(position, it, "albumFolder")
         }
-
     }
 
     override fun getItemCount(): Int = data.size
 
-    class AlbumFolderHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var coverImage = itemView.ivCover!!
-        var title = itemView.tvTitle!!
-        var count = itemView.tvCount!!
-        var thisChecked = itemView.iv_check!!
-        var container = itemView.clContainer!!
-    }
-
-    private var listener: OnRecyclerItemClickListener? = null
     fun setOnFolderItemClickListener(l: OnRecyclerItemClickListener) {
         listener = l
+    }
+
+    class AlbumFolderHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val coverImage: ImageView = view.findViewById(R.id.ivCover)
+        val title: TextView = view.findViewById(R.id.tvTitle)
+        val count: TextView = view.findViewById(R.id.tvCount)
+        val checked: ImageView = view.findViewById(R.id.iv_check)
+        val container: View = view.findViewById(R.id.clContainer)
     }
 }
