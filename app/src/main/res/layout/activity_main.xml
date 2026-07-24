@@ -113,6 +113,12 @@
                     android:text="获取手机中app列表及相关信息" />
             </com.google.android.flexbox.FlexboxLayout>
 
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/compose_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp" />
+
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
